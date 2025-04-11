@@ -64,4 +64,9 @@ Route::get('/admin/kelola_pengiriman', function () {
     return view('admin.kelola_pengiriman');
 })->name('admin.kelola_pengiriman');
 
+Route::get('/admin/history_pengiriman', function () {
+    return view('admin.history_pengiriman');
+})->name('admin.history_pengiriman');
+
+
 
