@@ -29,8 +29,8 @@
                 <th class="px-4 py-2 text-left">Tanggal</th>
                 <th class="px-4 py-2 text-center">Berat (kg)</th>
                 <th class="px-4 py-2 text-center">Harga (Rp)</th>
-                <th class="px-4 py-2 text-left">Metode Pembayaran</th> <!-- Metode Pembayaran setelah Harga -->
-                <th class="px-4 py-2 text-left">Kurir</th> <!-- Kurir setelah Metode Pembayaran -->
+                <th class="px-4 py-2 text-left">Metode Pembayaran</th>
+                <th class="px-4 py-2 text-left">Kurir</th> 
                 <th class="px-4 py-2 text-center">Status Pengiriman</th>
                 <th class="px-4 py-2 text-center">Aksi</th>
             </tr>
@@ -62,8 +62,8 @@
                     <td class="px-4 py-2">{{ $data[7] }}</td>
                     <td class="px-4 py-2 text-center">{{ $data[8] }}</td>
                     <td class="px-4 py-2 text-center">{{ number_format($data[9], 0, ',', '.') }}</td>
-                    <td class="px-4 py-2">{{ $data[5] }}</td> <!-- Metode Pembayaran -->
-                    <td class="px-4 py-2">{{ $data[6] }}</td> <!-- Kurir -->
+                    <td class="px-4 py-2">{{ $data[5] }}</td> 
+                    <td class="px-4 py-2">{{ $data[6] }}</td> 
                     <td class="px-4 py-2 text-center font-semibold text-sm
                         @if ($data[10] === 'menunggu konfirmasi') text-gray-600
                         @elseif ($data[10] === 'sedang dikirim') text-red-600
