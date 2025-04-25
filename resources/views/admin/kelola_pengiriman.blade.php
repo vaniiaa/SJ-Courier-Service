@@ -52,48 +52,58 @@
             @endphp
 
             @foreach ($pengiriman as $index => $data)
-                <tr class="{{ $index % 2 === 0 ? 'bg-white' : 'bg-gray-100' }}">
-                    <td class="px-4 py-2 text-center">{{ $index + 1 }}</td>
-                    <td class="px-4 py-2 text-center">{{ $data[0] }}</td>
-                    <td class="px-4 py-2">{{ $data[1] }}</td>
-                    <td class="px-4 py-2">{{ $data[2] }}</td>
-                    <td class="px-4 py-2">{{ $data[3] }}</td>
-                    <td class="px-4 py-2">{{ $data[4] }}</td>
-                    <td class="px-4 py-2">{{ $data[7] }}</td>
-                    <td class="px-4 py-2 text-center">{{ $data[8] }}</td>
-                    <td class="px-4 py-2 text-center">{{ number_format($data[9], 0, ',', '.') }}</td>
-                    <td class="px-4 py-2">{{ $data[5] }}</td> 
-                    <td class="px-4 py-2">{{ $data[6] }}</td> 
-                    <td class="px-4 py-2 text-center font-semibold text-sm
-                        @if ($data[10] === 'menunggu konfirmasi') text-gray-600
-                        @elseif ($data[10] === 'sedang dikirim') text-red-600
-                        @elseif ($data[10] === 'menuju alamat') text-blue-600
-                        @elseif ($data[10] === 'pesanan diterima') text-green-600
-                        @endif">
-                        {{ ucfirst($data[10]) }}
-                    </td>
-                    <td class="px-4 py-2 text-center">
-                        <div class="flex justify-center gap-2">
-                            @if ($index < 5)
-                                <button class="w-28 bg-red-500 text-white py-1 rounded text-xs hover:bg-red-600 shadow-md shadow-gray-700" onclick="openModal()">Tentukan Kurir</button>
-                            @endif
-                            <button
-                                class="px-3 bg-blue-500 text-white py-1 rounded text-xs hover:bg-blue-600 shadow-md shadow-gray-700  px-4 py-2 "
-                                onclick="showDetailModal(
-                                    '{{ $data[0] }}', '{{ $data[1] }}', '{{ $data[2] }}',
-                                    '{{ $data[3] }}', '{{ $data[4] }}', '{{ $data[5] }}',
-                                    '{{ $data[6] }}', '{{ $data[7] }}', '{{ number_format($data[9], 0, ',', '.') }}',
-                                    '{{ ucfirst($data[10]) }}'
-                                )"
-                            >
-                                Detail
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+            <tr class="{{ $index % 2 === 0 ? 'bg-white' : 'bg-gray-100' }}">
+                <td class="px-4 py-2 text-center">{{ $index + 1 }}</td>
+                <td class="px-4 py-2 text-center">{{ $data[0] }}</td>
+                <td class="px-4 py-2">{{ $data[1] }}</td>
+                <td class="px-4 py-2">{{ $data[2] }}</td>
+                <td class="px-4 py-2">{{ $data[3] }}</td>
+                <td class="px-4 py-2">{{ $data[4] }}</td>
+                <td class="px-4 py-2">{{ $data[7] }}</td>
+                <td class="px-4 py-2 text-center">{{ $data[8] }}</td>
+                <td class="px-4 py-2 text-center">{{ number_format($data[9], 0, ',', '.') }}</td>
+                <td class="px-4 py-2">{{ $data[5] }}</td> 
+                <td class="px-4 py-2">{{ $data[6] }}</td> 
+                <td class="px-4 py-2 text-center font-semibold text-sm
+                @if ($data[10] === 'menunggu konfirmasi') text-gray-600
+                @elseif ($data[10] === 'sedang dikirim') text-red-600
+                @elseif ($data[10] === 'menuju alamat') text-blue-600
+                @elseif ($data[10] === 'pesanan diterima') text-green-600
+                @endif">
+                {{ ucfirst($data[10]) }}
+            </td>
+            <td class="px-4 py-2 text-center">
+                <div class="flex justify-center gap-2">
+                     @if ($index < 5)
+                     <button onclick="printData()" class="w-16 bg-green-500 hover:bg-green-600 text-white py-1 rounded text-xs shadow-md shadow-gray-700 flex justify-center items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V4h12v5M6 14h12v6H6v-6zM6 14H4a2 2 0 01-2-2V9a2 2 0 012-2h16a2 2 0 012 2v3a2 2 0 01-2 2h-2" />
+                        </svg>
+                    </button>
+                    <button class="w-16 bg-red-500 text-white py-1 rounded text-xs hover:bg-red-600 shadow-md shadow-gray-700" onclick="openModal()">Kurir</button>
+                    @elseif ($index >= 5 && $index < 10)
+                    <button onclick="printData()" class="w-16 bg-green-500 hover:bg-green-600 text-white py-1 rounded text-xs shadow-md shadow-gray-700 flex justify-center items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V4h12v5M6 14h12v6H6v-6zM6 14H4a2 2 0 01-2-2V9a2 2 0 012-2h16a2 2 0 012 2v3a2 2 0 01-2 2h-2" />
+                        </svg>
+                    </button>
+                    @endif
+                    <button
+                    class="px-3 bg-blue-500 text-white py-1 rounded text-xs hover:bg-blue-600 shadow-md shadow-gray-700 px-4 py-2"
+                    onclick="showDetailModal(
+                    '{{ $data[0] }}', '{{ $data[1] }}', '{{ $data[2] }}',
+                    '{{ $data[3] }}', '{{ $data[4] }}', '{{ $data[5] }}',
+                    '{{ $data[6] }}', '{{ $data[7] }}', '{{ number_format($data[9], 0, ',', '.') }}',
+                    '{{ ucfirst($data[10]) }}'
+                    )"
+                    > Detail
+                </button>
+            </div>
+        </td>
+    </tr>
+    @endforeach
+</tbody>
+</table>
 </div>
 
         {{-- Pagination --}}
