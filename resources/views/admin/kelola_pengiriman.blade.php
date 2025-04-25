@@ -120,7 +120,7 @@
 <div id="modalDetail" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50 hidden">
     <div class="bg-white p-6 rounded-lg shadow-md shadow-gray-700 w-[1000px]">
         <div class="flex justify-between items-center">
-            <img src="{{ asset('images/admin/logo.jpg') }}" alt="Logo" class="w-16 h-16 object-cover rounded-full">
+            <img src="{{ asset('images/admin/logo2.jpg') }}" alt="Logo" class="w-16 h-16 object-cover rounded-full">
             <h5 class="text-xl font-semibold flex-1 ml-4">Detail Pengiriman</h5>
             <button onclick="closeDetailModal()" class="text-gray-600 hover:text-gray-800">&times;</button>
         </div>
@@ -185,7 +185,7 @@
 {{-- Modal Tentukan Kurir --}}
 <div id="modalTentukanKurir" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50 hidden">
     <div class="bg-white p-6 rounded-lg shadow-md shadow-gray-700 w-[1000px]"> <div class="flex justify-between items-center">
-            <img src="{{ asset('images/admin/logo.jpg') }}" alt="Logo" class="w-16 h-16 object-cover rounded-full">
+            <img src="{{ asset('images/admin/logo2.jpg') }}" alt="Logo" class="w-16 h-16 object-cover rounded-full">
             <h5 class="text-xl font-semibold flex-1 ml-4">Penjadwalan Kurir</h5>
             <button class="text-gray-500 hover:text-gray-700" onclick="closeModal()">&times;</button>
         </div>

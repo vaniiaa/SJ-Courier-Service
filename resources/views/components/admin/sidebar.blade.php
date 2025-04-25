@@ -1,7 +1,7 @@
 <aside id="sidebar" class="flex flex-col justify-between w-64 bg-white shadow border-r fixed top-0 left-0 z-50 transform -translate-x-full transition-transform duration-300" style="height: 100vh;">
     <div>
         <div class="p-4 border-b flex items-center gap-3" style="margin-top: -20px; background: linear-gradient(90deg, #FFA500 100%)">
-            <img src="{{ asset('images/admin/logo.jpg') }}" alt="Logo" class="h-8 w-8 object-contain" />
+            <img src="{{ asset('images/admin/logo1.jpg') }}" alt="Logo" class="h-10 w-10 object-contain" />
             <span class="text-lg font-bold text-black-600" style="margin-top: 10px;">SJ Courier Service</span>
         </div>
 
