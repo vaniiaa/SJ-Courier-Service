@@ -1,0 +1,73 @@
+body {
+    margin: 0;
+}
+
+/* Fixed header */
+#admin-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px; /* tinggi header */
+    z-index: 20;
+    background-color: white;
+    transition: left 0.3s ease-in-out, filter 0.3s ease-in-out;
+}
+
+/* class untuk menggelapkan header */
+#admin-header.darken {
+    filter: brightness(50%);
+}
+
+/* Breadcrumbs positioning */
+#breadcrumbs-container {
+    position: absolute;
+    top: 56px; /* di bawah header */
+    left: 0;
+    right: 0;
+    padding: 8px 16px;
+    background-color: inherit;
+    z-index: 10;
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(0);
+}
+
+/* Responsive breadcrumbs when sidebar is open */
+body.sidebar-open #breadcrumbs-container {
+    transform: translateX(256px);
+}
+
+/* Main content container */
+#main-container {
+    margin-top: -0px; /* Menempatkan konten tepat di bawah breadcrumbs */
+    padding-top: 0;
+    transition: margin-left 0.3s ease-in-out;
+    position: relative;
+    z-index: 15;
+}
+
+/* Adjust main content when sidebar is open */
+body.sidebar-open #main-container {
+    margin-left: 256px;
+}
+
+/* Sidebar styling */
+#sidebar {
+    top: 0;
+    height: 100vh;
+    z-index: 30;
+}
+
+/* Layout adjustments for non-sidebar open */
+body:not(.sidebar-open) #main-container {
+    margin-left: 0;
+}
+
+/* Remove any extra padding in main content */
+main {
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 16px;
+    padding-right: 16px;
+    transition: all 0.3s;
+}

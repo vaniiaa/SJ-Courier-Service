@@ -68,5 +68,8 @@ Route::get('/admin/history_pengiriman', function () {
     return view('admin.history_pengiriman');
 })->name('admin.history_pengiriman');
 
+    Route::get('/admin/dashboard_admin', function () {
+        return view('admin.dashboard_admin');
+    })->name('admin.dashboard_admin');
 
 
