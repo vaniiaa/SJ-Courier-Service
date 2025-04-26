@@ -118,49 +118,50 @@
 
 {{-- Modal Detail --}}
 <div id="modalDetail" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50 hidden">
-    <div class="bg-white p-6 rounded-lg shadow-md shadow-gray-700 w-[1000px]">
+    <div class="bg-white p-4 rounded-lg shadow-md shadow-gray-700 w-[900px] max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center">
-            <img src="{{ asset('images/admin/logo2.jpg') }}" alt="Logo" class="w-16 h-16 object-cover rounded-full">
+            <img src="{{ asset('images/admin/logo2.jpg') }}" alt="Logo" class="w-12 h-12 object-cover rounded-full">
             <h5 class="text-xl font-semibold flex-1 ml-4">Detail Pengiriman</h5>
-            <button onclick="closeDetailModal()" class="text-gray-600 hover:text-gray-800">&times;</button>
+            <button onclick="closeDetailModal()" class="text-gray-600 hover:text-gray-800 text-2xl">&times;</button>
         </div>
         <hr class="my-4 border-gray-300">
+
         <form id="detailForm" class="text-sm space-y-3">
             <div class="flex items-center gap-4">
-                <label for="resiDetail" class="w-32 text-left font-medium text-gray-700 text-sm after:content-[':']">Resi</label>
-                <input type="text" id="resiDetail" name="resi" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" readonly>
+                <label for="resiDetail" class="w-32 text-left font-medium text-gray-700 after:content-[':']">Resi</label>
+                <input type="text" id="resiDetail" name="resi" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500 sm:text-sm" readonly>
             </div>
             <div class="flex items-center gap-4">
-                <label for="pengirimDetail" class="w-32 text-left font-medium text-gray-700 text-sm after:content-[':']">Nama Pengirim</label>
-                <input type="text" id="pengirimDetail" name="pengirim" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <label for="pengirimDetail" class="w-32 text-left font-medium text-gray-700 after:content-[':']">Nama Pengirim</label>
+                <input type="text" id="pengirimDetail" name="pengirim" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
             </div>
             <div class="flex items-center gap-4">
-                <label for="alamatJemputDetail" class="w-32 text-left font-medium text-gray-700 text-sm after:content-[':']">Alamat Penjemputan</label>
-                <textarea id="alamatJemputDetail" name="alamatJemput" rows="2" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+                <label for="alamatJemputDetail" class="w-32 text-left font-medium text-gray-700 after:content-[':']">Alamat Penjemputan</label>
+                <textarea id="alamatJemputDetail" name="alamatJemput" rows="2" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
             </div>
             <div class="flex items-center gap-4">
-                <label for="penerimaDetail" class="w-32 text-left font-medium text-gray-700 text-sm after:content-[':']">Nama Penerima</label>
-                <input type="text" id="penerimaDetail" name="penerima" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <label for="penerimaDetail" class="w-32 text-left font-medium text-gray-700 after:content-[':']">Nama Penerima</label>
+                <input type="text" id="penerimaDetail" name="penerima" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
             </div>
             <div class="flex items-center gap-4">
-                <label for="alamatTujuanDetail" class="w-32 text-left font-medium text-gray-700 text-sm after:content-[':']">Alamat Tujuan</label>
-                <textarea id="alamatTujuanDetail" name="alamatTujuan" rows="2" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+                <label for="alamatTujuanDetail" class="w-32 text-left font-medium text-gray-700 after:content-[':']">Alamat Tujuan</label>
+                <textarea id="alamatTujuanDetail" name="alamatTujuan" rows="2" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
             </div>
             <div class="flex items-center gap-4">
-                <label for="beratDetail" class="w-32 text-left font-medium text-gray-700 text-sm after:content-[':']">Berat (kg)</label>
-                <input type="number" id="beratDetail" name="berat" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <label for="beratDetail" class="w-32 text-left font-medium text-gray-700 after:content-[':']">Berat (kg)</label>
+                <input type="number" id="beratDetail" name="berat" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
             </div>
             <div class="flex items-center gap-4">
-                <label for="hargaDetail" class="w-32 text-left font-medium text-gray-700 text-sm after:content-[':']">Harga (Rp)</label>
-                <input type="text" id="hargaDetail" name="harga" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <label for="hargaDetail" class="w-32 text-left font-medium text-gray-700 after:content-[':']">Harga (Rp)</label>
+                <input type="text" id="hargaDetail" name="harga" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
             </div>
             <div class="flex items-center gap-4">
-                <label for="kurirDetail" class="w-32 text-left font-medium text-gray-700 text-sm after:content-[':']">Kurir</label>
-                <input type="text" id="kurirDetail" name="kurir" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <label for="kurirDetail" class="w-32 text-left font-medium text-gray-700 after:content-[':']">Kurir</label>
+                <input type="text" id="kurirDetail" name="kurir" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
             </div>
             <div class="flex items-center gap-4">
-                <label for="statusDetail" class="w-32 text-left font-medium text-gray-700 text-sm after:content-[':']">Status</label>
-                <select id="statusDetail" name="status" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <label for="statusDetail" class="w-32 text-left font-medium text-gray-700 after:content-[':']">Status</label>
+                <select id="statusDetail" name="status" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                     <option value="menunggu konfirmasi">Menunggu Konfirmasi</option>
                     <option value="sedang dikirim">Sedang Dikirim</option>
                     <option value="menuju alamat">Menuju Alamat</option>
@@ -168,16 +169,24 @@
                 </select>
             </div>
             <div class="flex items-center gap-4">
-                <label for="tanggalDetail" class="w-32 text-left font-medium text-gray-700 text-sm after:content-[':']">Tanggal Pengiriman</label>
-                <input type="text" id="tanggalDetail" name="tanggal" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <label for="tanggalDetail" class="w-32 text-left font-medium text-gray-700 after:content-[':']">Tanggal Pengiriman</label>
+                <input type="text" id="tanggalDetail" name="tanggal" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
             </div>
             <div class="flex items-center gap-4">
-                 <label for="catatanDetail" class="w-32 text-left font-medium text-gray-700 text-sm after:content-[':']">Catatan</label>
-                  <textarea id="catatanDetail" name="catatan" rows="2" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
-                </div>
+                <label for="catatanDetail" class="w-32 text-left font-medium text-gray-700 after:content-[':']">Catatan</label>
+                <textarea id="catatanDetail" name="catatan" rows="2" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+            </div>
         </form>
+
+        {{-- Tombol Tutup --}}
+        <div class="flex justify-end mt-6">
+            <button onclick="closeDetailModal()" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
+                Tutup
+            </button>
+        </div>
     </div>
 </div>
+
 
 
 

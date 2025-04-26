@@ -43,7 +43,7 @@
                 <span>Kelola Akun Kurir</span>
             </a>
 
-            <a href="#" class="sidebar-link flex items-center space-x-4 p-3 rounded-lg transition hover:bg-gradient-to-r hover:from-yellow-400 hover:to-orange-300">
+            <a href="{{ asset('admin/live_tracking_admin') }}" class="sidebar-link flex items-center space-x-4 p-3 rounded-lg transition hover:bg-gradient-to-r hover:from-yellow-400 hover:to-orange-300">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-700 ml-2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 0c0 7-9 12-9 12S3 17 3 10a9 9 0 1118 0z" />
                 </svg>

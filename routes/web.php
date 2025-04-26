@@ -91,3 +91,12 @@ Route::get('/admin/history_pengiriman', function () {
     Route::get('/kurir/history_pengiriman_kurir', function () {
         return view('kurir.history_pengiriman_kurir');
     })->name('kurir.history_pengiriman_kurir');
+
+    Route::get('/admin/live_tracking_admin', function () {
+        return view('/admin/live_tracking_admin');
+    })->name('/admin/live_tracking_admin');
+
+    Route::get('/admin/kelola_profile_admin', function () {
+        return view('admin.kelola_profile_admin');
+    })->name('admin.kelola_profile_admin');
+

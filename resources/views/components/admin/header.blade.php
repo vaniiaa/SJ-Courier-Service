@@ -13,7 +13,7 @@
 
     <!-- Profile Icon -->
     <div class="ml-auto mr-4">
-        <a href="#" title="Profil Pengguna">
+        <a href="{{ asset('admin/kelola_profile_admin') }}" title="Profil Pengguna">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 hover:text-gray-700 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M16 14c2.21 0 4 1.79 4 4v1H4v-1c0-2.21 1.79-4 4-4h8zM12 12a4 4 0 100-8 4 4 0 000 8z" />

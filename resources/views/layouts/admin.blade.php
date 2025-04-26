@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'SJ Courier - Admin')</title>
+    <title>@yield('title', 'SJ Courier - Kurir')</title>
     <link rel="icon" href="{{ asset('images/admin/logo2.jpg') }}" type="image/jpeg">
     
-    {{-- Tailwind CSS CDN --}}
+    {{-- Tailwind CSS & DaisyUI --}}
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    {{-- Alpine.js --}}
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
     {{-- Link ke file CSS eksternal --}}
     <link rel="stylesheet" href="{{ asset('css/LayoutAdmin.css') }}">
