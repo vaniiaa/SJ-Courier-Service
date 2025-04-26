@@ -72,4 +72,22 @@ Route::get('/admin/history_pengiriman', function () {
         return view('admin.dashboard_admin');
     })->name('admin.dashboard_admin');
 
-
+    Route::get('/kurir/daftar_pengiriman', function () {
+        return view('kurir.daftar_pengiriman');
+    })->name('kurir.daftar_pengiriman');
+    
+    Route::get('/kurir/kelola_profile_kurir', function () {
+        return view('kurir.kelola_profile_kurir');
+    })->name('kurir.kelola_profile_kurir');
+    
+    Route::get('/kurir/live_tracking', function () {
+        return view('kurir.live_tracking');
+    })->name('kurir.live_tracking');
+    
+    Route::get('/kurir/kelola_status', function () {
+        return view('kurir.kelola_status');
+    })->name('kurir.kelola_status');
+    
+    Route::get('/kurir/history_pengiriman_kurir', function () {
+        return view('kurir.history_pengiriman_kurir');
+    })->name('kurir.history_pengiriman_kurir');

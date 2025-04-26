@@ -1,7 +1,7 @@
 <footer class="bg-gradient-to-r from-[#FFA500] to-[#FFD45B] text-black py-6 px-10 mt-10">
     <div class="grid grid-cols-4 gap-4">
         <div>
-            <h3 class="font-bold">LOGO</h3>
+        <img src="{{ asset('images/admin/logo.png') }}" alt="Logo" class="h-12 w-12 object-contain" />
             <p>SJ City Courier adalah layanan pengiriman cepat, aman, dan terpercaya.</p>
         </div>
         <div>
@@ -13,15 +13,15 @@
         <div>
             <h3 class="font-bold">Navigasi</h3>
             <ul>
-                <li><a href="#" class="hover:underline">Daftar Pengiriman</a></li>
-                <li><a href="#" class="hover:underline">Live Tracking</a></li>
-                <li><a href="#" class="hover:underline">Kelola Status</a></li>
-                <li><a href="#" class="hover:underline">Konfirmasi Pengiriman</a></li>
+                <li><a href="{{ asset('kurir/daftar_pengiriman')}}" class="hover:underline">Daftar Pengiriman</a></li>
+                <li><a href="{{ asset('kurir/live_tracking')}}" class="hover:underline">Live Tracking</a></li>
+                <li><a href="{{ asset('kurir/kelola_status')}}" class="hover:underline">Kelola Status</a></li>
+                <li><a href="{{ asset('kurir/kelola_status')}}" class="hover:underline">Konfirmasi Pengiriman</a></li>
             </ul>
         </div>
         <div>
             <h3 class="font-bold">Privacy & TOS</h3>
-            <a href="#" class="hover:underline">Login</a>
+            <a href="{{ asset('/login/kurir')}}" class="hover:underline">Login</a>
         </div>
     </div>
 </footer>
