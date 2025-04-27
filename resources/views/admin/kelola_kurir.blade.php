@@ -82,18 +82,21 @@
     </div>
 </div>
 
-{{-- Modal Popup --}}
+<!-- Modal Popup -->
 <div id="popup-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-    <div id="popup-box" class="bg-white rounded-lg shadow-lg w-full max-w-sm p-6 text-center relative modal-bouncy">
-        <button onclick="tutupModal()" class="absolute top-2 right-2 text-red-600 text-xl font-bold hover:text-red-800">&times;</button>
-        <div class="text-4xl text-red-600 mb-2">⚠️</div>
-        <p class="text-lg font-semibold mb-4">Apakah Anda yakin ingin menghapus akun ini?</p>
-        <div class="flex justify-center space-x-4">
-            <button onclick="tutupModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">Batal</button>
-            <button class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded ">Hapus</button>
+    <div id="popup-box" class="bg-white rounded-lg shadow-lg w-full max-w-lg p-8 text-center relative modal-bouncy">
+        <button onclick="tutupModal()" class="absolute top-2 right-2 text-red-600 text-3xl font-bold hover:text-red-800 p-2">
+            &times;
+        </button>
+        <div class="text-4xl text-red-600 mb-4">⚠️</div>
+        <p class="text-lg font-semibold mb-6">Apakah Anda yakin ingin menghapus akun ini?</p>
+        <div class="flex justify-center space-x-6">
+            <button onclick="tutupModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded">Batal</button>
+            <button class="bg-red-600 hover:bg-red-500 text-white px-6 py-3 rounded">Hapus</button>
         </div>
     </div>
 </div>
+
 
 <script src="{{ asset('js/modal.js') }}"></script>
 @endsection

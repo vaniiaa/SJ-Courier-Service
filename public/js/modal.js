@@ -9,3 +9,13 @@ function bukaModal(nama) {
 function tutupModal() {
     document.getElementById('popup-modal').classList.add('hidden');
 }
+
+function bukaModal() {
+    headerEl.classList.add('darken');
+    document.getElementById('popup-modal').classList.remove('hidden');
+}
+
+function tutupModal() {
+    document.getElementById('popup-modal').classList.add('hidden');
+    headerEl.classList.remove('darken');
+}
