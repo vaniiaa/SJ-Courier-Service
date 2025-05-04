@@ -1,5 +1,5 @@
-<head>
-    <script src="https://cdn.tailwindcss.com"></script>
+<head>   
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <aside id="sidebar" class="flex flex-col justify-between w-64 bg-white shadow border-r fixed top-0 left-0 z-50 transform -translate-x-full transition-transform duration-300" style="height: 100vh;">
