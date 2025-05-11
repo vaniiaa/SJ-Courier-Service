@@ -227,7 +227,7 @@
             >
                 <div
                     @click.away="showStatus = false"
-                    class="bg-white rounded-xl shadow-xl w-full max-w-2xl mx-4 overflow-hidden relative"
+                    class="bg-white rounded-xl shadow-xl w-full max-w-2xl mx-4 min-h-[40px] overflow-visible relative"
                 >
                     <!-- Tombol Tutup (X) di kiri atas -->
                     <button
@@ -266,6 +266,7 @@
 
                                 <ul x-show="open" @click.away="open = false" x-transition class="absolute w-full mt-1 bg-white border border-gray-300 rounded shadow z-10">
                                     <li><a href="#" @click.prevent="selected = 'Sedang Dikirim'; open = false" class="block px-4 py-2 hover:bg-gray-100">Sedang Dikirim</a></li>
+                                    <li><a href="#" @click.prevent="selected = 'Menuju Alamat'; open = false" class="block px-4 py-2 hover:bg-gray-100">Menuju Alamat</a></li>
                                     <li><a href="#" @click.prevent="selected = 'Pesanan Selesai'; open = false" class="block px-4 py-2 hover:bg-gray-100">Pesanan Selesai</a></li>
                                 </ul>
 

@@ -6,8 +6,10 @@
     <title>@yield('title', 'SJ Courier - Kurir')</title>
     <link rel="icon" href="{{ asset('images/admin/logo2.jpg') }}" type="image/jpeg">
 
-    {{-- Tailwind CSS & DaisyUI --}}
-    <script src="https://cdn.tailwindcss.com"></script>
+    {{-- Tailwind CSS --}}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    {{-- DaisyUI --}}
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
 
     {{-- Alpine.js --}}

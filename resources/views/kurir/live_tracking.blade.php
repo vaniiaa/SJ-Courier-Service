@@ -2,7 +2,7 @@
 @section('title', 'Live Tracking')
 
 @section('content')
-<div class="absolute top-32 left-0 right-0 px-4" x-data="{ showResult: false }">
+<div class="absolute top-32 left-0 right-0 px-4 mt-10" x-data="{ showResult: false }">
     <div class="max-w-[60rem] mx-auto flex flex-col gap-6">
 
         <!-- Card 1: Form Tracking -->

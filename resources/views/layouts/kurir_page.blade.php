@@ -7,12 +7,12 @@
     <link rel="icon" href="{{ asset('images/admin/logo2.jpg') }}" type="image/jpeg">
 
     {{-- Tailwind CSS CDN --}}
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     {{-- DaisyUI CDN --}}
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
     
-    {{-- Alpine --}}
+    {{-- Alpine.js --}}
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
@@ -26,7 +26,7 @@
     @include('components.kurir.breadcrumbs_kurir', ['title' => View::getSection('title')])
 
     {{-- Main Content --}}
-    <main class="container mx-auto py-6 px-4">
+    <main class="container mx-auto py-6 px-4 pt-20">
         @yield('content')
     </main>
 

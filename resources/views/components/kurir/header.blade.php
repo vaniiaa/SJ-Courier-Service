@@ -4,10 +4,26 @@
     padding: 0;
     width: 100%;
     overflow-x: hidden;
-}
+
+    /* Header */
+    .fixed-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 50;
+        background: linear-gradient(to right, #FFA500, #FFD45B); 
+        padding: 16px 20px;
+    }
+
+    /* Margin top konten utama */
+    body {
+        margin-top: 70px; 
+    }
+  }
 </style>
 <body>
-<nav class="sticky top-0 z-50 w-full bg-gradient-to-r from-[#FFA500] to-[#FFD45B] text-black py-3 px-6 flex justify-between items-center shadow-md">
+<nav class="fixed-header text-black py-3 px-6 flex justify-between items-center shadow-md">
     <div class="flex items-center">
         <img src="{{ asset('images/admin/logo.png') }}" alt="Logo" class="h-10 w-10 object-contain" />
         <span class="ml-2 font-bold">SJ Courier Service</span>
