@@ -1,16 +1,40 @@
 @extends('layouts.kurir')
 
 @section('content')
-<div class="autoplay w-screen h-auto relative overflow-hidden">
-    <div>
-        <img src="{{ asset('images/kurir/carousel1.jpg') }}" class="w-full h-full object-cover" />
+<div class="relative w-full h-[500px]">
+  <!-- Carousel -->
+  <div id="carousel" class="carousel w-full h-full relative overflow-hidden">
+    <div id="slide1" class="carousel-item w-full h-full">
+      <img
+        src="{{ asset('images/kurir/carousel1.jpg') }}"
+        class="w-full h-full object-cover"
+      />
+      <div class="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-6 z-30">
+        <a href="#slide3" class="btn btn-circle text-xl p-4 bg-black bg-opacity-50 hover:bg-opacity-75 text-white transition-all" aria-label="Previous slide">❮</a>
+        <a href="#slide2" class="btn btn-circle text-xl p-4 bg-black bg-opacity-50 hover:bg-opacity-75 text-white transition-all" aria-label="Next slide">❯</a>
+      </div>
     </div>
-    <div>
-        <img src="{{ asset('images/kurir/carousel3.png') }}" class="w-full h-full object-cover" />
+    <div id="slide2" class="carousel-item w-full h-full">
+      <img
+        src="{{ asset('images/kurir/carousel3.png') }}"
+        class="w-full h-full object-cover"
+      />
+      <div class="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-6 z-30">
+        <a href="#slide1" class="btn btn-circle text-xl p-4 bg-black bg-opacity-50 hover:bg-opacity-75 text-white transition-all" aria-label="Previous slide">❮</a>
+        <a href="#slide3" class="btn btn-circle text-xl p-4 bg-black bg-opacity-50 hover:bg-opacity-75 text-white transition-all" aria-label="Next slide">❯</a>
+      </div>
     </div>
-    <div>
-        <img src="{{ asset('images/kurir/carousel2.jpg') }}" class="w-full h-full object-cover" />
+    <div id="slide3" class="carousel-item w-full h-full">
+      <img
+        src="{{ asset('images/kurir/carousel2.jpg') }}"
+        class="w-full h-full object-cover"
+      />
+      <div class="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-6 z-30">
+        <a href="#slide2" class="btn btn-circle text-xl p-4 bg-black bg-opacity-50 hover:bg-opacity-75 text-white transition-all" aria-label="Previous slide">❮</a>
+        <a href="#slide1" class="btn btn-circle text-xl p-4 bg-black bg-opacity-50 hover:bg-opacity-75 text-white transition-all" aria-label="Next slide">❯</a>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- Text and Image Section Below Carousel -->
