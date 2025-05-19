@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Log;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -17,10 +18,17 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+
+     // Tentukan primary key
+     protected $primaryKey = 'user_id';
+
     protected $fillable = [
+        'role_id',
         'name',
+        'phone',
         'email',
         'password',
+        'address',
     ];
 
     /**
@@ -40,5 +48,19 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'password' => 'hashed',
     ];
+
+    //get role
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'role_id', 'role_id');
+    }
+
+    //cek apakah user adalah admin
+    public function isAdmin()
+    {
+        Log::info('User role_id: ' . $this->role_id);
+    return (int)$this->role_id === 1;
+    }
 }

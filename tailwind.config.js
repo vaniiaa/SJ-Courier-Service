@@ -1,12 +1,22 @@
+import defaultTheme from "tailwindcss/defaultTheme";
+import forms from "@tailwindcss/forms";
+import daisyui from "daisyui";
+
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
     content: [
-      './resources/views/**/*.blade.php',
-      './resources/js/**/*.js',
-      './resources/css/**/*.css',
+        "./vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php",
+        "./storage/framework/views/*.php",
+        "./resources/views/**/*.blade.php",
     ],
+
     theme: {
-      extend: {},
+        extend: {
+            fontFamily: {
+                sans: ["Figtree", ...defaultTheme.fontFamily.sans],
+            },
+        },
     },
-    plugins: [],
-  }  
+
+    plugins: [require("daisyui")],
+};

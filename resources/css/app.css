@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.form-input {
+    background-color: #fff; /* putih */
+    color: #222; /* hitam */
+}
+
+.active-tab {
+    font-weight: bold;
+    z-index: 1;
+}
