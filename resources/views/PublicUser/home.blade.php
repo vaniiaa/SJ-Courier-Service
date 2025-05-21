@@ -1,5 +1,5 @@
 <!-- resources/views/home.blade.php -->
-@extends('..Guest_awal')
+@extends('layouts.PublicUser')
 
 @section('title', 'Home')
 
