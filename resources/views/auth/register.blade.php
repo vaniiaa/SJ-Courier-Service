@@ -46,7 +46,7 @@
                     
                     <!-- Ilustrasi kecil hanya muncul di tampilan mobile -->
                     <div class="flex md:hidden justify-center mb-6">
-                        <img src="{{ asset('images/user/register.jpg') }}" alt="Register" class="h-32">
+                        <img src="{{ asset('images/user/register.png') }}" alt="Register" class="h-32">
                     </div>
 
                     <form method="POST" action="{{ route('register') }}">

@@ -16,12 +16,12 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-gray-100">
     <!-- Header -->
-    @include('components.PublicUser.navigation')
+   <x-header :user="Auth::user()" :links="$links" />
 
     <!-- Main Content -->
-    <main class="flex-grow">
+    <main class="flex-grow pt-20 px-4 md:px-10">
         @yield('content')
     </main>
 

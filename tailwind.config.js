@@ -10,6 +10,8 @@ export default {
         "./resources/views/**/*.blade.php",
     ],
 
+    darkMode: false, //  Nonaktifkan dark mode
+
     theme: {
         extend: {
             fontFamily: {

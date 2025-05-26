@@ -1,6 +1,6 @@
-<nav class="navbar bg-gradient-to-r from-[#FFA500] to-[#FFD45B] text-black px-6 py-3 shadow-md relative z-50">
+<nav class="navbar bg-gradient-to-r from-[#FFA500] to-[#FFD45B] text-black top-0 left-0 shadow-md fixed z-50">
   <div class="flex-1">
-    <a href="{{ asset('home') }}" class="flex items-center gap-2">
+    <a class="flex items-center gap-2">
       <img src="{{ asset('images/admin/logo.png') }}" alt="Logo" class="h-10 w-10 object-contain" />
       <span class="font-bold text-base md:text-lg">SJ Courier Service</span>
     </a>

@@ -63,4 +63,11 @@ class User extends Authenticatable implements MustVerifyEmail
         Log::info('User role_id: ' . $this->role_id);
     return (int)$this->role_id === 1;
     }
+
+    //cek apakah user adalah kurir
+    public function isKurir()
+    {
+        Log::info('User role_id: ' . $this->role_id);
+        return (int)$this->role_id === 2;
+    }
 }
