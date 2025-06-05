@@ -13,14 +13,22 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
+//Guest routes
 Route::get('/', function () {
     return view('PublicUser.home');
 });
 
+
+// Authenticated user routes
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return view('User.dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+//User routes
+Route::get('/pengiriman', function () {
+    return view('User.daftar_pengiriman');
+})->middleware(['auth', 'verified'])->name('pengiriman');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

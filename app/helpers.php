@@ -10,12 +10,6 @@ if (!function_exists('getNavigationLinks')) {
                 ]],
             ];
         }
-        if ($user->isAdmin()) {
-            return [
-                ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
-                ['label' => 'Manajemen User', 'url' => route('admin.users')],
-            ];
-        }
         if ($user->isKurir()) {
             return [
                 ['label' => 'Dashboard', 'url' => route('kurir.dashboard')],
@@ -27,7 +21,9 @@ if (!function_exists('getNavigationLinks')) {
             ['label' => 'Dashboard', 'url' => route('dashboard')],
             ['label' => 'Layanan', 'children' => [
                 ['label' => 'Live Tracking', 'url' => route('login')],
-                ['label' => 'Pengiriman', 'url' => route('login')],
+                ['label' => 'Permintaan Pengiriman', 'url' => route('pengiriman')],
+                ['label' => 'Daftar Pengiriman', 'url' => route('login')],
+                ['label' => 'History Pengiriman', 'url' => route('login')],
             ]],
         ];
     }

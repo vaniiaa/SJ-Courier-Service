@@ -20,7 +20,7 @@
     <x-header :user="Auth::user()" :links="$links" />
 
     <!-- Page Content -->
-    <main class="flex-grow pt-20 px-4 md:px-10">
+    <main class="flex-grow pt-20 md:px-10">
         {{ $slot }}
     </main>
 
