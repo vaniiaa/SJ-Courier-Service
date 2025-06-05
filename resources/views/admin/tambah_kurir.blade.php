@@ -7,8 +7,18 @@
 @section('content')
 <div class="absolute top-36 left-0 right-0 px-4">
     <div class="w-full max-w-[90rem] mx-auto bg-white rounded-lg shadow-lg p-6">
-        <form action="{{ route('admin.edit_kurir.submit') }}" method="POST">
-            @csrf
+        @if ($errors->any())
+        <div class="mb-6 p-4 bg-red-100 text-red-700 rounded-md">
+            <ul class="list-disc list-inside">
+                @foreach ($errors->all() as $error)
+                    <li>- {{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <form action="{{ route('admin.simpan_kurir') }}" method="POST" class="space-y-6">
+        @csrF
 
             {{-- Nama --}}
             <div class="flex items-start mb-4">
@@ -100,7 +110,7 @@
                     Sandi
                 </label>
                 <span class="mx-2 mt-2">:</span>
-                <input type="password" id="password" name="password" placeholder="Tulis sandi minimal 8 karakter"
+                <input type="password" id="password" name="password" placeholder="Tulis sandi minimal 6 karakter"
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">
             </div>
 
@@ -114,4 +124,4 @@
         </form>
     </div>
 </div>
-@endsection
+@endsection]

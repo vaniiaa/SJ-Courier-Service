@@ -6,12 +6,12 @@
 
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/modal.css') }}">
-<div class="absolute top-28 left-0 right-0 px-4">
 
+<div class="absolute top-28 left-0 right-0 px-4">
     <div class="max-w-[90rem] mx-auto mb-2 flex justify-end">
-        <a href="{{ route('admin.tambah_kurir') }}" 
+        <a href="{{ route('admin.tambah_kurir') }}"
            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow-md shadow-gray-700">
-            Tambah
+            Tambah Kurir
         </a>
     </div>
 
@@ -34,69 +34,127 @@
                         <th class="text-left px-4 py-2">No. HP</th>
                         <th class="text-left px-4 py-2">Alamat</th>
                         <th class="text-left px-4 py-2">Wilayah Pengiriman</th>
-                        <th class="text-left px-4 py-2">User</th>
-                        <th class="text-left px-4 py-2">Sandi</th>
-                        <th class="px-4 py-2">Action</th>
+                        <th class="text-left px-4 py-2">Username</th>
+                        <th class="px-4 py-2">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @php $users = [
-                        ['Aulia Sabrina', 'auliasabrina123@gmail.com', '+6281264073088', 'Punggur', 'Batam Timur', 'auliasabrina123', 'aulia321brina'],
-                        ['Vania', 'vania61@gmail.com', '+6281264073066', 'Botania', 'Batam Kota', 'vania123', 'vania321!#'],
-                        ['Valuhk Januari', 'valuhkjanurat8@gmail.com', '+6281264073055', 'Nongsa', 'Nongsa', 'valuhk123', 'valuhk534!#'],
-                        ['John Doe', 'johndoe166@gmail.com', '+6281264073654', 'Batam Centre', 'Batam Kota', 'johndoe687', 'johndoe687!#'],
-                        ['Henry Cavill', 'henrycavill76@gmail.com', '+6281264073076', 'Batu Aji', 'Sagulung', 'henrycavill076', 'cavillhen076!#'],
-                        ['Siti Aminah', 'sitiaminah09@gmail.com', '+6281264073033', 'Tiban', 'Sekupang', 'aminahsiti', 'aminah321!@#'],
-                        ['Bayu Saputra', 'bayusaputra@gmail.com', '+6281264073022', 'Simpang Kabil', 'Bengkong', 'bayusaputra88', 'saputra#88'],
-                        ['Rika Marlina', 'rikamarlina12@gmail.com', '+6281264073011', 'Tanjung Uma', 'Lubuk Baja', 'rika12', 'rika*12**'],
-                        ['David Wijaya', 'davidwijaya@gmail.com', '+6281264073000', 'Baloi', 'Batam Kota', 'davidw123', 'wijaya123!'],
-                        ['Nina Agustina', 'ninaagustina@gmail.com', '+6281264073999', 'Sadai', 'Lubuk Baja', 'nina08', 'ninaAugust#99'],
-                    ]; @endphp
-
-                    @foreach ($users as $index => $user)
+                    @forelse($kurirs as $index => $kurir)
                         <tr class="{{ $index % 2 === 0 ? 'bg-white' : 'bg-gray-100' }}">
                             <td class="px-4 py-2 text-center">{{ $index + 1 }}</td>
-                            <td class="px-4 py-2">{{ $user[0] }}</td>
-                            <td class="px-4 py-2">{{ $user[1] }}</td>
-                            <td class="px-4 py-2">{{ $user[2] }}</td>
-                            <td class="px-4 py-2">{{ $user[3] }}</td>
-                            <td class="px-4 py-2">{{ $user[4] }}</td>
-                            <td class="px-4 py-2">{{ $user[5] }}</td>
-                            <td class="px-4 py-2">{{ $user[6] }}</td>
+                            <td class="px-4 py-2">{{ $kurir->nama }}</td>
+                            <td class="px-4 py-2">{{ $kurir->email }}</td>
+                            <td class="px-4 py-2">{{ $kurir->no_hp }}</td>
+                            <td class="px-4 py-2">{{ $kurir->alamat }}</td>
+                            <td class="px-4 py-2">{{ $kurir->wilayah_pengiriman }}</td>
+                            <td class="px-4 py-2">{{ $kurir->username }}</td>
                             <td class="px-4 py-2 text-center">
-                                <a href="{{ route('admin.edit_kurir') }}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 shadow-md shadow-gray-700">Edit</a>
-                                <button onclick="bukaModal('{{ $user[0] }}')" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 ml-1 shadow-md shadow-gray-700">Hapus</button>
+                                <div style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; height: 100%;">
+                                    <a href="{{ route('admin.edit_kurir', $kurir->id) }}"
+                                       style="background-color: #22c55e; color: white; padding: 0.3rem 0.75rem; border-radius: 0.375rem;
+                                              box-shadow: 0 2px 6px rgba(0,0,0,0.15); text-decoration: none; font-size: 0.875rem;
+                                              transition: background-color 0.3s ease;"
+                                       onmouseover="this.style.backgroundColor='#16a34a'"
+                                       onmouseout="this.style.backgroundColor='#22c55e'">
+                                        Edit
+                                    </a>
+                                    <form id="hapusForm-{{ $kurir->id }}" action="{{ route('admin.hapus_kurir', $kurir->id) }}" method="POST" style="margin: 0;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button"
+                                                onclick="bukaModal('{{ $kurir->id }}', '{{ addslashes($kurir->nama) }}')"
+                                                style="background-color: #ef4444; color: white; padding: 0.3rem 0.75rem; border-radius: 0.375rem;
+                                                       box-shadow: 0 2px 6px rgba(0,0,0,0.15); font-size: 0.875rem; border: none; cursor: pointer;
+                                                       transition: background-color 0.3s ease;"
+                                                onmouseover="this.style.backgroundColor='#b91c1c'"
+                                                onmouseout="this.style.backgroundColor='#ef4444'">
+                                            Hapus
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="8" class="text-center py-4">Data kurir tidak ditemukan.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
+    </div>
+</div>
 
-        <div class="flex justify-end mt-4 space-x-1">
-            <button class="px-4 py-2 border rounded bg-gradient-to-r from-[#FFA500] to-[#FFD45B]">&lt;&lt;</button>
-            <button class="px-4 py-2 border rounded bg-gradient-to-r from-[#FFA500] to-[#FFD45B]">1</button>
-            <button class="px-4 py-2 border rounded bg-white hover:bg-gray-100">2</button>
-            <button class="px-4 py-2 border rounded bg-white hover:bg-gray-100">...</button>
+{{-- Pagination --}}
+<div class="flex justify-end mt-4">
+    {{ $kurirs->links() }}
+</div>
+
+{{-- Modal Popup --}}
+<div id="popup-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 z-50">
+    <div class="bg-white rounded-lg shadow-lg w-full p-4 transform scale-90 transition-transform duration-300 relative" style="max-width: 400px;">
+        <button onclick="tutupModal()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-xl font-bold">&times;</button>
+        <div class="flex flex-col items-center space-y-3">
+            <svg class="w-10 h-10 text-red-600 animate-pulse" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 class="text-base font-semibold text-gray-900 text-center">
+                Yakin ingin menghapus <span id="modal-item-name" class="font-bold text-red-600"></span>?
+            </h3>
+            <div class="flex space-x-3 pt-1">
+                <button onclick="tutupModal()" class="px-3 py-1.5 rounded bg-gray-300 hover:bg-gray-400 transition text-xs">Batal</button>
+                <button id="confirmDeleteBtn" class="px-3 py-1.5 rounded bg-red-600 text-white hover:bg-red-700 transition text-xs">Hapus</button>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Modal Popup -->
-<div id="popup-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-    <div id="popup-box" class="bg-white rounded-lg shadow-lg w-full max-w-lg p-8 text-center relative modal-bouncy">
-        <button onclick="tutupModal()" class="absolute top-2 right-2 text-red-600 text-3xl font-bold hover:text-red-800 p-2">
-            &times;
-        </button>
-        <div class="text-4xl text-red-600 mb-4">⚠️</div>
-        <p class="text-lg font-semibold mb-6">Apakah Anda yakin ingin menghapus akun ini?</p>
-        <div class="flex justify-center space-x-6">
-            <button onclick="tutupModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded">Batal</button>
-            <button class="bg-red-600 hover:bg-red-500 text-white px-6 py-3 rounded">Hapus</button>
-        </div>
-    </div>
-</div>
+{{-- JavaScript for Modal --}}
+<script>
+let formToDeleteId = null;
 
+function bukaModal(id, name) {
+    formToDeleteId = id;
+    document.getElementById('modal-item-name').textContent = name; // Changed from ${name} to name
 
-<script src="{{ asset('js/modal.js') }}"></script>
+    const modal = document.getElementById('popup-modal');
+    modal.classList.remove('opacity-0', 'pointer-events-none', 'hidden');
+    modal.classList.add('opacity-100');
+
+    document.querySelector('body').classList.add('modal-open');
+}
+
+function tutupModal() {
+    const modal = document.getElementById('popup-modal');
+    const modalContent = modal.querySelector('div > div');
+
+    modalContent.classList.add('scale-90');
+    modalContent.classList.remove('scale-100');
+
+    setTimeout(() => {
+        modal.classList.add('opacity-0', 'pointer-events-none', 'hidden');
+        modal.classList.remove('opacity-100');
+        formToDeleteId = null;
+        document.querySelector('body').classList.remove('modal-open');
+    }, 300);
+}
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+    if (formToDeleteId) {
+        const form = document.getElementById('hapusForm-' + formToDeleteId);
+        if (form) {
+            form.submit();
+        }
+    }
+});
+</script>
+
+<style>
+/* CSS Tambahan untuk menggelapkan header saat modal terbuka */
+.modal-open .admin-header {
+    filter: brightness(0.5); /* Menggelapkan sebesar 50% */
+    transition: filter 0.3s ease-in-out;
+    pointer-events: none; /* Menonaktifkan interaksi klik */
+}
+</style>
 @endsection

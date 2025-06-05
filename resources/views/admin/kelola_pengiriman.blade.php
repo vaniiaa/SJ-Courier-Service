@@ -2,7 +2,7 @@
 
 @include('components.admin.sidebar')
 
-@section('title', 'Kelola Pengiriman')
+@section('title', 'Kelola Pengiriman') 
 
 @section('content')
 <div class="absolute top-36 left-0 right-0 px-4">
@@ -52,57 +52,51 @@
 @endphp
 
 @foreach ($pengiriman as $index => $data)
-    <tr class="{{ $index % 2 === 0 ? 'bg-white' : 'bg-gray-100' }}">
-        <td class="px-4 py-2 text-center">{{ $index + 1 }}</td>
-        <td class="px-4 py-2 text-center">{{ $data[0] }}</td>
-        <td class="px-4 py-2">{{ $data[1] }}</td>
-        <td class="px-4 py-2">{{ $data[2] }}</td>
-        <td class="px-4 py-2">{{ $data[3] }}</td>
-        <td class="px-4 py-2">{{ $data[4] }}</td>
-        <td class="px-4 py-2">{{ $data[7] }}</td>
-        <td class="px-4 py-2 text-center">{{ $data[8] }}</td>
-        <td class="px-4 py-2 text-center">{{ number_format($data[9], 0, ',', '.') }}</td>
-        <td class="px-4 py-2 text-center">{{ $data[5] }}</td>  <!-- Metode Pembayaran -->
-        <td class="px-4 py-2 text-center">{{ $data[6] }}</td>  <!-- Kurir -->
-        <td class="px-4 py-2 text-center font-semibold text-sm
+<tr class="{{ $index % 2 === 0 ? 'bg-white' : 'bg-gray-100' }}">
+    <td class="px-4 py-2 text-center">{{ $index + 1 }}</td>
+    <td class="px-4 py-2 text-center">{{ $data[0] }}</td> {{-- Resi --}}
+    <td class="px-4 py-2">{{ $data[1] }}</td> {{-- Nama Pengirim --}}
+    <td class="px-4 py-2">{{ $data[2] }}</td> {{-- Alamat Penjemputan --}}
+    <td class="px-4 py-2">{{ $data[3] }}</td> {{-- Nama Penerima --}}
+    <td class="px-4 py-2">{{ $data[4] }}</td> {{-- Alamat Tujuan --}}
+    <td class="px-4 py-2">{{ $data[7] }}</td> {{-- Tanggal --}}
+    <td class="px-4 py-2 text-center">{{ $data[8] }}</td> {{-- Berat --}}
+    <td class="px-4 py-2 text-center">{{ number_format($data[9], 0, ',', '.') }}</td> {{-- Harga --}}
+    <td class="px-4 py-2 text-center">{{ $data[5] }}</td> {{-- Metode Pembayaran --}}
+    <td class="px-4 py-2 text-center">{{ $data[6] ?? 'Belum Ditentukan' }}</td> {{-- Kurir --}}
+    <td class="px-4 py-2 text-center font-semibold text-sm
         @if ($data[10] === 'menunggu konfirmasi') text-gray-600
         @elseif ($data[10] === 'sedang dikirim') text-red-600
         @elseif ($data[10] === 'menuju alamat') text-blue-600
         @elseif ($data[10] === 'pesanan diterima') text-green-600
         @endif">
         {{ ucfirst($data[10]) }}
-        </td>
-        <td class="px-4 py-2 text-center">
-            <div class="flex justify-center gap-2">
-                 @if ($index < 5)
-                 <button onclick="printData()" class="w-16 bg-green-500 hover:bg-green-600 text-white py-1 rounded text-xs shadow-md shadow-gray-700 flex justify-center items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V4h12v5M6 14h12v6H6v-6zM6 14H4a2 2 0 01-2-2V9a2 2 0 012-2h16a2 2 0 012 2v3a2 2 0 01-2 2h-2" />
-                    </svg>
-                </button>
-                <button class="w-16 bg-red-500 text-white py-1 rounded text-xs hover:bg-red-600 shadow-md shadow-gray-700" onclick="openModal()">Kurir</button>
-                @elseif ($index >= 5 && $index < 10)
+    </td>
+    <td class="px-4 py-2 text-center">
+        <div class="flex justify-center gap-2">
+            @if ($data[10] === 'menunggu konfirmasi')
                 <button onclick="printData()" class="w-16 bg-green-500 hover:bg-green-600 text-white py-1 rounded text-xs shadow-md shadow-gray-700 flex justify-center items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V4h12v5M6 14h12v6H6v-6zM6 14H4a2 2 0 01-2-2V9a2 2 0 012-2h16a2 2 0 012 2v3a2 2 0 01-2 2h-2" />
                     </svg>
                 </button>
-                @endif
-                <button
+                <button class="w-16 bg-red-500 text-white py-1 rounded text-xs hover:bg-red-600 shadow-md shadow-gray-700" onclick="openModal()">Kurir</button>
+            @endif
+
+            <button
                 class="px-3 bg-blue-500 text-white py-1 rounded text-xs hover:bg-blue-600 shadow-md shadow-gray-700 px-4 py-2"
                 onclick="showDetailModal(
-                '{{ $data[0] }}', '{{ $data[1] }}', '{{ $data[2] }}',
-                '{{ $data[3] }}', '{{ $data[4] }}', '{{ $data[6] }}',
-                '{{ $data[7] }}', '{{ $data[8] }}', '{{ number_format($data[9], 0, ',', '.') }}',
-                '{{ ucfirst($data[10]) }}'
+                    '{{ $data[0] }}', '{{ $data[1] }}', '{{ $data[2] }}',
+                    '{{ $data[3] }}', '{{ $data[4] }}', '{{ $data[6] ?? 'Belum Ditentukan' }}',
+                    '{{ $data[7] }}', '{{ $data[8] }}', '{{ number_format($data[9], 0, ',', '.') }}',
+                    '{{ ucfirst($data[10]) }}'
                 )"
-                > Detail
+            > Detail
             </button>
         </div>
     </td>
 </tr>
 @endforeach
-
 </tbody>
 </table>
 </div>
@@ -194,55 +188,103 @@
 
 {{-- Modal Tentukan Kurir --}}
 <div id="modalTentukanKurir" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50 hidden">
-    <div class="bg-white p-6 rounded-lg shadow-md shadow-gray-700 w-[1000px]"> <div class="flex justify-between items-center">
+    <div class="bg-white p-6 rounded-lg shadow-md shadow-gray-700 w-[1000px]">
+        <div class="flex justify-between items-center">
             <img src="{{ asset('images/admin/logo2.jpg') }}" alt="Logo" class="w-16 h-16 object-cover rounded-full">
             <h5 class="text-xl font-semibold flex-1 ml-4">Penjadwalan Kurir</h5>
             <button class="text-gray-500 hover:text-gray-700 text-2xl" onclick="closeModal()">&times;</button>
         </div>
         <hr class="my-4 border-gray-300">
 
-        <form>
+        <form action="" method="POST" id="formTentukanKurir">
+            @csrf
             <div class="mb-4">
-                 <label for="wilayahPengiriman" class="block text-sm font-medium text-gray-700">Wilayah Pengiriman</label>
-                 <select id="wilayahPengiriman" name="wilayahPengiriman" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                     <option value="">Pilih wilayah pengiriman...</option>
-                     <option value="wilayahA">Batam Centre</option>
-                     <option value="wilayahB">Botania</option>
-                     <option value="wilayahC">Batu Aji</option>
-                     <option value="wilayahD">Punggur</option>
-                     <option value="wilayahE">Piayu</option>
-                 </select>
-             </div>
+                <label for="wilayahPengiriman" class="block text-sm font-medium text-gray-700">Wilayah Pengiriman</label>
+                <select id="wilayahPengiriman" name="wilayahPengiriman" required
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Pilih wilayah pengiriman...</option>
+                    <option value="Batam Centre">Batam Centre</option>
+                    <option value="Botania">Botania</option>
+                    <option value="Batu Aji">Batu Aji</option>
+                    <option value="Punggur">Punggur</option>
+                    <option value="Piayu">Piayu</option>
+                </select>
+            </div>
 
             <div class="mb-4">
                 <label for="kurir" class="block text-sm font-medium text-gray-700">Pilih Kurir</label>
-                <select id="kurir" name="kurir" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                <select id="kurir" name="kurir" required
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     <option value="">Pilih kurir...</option>
-                    <option value="kurirA">Faisal</option>
-                    <option value="kurirB">Ricardo</option>
-                    <option value="kurirC">William</option>
-                    <option value="kurirD">Nick</option>
-                    <option value="kurirE">Daniel</option>
+                    {{-- Option akan diisi otomatis via JS --}}
                 </select>
             </div>
 
             <div class="mb-4">
                 <label for="tanggalPengiriman" class="block text-sm font-medium text-gray-700">Tanggal Pengiriman</label>
-                <input type="date" id="tanggalPengiriman" name="tanggalPengiriman" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                <input type="date" id="tanggalPengiriman" name="tanggalPengiriman" required
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
             </div>
 
             <div class="mb-4">
                 <label for="catatan" class="block text-sm font-medium text-gray-700">Catatan</label>
-                <textarea id="catatan" name="catatan" rows="3" placeholder="Masukkan catatan khusus" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
+                <textarea id="catatan" name="catatan" rows="3" placeholder="Masukkan catatan khusus"
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
             </div>
 
             <div class="flex justify-end space-x-4">
-                 <button type="button" onclick="closeModal()" class="text-sm py-3 px-5 bg-red-500 text-white rounded-lg hover:bg-red-600 shadow-md shadow-gray-700">Batal</button>
-                 <button type="submit"  class="text-sm py-3 px-5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 shadow-md shadow-gray-700">Kirim</button>
-             </div>
+                <button type="button" onclick="closeModal()"
+                    class="text-sm py-3 px-5 bg-red-500 text-white rounded-lg hover:bg-red-600 shadow-md shadow-gray-700">Batal</button>
+                <button type="submit"
+                    class="text-sm py-3 px-5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 shadow-md shadow-gray-700">Kirim</button>
+            </div>
         </form>
+    </div>
 </div>
-</div>
+
+<script>
+    const wilayahSelect = document.getElementById('wilayahPengiriman');
+    const kurirSelect = document.getElementById('kurir');
+
+    wilayahSelect.addEventListener('change', function () {
+        const wilayah = this.value;
+        kurirSelect.innerHTML = '<option value="">Loading...</option>';
+
+        if (wilayah) {
+            const url = `{{ route('kurir.byWilayah', ['wilayah' => 'WILAYAH_PLACEHOLDER']) }}`.replace('WILAYAH_PLACEHOLDER', encodeURIComponent(wilayah));
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(errorData => {
+                            throw new Error(errorData.message || 'Server error occurred');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    kurirSelect.innerHTML = '<option value="">Pilih kurir...</option>';
+                    if (data.length === 0) {
+                        kurirSelect.innerHTML = '<option value="">Tidak ada kurir untuk wilayah ini</option>';
+                    } else {
+                        data.forEach(kurir => {
+                            const option = document.createElement('option');
+                            option.value = kurir.id;
+                            option.textContent = kurir.username; // ✅ GANTI INI
+                            kurirSelect.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching courier data:', error);
+                    kurirSelect.innerHTML = '<option value="">Tidak ada kurir untuk wilayah ini</option>';
+                });
+        } else {
+            kurirSelect.innerHTML = '<option value="">Pilih kurir...</option>';
+        }
+    });
+</script>
+
 
 {{-- Hubungkan file JavaScript eksternal --}}
 <script src="{{ asset('js/kelola_pengiriman.js') }}"></script>
