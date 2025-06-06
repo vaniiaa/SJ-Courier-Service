@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable; 
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class Kurir extends Authenticatable
@@ -17,8 +17,13 @@ class Kurir extends Authenticatable
 
     protected $hidden = [
         'password',
-        'remember_token', 
+        'remember_token',
     ];
 
-    public $timestamps = false;
+    public $timestamps = false; // Jika tabel kurir tidak menggunakan created_at dan updated_at
+
+    public function pengiriman()
+    {
+        return $this->hasMany(Pengiriman::class);
+    }
 }

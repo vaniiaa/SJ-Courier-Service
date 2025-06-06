@@ -24,6 +24,13 @@
             </form>
         </div>
 
+         {{-- Notifikasi --}}
+        @if(session('notif'))
+            <div class="alert alert-info">
+                {{ session('notif') }}
+            </div>
+        @endif
+        
         <div class="overflow-x-auto border border-gray-300 rounded-lg">
             <table class="w-full table-auto text-sm rounded-lg overflow-hidden">
                 <thead class="text-black">
@@ -102,53 +109,14 @@
                 Yakin ingin menghapus <span id="modal-item-name" class="font-bold text-red-600"></span>?
             </h3>
             <div class="flex space-x-3 pt-1">
-                <button onclick="tutupModal()" class="px-3 py-1.5 rounded bg-gray-300 hover:bg-gray-400 transition text-xs">Batal</button>
-                <button id="confirmDeleteBtn" class="px-3 py-1.5 rounded bg-red-600 text-white hover:bg-red-700 transition text-xs">Hapus</button>
+                <button onclick="tutupModal()" class="px-3 py-2 rounded bg-gray-300 hover:bg-gray-400 transition text-xs">Batal</button>
+                <button id="confirmDeleteBtn" class="px-3 py-2 rounded bg-red-600 text-white hover:bg-red-700 transition text-xs">Hapus</button>
             </div>
         </div>
     </div>
 </div>
 
-{{-- JavaScript for Modal --}}
-<script>
-let formToDeleteId = null;
-
-function bukaModal(id, name) {
-    formToDeleteId = id;
-    document.getElementById('modal-item-name').textContent = name; // Changed from ${name} to name
-
-    const modal = document.getElementById('popup-modal');
-    modal.classList.remove('opacity-0', 'pointer-events-none', 'hidden');
-    modal.classList.add('opacity-100');
-
-    document.querySelector('body').classList.add('modal-open');
-}
-
-function tutupModal() {
-    const modal = document.getElementById('popup-modal');
-    const modalContent = modal.querySelector('div > div');
-
-    modalContent.classList.add('scale-90');
-    modalContent.classList.remove('scale-100');
-
-    setTimeout(() => {
-        modal.classList.add('opacity-0', 'pointer-events-none', 'hidden');
-        modal.classList.remove('opacity-100');
-        formToDeleteId = null;
-        document.querySelector('body').classList.remove('modal-open');
-    }, 300);
-}
-
-document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
-    if (formToDeleteId) {
-        const form = document.getElementById('hapusForm-' + formToDeleteId);
-        if (form) {
-            form.submit();
-        }
-    }
-});
-</script>
-
+<script src="{{ asset('js/kurir.js') }}"></script>
 <style>
 /* CSS Tambahan untuk menggelapkan header saat modal terbuka */
 .modal-open .admin-header {
