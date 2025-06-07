@@ -7,6 +7,28 @@
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/modal.css') }}">
 
+{{-- CSS Tambahan untuk Transisi Notifikasi & Gelap Header Modal --}}
+<style>
+    /* Style untuk transisi muncul dan menghilang pada notifikasi */
+    .notification-transition {
+        opacity: 0;
+        transform: translateY(-20px); /* Mulai sedikit di atas */
+        transition: opacity 0.5s ease-out, transform 0.5s ease-out; /* Transisi 0.5 detik */
+    }
+
+    .notification-transition.show {
+        opacity: 1;
+        transform: translateY(0); /* Kembali ke posisi normal */
+    }
+
+    /* CSS untuk menggelapkan header saat modal terbuka */
+    .modal-open .admin-header {
+        filter: brightness(0.5); /* Menggelapkan sebesar 50% */
+        transition: filter 0.3s ease-in-out;
+        pointer-events: none; /* Menonaktifkan interaksi klik pada header */
+    }
+</style>
+
 <div class="absolute top-28 left-0 right-0 px-4">
     <div class="max-w-[90rem] mx-auto mb-2 flex justify-end">
         <a href="{{ route('admin.tambah_kurir') }}"
@@ -16,18 +38,54 @@
     </div>
 
     <div class="max-w-[90rem] mx-auto bg-white rounded-lg shadow-lg p-4">
-        {{-- Search Bar --}}
+        {{-- Search Bar (MODIFIED) --}}
         <div class="flex justify-end items-center mb-4">
-            <form action="" method="GET" class="flex items-center gap-2">
-                <label for="search" class="font-medium">Search:</label>
-                <input type="text" id="search" name="search" placeholder="Cari resi / nama" class="border px-4 py-2 rounded" />
+            <form action="{{ route('admin.kelola_kurir') }}" method="GET" class="flex items-center gap-2">
+                <label for="search" class="font-medium text-sm">Search:</label>
+                <input type="text" id="search" name="search" placeholder="Cari resi / nama" class="border px-2 py-1 rounded text-sm" value="{{ request('search') }}" />
+                <button type="submit" class="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600">Cari</button>
             </form>
         </div>
 
-         {{-- Notifikasi --}}
-        @if(session('notif'))
-            <div class="alert alert-info">
-                {{ session('notif') }}
+        {{-- Notifikasi Sukses --}}
+        @if(session('success'))
+            <div id="success-alert" class="notification-transition" role="alert"
+                 style="background-color: #d1fae5; /* Warna hijau muda */
+                        border: 1px solid #34d399; /* Border hijau */
+                        color: #047857; /* Warna teks hijau gelap */
+                        padding: 1rem; /* Padding internal */
+                        border-radius: 0.5rem; /* Sudut membulat */
+                        margin-bottom: 1rem; /* Margin bawah */
+                        position: relative;">
+                <strong style="font-weight: bold;">Berhasil!</strong>
+                <span style="display: inline;">{{ session('success') }}</span>
+                <span style="position: absolute; top: 0; bottom: 0; right: 0; padding: 1rem; cursor: pointer;" onclick="document.getElementById('success-alert').style.display='none'">
+                    <svg style="height: 1.5rem; width: 1.5rem; fill: currentColor; color: #10b981;" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <title>Close</title>
+                        <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 2.651a1.2 1.2 0 1 1-1.697-1.697L8.303 10l-2.651-2.651a1.2 1.2 0 1 1 1.697-1.697L10 8.181l2.651-2.651a1.2 1.2 0 1 1 1.697 1.697L11.697 10l2.651 2.651a1.2 1.2 0 0 1 0 1.697z"/>
+                    </svg>
+                </span>
+            </div>
+        @endif
+
+        {{-- Notifikasi Error --}}
+        @if(session('error'))
+            <div id="error-alert" class="notification-transition" role="alert"
+                 style="background-color: #fee2e2; /* Warna merah muda */
+                        border: 1px solid #f87171; /* Border merah */
+                        color: #b91c1c; /* Warna teks merah gelap */
+                        padding: 1rem; /* Padding internal */
+                        border-radius: 0.5rem; /* Sudut membulat */
+                        margin-bottom: 1rem; /* Margin bawah */
+                        position: relative;">
+                <strong style="font-weight: bold;">Gagal!</strong>
+                <span style="display: inline;">{{ session('error') }}</span>
+                <span style="position: absolute; top: 0; bottom: 0; right: 0; padding: 1rem; cursor: pointer;" onclick="document.getElementById('error-alert').style.display='none'">
+                    <svg class="fill-current" style="height: 1.5rem; width: 1.5rem; color: #ef4444;" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <title>Close</title>
+                        <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 2.651a1.2 1.2 0 1 1-1.697-1.697L8.303 10l-2.651-2.651a1.2 1.2 0 1 1 1.697-1.697L10 8.181l2.651-2.651a1.2 1.2 0 1 1 1.697 1.697L11.697 10l2.651 2.651a1.2 1.2 0 0 1 0 1.697z"/>
+                    </svg>
+                </span>
             </div>
         @endif
         
@@ -117,12 +175,49 @@
 </div>
 
 <script src="{{ asset('js/kurir.js') }}"></script>
-<style>
-/* CSS Tambahan untuk menggelapkan header saat modal terbuka */
-.modal-open .admin-header {
-    filter: brightness(0.5); /* Menggelapkan sebesar 50% */
-    transition: filter 0.3s ease-in-out;
-    pointer-events: none; /* Menonaktifkan interaksi klik */
-}
-</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const successAlert = document.getElementById('success-alert');
+        const errorAlert = document.getElementById('error-alert');
+
+        // Fungsi untuk menampilkan notifikasi dengan transisi
+        function showNotification(alertElement) {
+            if (alertElement) {
+                // Pastikan elemen terlihat (display: block) sebelum menambahkan kelas 'show'
+                // Ini penting agar transisi 'opacity' dan 'transform' bisa berjalan mulus dari awal.
+                alertElement.style.display = 'block'; 
+                setTimeout(() => {
+                    alertElement.classList.add('show');
+                }, 100); // Memberi sedikit delay (100ms) untuk memastikan browser merender status awal sebelum transisi
+            }
+        }
+
+        // Fungsi untuk menyembunyikan notifikasi dengan transisi
+        function hideNotification(alertElement) {
+            if (alertElement) {
+                alertElement.classList.remove('show'); // Hapus kelas 'show' untuk memicu transisi menghilang
+                // Setelah transisi selesai, sembunyikan elemen sepenuhnya (display: none)
+                alertElement.addEventListener('transitionend', function() {
+                    alertElement.style.display = 'none';
+                }, { once: true }); // Listener ini hanya akan berjalan sekali
+            }
+        }
+
+        // Jalankan logika untuk notifikasi sukses
+        if (successAlert) {
+            showNotification(successAlert); // Tampilkan notifikasi
+            setTimeout(() => {
+                hideNotification(successAlert); // Sembunyikan setelah 5 detik
+            }, 5000); // 5000 milidetik = 5 detik
+        }
+        
+        // Jalankan logika untuk notifikasi error
+        if (errorAlert) {
+            showNotification(errorAlert); // Tampilkan notifikasi
+            setTimeout(() => {
+                hideNotification(errorAlert); // Sembunyikan setelah 5 detik
+            }, 5000); // 5000 milidetik = 5 detik
+        }
+    });
+</script>
 @endsection

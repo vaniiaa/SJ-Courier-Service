@@ -67,4 +67,4 @@ Route::delete('/kurir/{id}', [DeleteCourierController::class, 'destroy'])->name(
         return view('kurir.daftar_pengiriman');
     })->name('kurir.daftar_pengiriman');
 
-    
+ Route::get('/kurir/daftar_pengiriman', [KelolaPengirimanController::class, 'daftarPengirimanKurir'])->name('kurir.daftar_pengiriman');
