@@ -288,12 +288,19 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan data via AJAX. --}
                     <label for="wilayahPengiriman" class="block text-sm font-medium text-gray-700">Wilayah Pengiriman</label>
                     <select id="wilayahPengiriman" name="wilayahPengiriman"
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">Pilih wilayah pengiriman...</option>
-                        <option value="Batam Centre">Batam Centre</option>
-                        <option value="Botania">Botania</option>
-                        <option value="Batu Aji">Batu Aji</option>
-                        <option value="Punggur">Punggur</option>
-                        <option value="Piayu">Piayu</option>
+                       <option value="">Pilih wilayah pengiriman...</option>
+            <option value="Batam Kota">Batam Kota</option>
+            <option value="Batu Aji">Batu Aji</option>
+            <option value="Batu Ampar">Batu Ampar</option>
+            <option value="Belakang Padang">Belakang Padang</option>
+            <option value="Bengkong">Bengkong</option>
+            <option value="Galang">Galang</option>
+            <option value="Lubuk Baja">Lubuk Baja</option>
+            <option value="Nongsa">Nongsa</option>
+            <option value="Sagulung">Sagulung</option>
+            <option value="Sei Beduk">Sei Beduk</option>
+            <option value="Sekupang">Sekupang</option>
+            <option value="Sungai Beduk">Sungai Beduk</option>
                     </select>
                 </div>
 
