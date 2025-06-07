@@ -347,7 +347,7 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan data via AJAX. --}
         window.showNotification = function(alertElement) { // Dijadikan global agar bisa dipanggil dari onclick di HTML
             if (alertElement) {
                 // Pastikan elemen terlihat (display: block) sebelum menambahkan kelas 'show'
-                alertElement.style.display = 'block'; 
+                alertElement.style.display = 'block';
                 setTimeout(() => {
                     alertElement.classList.add('show');
                 }, 100); // Memberi sedikit delay (100ms) untuk memastikan browser merender status awal sebelum transisi
@@ -418,25 +418,28 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan data via AJAX. --}
             });
 
             showNotification(alertDiv); // Show with transition
+            // Durasi notifikasi dinamis: 5000 milidetik (5 detik)
             setTimeout(() => {
-                hideNotification(alertDiv); // Hide after 5 seconds
+                hideNotification(alertDiv);
             }, 5000);
         }
 
         // Jalankan logika untuk notifikasi sukses yang ada di sesi
         if (successAlert) {
             showNotification(successAlert); // Tampilkan notifikasi
+            // Durasi notifikasi sukses (session-based): 5000 milidetik (5 detik)
             setTimeout(() => {
-                hideNotification(successAlert); // Sembunyikan setelah 5 detik
-            }, 5000); // 5000 milidetik = 5 detik
+                hideNotification(successAlert);
+            }, 5000);
         }
         
         // Jalankan logika untuk notifikasi error yang ada di sesi
         if (errorAlert) {
             showNotification(errorAlert); // Tampilkan notifikasi
+            // Durasi notifikasi error (session-based): 5000 milidetik (5 detik)
             setTimeout(() => {
-                hideNotification(errorAlert); // Sembunyikan setelah 5 detik
-            }, 5000); // 5000 milidetik = 5 detik
+                hideNotification(errorAlert);
+            }, 5000);
         }
 
 
@@ -454,7 +457,7 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan data via AJAX. --}
         if (!wilayahSelect || !kurirSelectDropdown || !formTentukanKurir || !shipmentIdToAssignInput || !selectedKurirIdInput || !modalTentukanKurir || !modalDetail || !adminHeader || !dynamicNotificationContainer) {
             console.error('One or more critical HTML elements for modal/form/notifications are missing. Please check your IDs and ensure admin-header and dynamic-notification-container exist.');
             // Jika ada elemen penting yang hilang, hentikan eksekusi script untuk mencegah error lebih lanjut.
-            return; 
+            return;
         }
 
         window.openModal = function(shipmentId) {
@@ -583,7 +586,7 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan data via AJAX. --}
                     createAndShowDynamicNotification(successData.message, 'success');
                     closeModal(); // Tutup modal setelah berhasil
                     // Consider a more granular update or simply reload for simplicity in this case
-                    location.reload(); 
+                    location.reload();
                 }
             } catch (error) {
                 console.error('Error submitting form:', error);
