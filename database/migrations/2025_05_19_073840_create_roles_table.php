@@ -23,7 +23,6 @@ return new class extends Migration
             ['role_name' => 'admin'],
             ['role_name' => 'courier'],
             ['role_name' => 'customer'],
-            ['role_name' => 'guest'],
         ]);
     }
 

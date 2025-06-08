@@ -70,4 +70,8 @@ class User extends Authenticatable implements MustVerifyEmail
         Log::info('User role_id: ' . $this->role_id);
         return (int)$this->role_id === 2;
     }
+
+     public function sentOrders() {
+        return $this->hasMany(Order::class, 'senderUserID');
+    }
 }
