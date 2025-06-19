@@ -1,14 +1,16 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CourierLoginController;
 use App\Http\Controllers\CreateCourierController;
 use App\Http\Controllers\DeleteCourierController;
 use App\Http\Controllers\EditCourierController;
 use App\Http\Controllers\KelolaPengirimanController;
-use App\Http\Controllers\DashboardAdminController;
 use App\Http\Controllers\KelolaKurirController;
+use App\Http\Controllers\DashboardAdminController;
+use App\Http\Controllers\ShipmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,16 +19,36 @@ use App\Http\Controllers\KelolaKurirController;
 */
 
 // ------------------- Guest Route -------------------
-Route::get('/', fn() => view('PublicUser.home'));
+Route::get('/', function() { return Auth::check() ? redirect()->route('dashboard') : view('PublicUser.home');
+});
 
 // ------------------- Authenticated User Routes -------------------
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', fn() => view('User.dashboard'))->name('dashboard');
-    Route::get('/pengiriman', fn() => view('User.daftar_pengiriman'))->name('pengiriman');
+   // Langkah 1: Menampilkan form utama untuk mengisi detail pengiriman
+    Route::get('/shipments/create-step-1', [ShipmentController::class, 'createStep1'])->name('shipments.create.step1');
+    // Memproses data dari Langkah 1
+    Route::post('/shipments/store-step-1', [ShipmentController::class, 'storeStep1'])->name('shipments.store.step1');
+    
+    // Langkah 2: Menampilkan halaman ringkasan & pembayaran
+    Route::get('/shipments/create-step-2', [ShipmentController::class, 'createStep2'])->name('shipments.create.step2');
+    // Memproses data dari Langkah 2 (Final)
+    Route::post('/shipments/store-final', [ShipmentController::class, 'storeFinal'])->name('shipments.store.final');
 
+    // Halaman konfirmasi setelah berhasil
+    Route::get('/shipments/confirmation/{orderID}', [ShipmentController::class, 'confirmation'])->name('shipments.confirmation');
+    
+    // Halaman riwayat pengiriman
+    Route::get('/shipments/history', [ShipmentController::class, 'history'])->name('shipments.history');
+
+    // Rute untuk Midtrans tetap sama
+    Route::get('/payment/finish', [ShipmentController::class, 'paymentFinish'])->name('payment.finish');
+    
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/kurir/scan/{tracking_number}', [ShipmentController::class, 'scanTrack'])->name('kurir.scan.track');
 });
 
 require __DIR__.'/auth.php';

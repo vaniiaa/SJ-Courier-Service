@@ -34,7 +34,6 @@ class StoreShipmentRequest extends FormRequest
             'itemType' => 'required|string|max:100',
             'weightKG' => 'required|numeric|min:0.1|max:1000', // Sesuaikan max weight
             'notes' => 'nullable|string|max:500',
-            'paymentMethodOption' => 'required|string|in:cod,online', // Untuk memilih COD atau Online
         ];
     }
 
@@ -65,8 +64,6 @@ class StoreShipmentRequest extends FormRequest
             'weightKG.required' => 'Berat barang wajib diisi.',
             'weightKG.numeric' => 'Berat barang harus berupa angka.',
             'weightKG.min' => 'Berat barang minimal 0.1 Kg.',
-            'paymentMethodOption.required' => 'Opsi metode pembayaran wajib dipilih.',
-            'paymentMethodOption.in' => 'Opsi metode pembayaran tidak valid.',
         ];
     }
 }
