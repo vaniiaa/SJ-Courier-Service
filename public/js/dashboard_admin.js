@@ -1,16 +1,14 @@
 const ctx = document.getElementById('pengirimanChart').getContext('2d');
-let dataPengiriman = [600, 500, 623, 450, 700, 850, 500, 670, 550, 780, 690, 720];
-let wilayah = ['Batam Center', 'Sekupang', 'Batu Aji', 'Nongsa', 'Tanjung Uncang', 'Lubuk Baja',
-               'Batu Besar', 'Bintan', 'Belakang Padang', 'Kabil', 'Sungai Panas', 'Mangsang'];
-const pengirimanChart = new Chart(ctx, {
-    type: 'line', 
+
+let pengirimanChart = new Chart(ctx, {
+    type: 'line',
     data: {
-        labels: wilayah, 
+        labels: [],
         datasets: [{
             label: 'Jumlah Pengiriman',
-            data: dataPengiriman,
+            data: [],
             borderColor: '#facc15',
-            backgroundColor: 'rgba(250, 204, 21, 0.2)', 
+            backgroundColor: 'rgba(250, 204, 21, 0.2)',
             fill: true,
             tension: 0.4,
             pointBackgroundColor: '#facc15',
@@ -24,22 +22,28 @@ const pengirimanChart = new Chart(ctx, {
             y: {
                 beginAtZero: true,
                 ticks: {
-                    stepSize: 100
+                    stepSize: 1
                 }
             }
         }
     }
 });
 
+function fetchChartData() {
+    fetch('/admin/api/pengiriman-per-wilayah')
+        .then(response => response.json())
+        .then(data => {
+            const labels = data.map(item => item.alamat_tujuan);
+            const values = data.map(item => item.total);
 
-function updateChartData() {
-    dataPengiriman = dataPengiriman.map(val => {
-        let change = Math.floor(Math.random() * 201) - 100; 
-        return Math.max(0, val + change); 
-    });
-
-    pengirimanChart.data.datasets[0].data = dataPengiriman;
-    pengirimanChart.update();
+            pengirimanChart.data.labels = labels;
+            pengirimanChart.data.datasets[0].data = values;
+            pengirimanChart.update();
+        })
+        .catch(error => {
+            console.error('Error fetching chart data:', error);
+        });
 }
 
-setInterval(updateChartData, 3000);
+fetchChartData();
+setInterval(fetchChartData, 3000);

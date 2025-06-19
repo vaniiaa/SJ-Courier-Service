@@ -1,3 +1,12 @@
+{{--
+ * Nama File: kelola_kurir.php
+ * Deskripsi: view ini berfungsi untuk menampilkan interface dari halaman kelola_kurir. halaman ini akan menampilkan data-data kurir
+ * yang ada pada aplikasi. pad halaman ini admin dapat melakukan tambah, edit, dan hapus data kurir.
+ * Dibuat Oleh: [Aulia Sabrina] - NIM [3312301002]
+ * Tanggal: 25 Mei 2025
+--}}
+
+
 @extends('layouts.admin')
 
 @include('components.admin.sidebar')
@@ -9,23 +18,23 @@
 
 {{-- CSS Tambahan untuk Transisi Notifikasi & Gelap Header Modal --}}
 <style>
-    /* Style untuk transisi muncul dan menghilang pada notifikasi */
+
     .notification-transition {
         opacity: 0;
-        transform: translateY(-20px); /* Mulai sedikit di atas */
-        transition: opacity 0.5s ease-out, transform 0.5s ease-out; /* Transisi 0.5 detik */
+        transform: translateY(-20px); 
+        transition: opacity 0.5s ease-out, transform 0.5s ease-out; 
     }
 
     .notification-transition.show {
         opacity: 1;
-        transform: translateY(0); /* Kembali ke posisi normal */
+        transform: translateY(0); 
     }
 
-    /* CSS untuk menggelapkan header saat modal terbuka */
+
     .modal-open .admin-header {
-        filter: brightness(0.5); /* Menggelapkan sebesar 50% */
+        filter: brightness(0.5); 
         transition: filter 0.3s ease-in-out;
-        pointer-events: none; /* Menonaktifkan interaksi klik pada header */
+        pointer-events: none; 
     }
 </style>
 
@@ -106,7 +115,9 @@
                 <tbody>
                     @forelse($kurirs as $index => $kurir)
                         <tr class="{{ $index % 2 === 0 ? 'bg-white' : 'bg-gray-100' }}">
-                            <td class="px-4 py-2 text-center">{{ $index + 1 }}</td>
+                      <td class="px-4 py-2 text-center">
+    {{ ($kurirs->currentPage() - 1) * $kurirs->perPage() + $loop->iteration }}
+</td>
                             <td class="px-4 py-2">{{ $kurir->nama }}</td>
                             <td class="px-4 py-2">{{ $kurir->email }}</td>
                             <td class="px-4 py-2">{{ $kurir->no_hp }}</td>
@@ -146,14 +157,38 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
-    </div>
 </div>
 
-{{-- Pagination --}}
-<div class="flex justify-end mt-4">
-    {{ $kurirs->links() }}
-</div>
+     @if ($kurirs->hasPages())
+    <div class="mt-6 flex justify-end pr-4">
+        <nav class="inline-flex -space-x-px text-sm shadow-sm" aria-label="Pagination">
+            {{-- Previous Page Link --}}
+            @if ($kurirs->onFirstPage())
+                <span class="px-3 py-2 rounded-l-md border border-gray-300 bg-gray-100 text-gray-400 cursor-default">Sebelumnya</span>
+            @else
+                <a href="{{ $kurirs->previousPageUrl() }}" class="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-200">Sebelumnya</a>
+            @endif
+
+            {{-- Page Numbers --}}
+            @foreach ($kurirs->getUrlRange(1, $kurirs->lastPage()) as $page => $url)
+                @if ($page == $kurirs->currentPage())
+                    <span class="px-3 py-2 border border-gray-300 bg-yellow-400 text-white font-semibold">{{ $page }}</span>
+                @else
+                    <a href="{{ $url }}" class="px-3 py-2 border border-gray-300 bg-white text-gray-700 hover:bg-yellow-100">{{ $page }}</a>
+                @endif
+            @endforeach
+
+            {{-- Next Page Link --}}
+            @if ($kurirs->hasMorePages())
+                <a href="{{ $kurirs->nextPageUrl() }}" class="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-200">Berikutnya</a>
+            @else
+                <span class="px-3 py-2 rounded-r-md border border-gray-300 bg-gray-100 text-gray-400 cursor-default">Berikutnya</span>
+            @endif
+        </nav>
+    </div>
+@endif
+
+
 
 {{-- Modal Popup --}}
 <div id="popup-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 z-50">
@@ -175,49 +210,4 @@
 </div>
 
 <script src="{{ asset('js/kurir.js') }}"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const successAlert = document.getElementById('success-alert');
-        const errorAlert = document.getElementById('error-alert');
-
-        // Fungsi untuk menampilkan notifikasi dengan transisi
-        function showNotification(alertElement) {
-            if (alertElement) {
-                // Pastikan elemen terlihat (display: block) sebelum menambahkan kelas 'show'
-                // Ini penting agar transisi 'opacity' dan 'transform' bisa berjalan mulus dari awal.
-                alertElement.style.display = 'block'; 
-                setTimeout(() => {
-                    alertElement.classList.add('show');
-                }, 100); // Memberi sedikit delay (100ms) untuk memastikan browser merender status awal sebelum transisi
-            }
-        }
-
-        // Fungsi untuk menyembunyikan notifikasi dengan transisi
-        function hideNotification(alertElement) {
-            if (alertElement) {
-                alertElement.classList.remove('show'); // Hapus kelas 'show' untuk memicu transisi menghilang
-                // Setelah transisi selesai, sembunyikan elemen sepenuhnya (display: none)
-                alertElement.addEventListener('transitionend', function() {
-                    alertElement.style.display = 'none';
-                }, { once: true }); // Listener ini hanya akan berjalan sekali
-            }
-        }
-
-        // Jalankan logika untuk notifikasi sukses
-        if (successAlert) {
-            showNotification(successAlert); // Tampilkan notifikasi
-            setTimeout(() => {
-                hideNotification(successAlert); // Sembunyikan setelah 5 detik
-            }, 5000); // 5000 milidetik = 5 detik
-        }
-        
-        // Jalankan logika untuk notifikasi error
-        if (errorAlert) {
-            showNotification(errorAlert); // Tampilkan notifikasi
-            setTimeout(() => {
-                hideNotification(errorAlert); // Sembunyikan setelah 5 detik
-            }, 5000); // 5000 milidetik = 5 detik
-        }
-    });
-</script>
 @endsection

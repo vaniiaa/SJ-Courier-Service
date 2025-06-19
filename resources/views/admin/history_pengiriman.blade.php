@@ -1,3 +1,5 @@
+{{-- admin/history_pengiriman.blade.php --}}
+
 @extends('layouts.admin')
 
 @include('components.admin.sidebar')
@@ -6,18 +8,37 @@
 
 @section('content')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    /* CSS untuk paginasi */
+    nav[role="navigation"] > div > span,
+    nav[role="navigation"] > div > a {
+        margin-right: 8px;
+        padding: 6px 12px;
+        border-radius: 0.375rem;
+        border: 1px solid #d1d5db;
+        color: #1f2937;
+    }
+
+    nav[role="navigation"] > div > span[aria-current="page"] {
+        background-color: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+    }
+</style>
+
 <div class="absolute top-36 left-0 right-0 px-4">
     <div class="max-w-[90rem] mx-auto bg-white rounded-lg shadow-lg p-4">
         {{-- Search Bar --}}
         <div class="flex justify-end items-center mb-4">
-            <form action="" method="GET" class="flex items-center gap-2">
+            <form action="{{ route('admin.history_pengiriman') }}" method="GET" class="flex items-center gap-2">
                 <label for="search" class="font-medium text-sm">Search:</label>
-                <input type="text" id="search" name="search" placeholder="Cari resi / nama" class="border px-2 py-1 rounded text-sm" />
+                <input type="text" id="search" name="search" placeholder="Cari resi / nama" class="border px-2 py-1 rounded text-sm" value="{{ request('search') }}" />
+                <button type="submit" class="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600">Cari</button>
             </form>
         </div>
 
         {{-- Tabel --}}
-        <div class=" border border-gray-300 rounded-lg mt-[-10px]">
+        <div class="overflow-x-auto border border-gray-300 rounded-lg mt-[-10px]">
             <table class="w-full table-auto text-sm rounded-lg overflow-hidden">
                 <thead class="bg-gray-50 text-gray-700 text-sm">
                     <tr class="border border-gray-300">
@@ -37,60 +58,76 @@
                     </tr>
                 </thead>
                 <tbody>
-                @php
-                    $pengiriman = [
-                        ['123456', 'John Doe', 'Jl. Punggur No.1', 'Dewi Lestari', 'Jl. Botania Raya', '2025-04-09', 2.5, 25000, 'COD', 'Kurir A', 'pesanan diterima'],
-                        ['654321', 'Sarah Lee', 'Jl. Nongsa No.12', 'Budi Santoso', 'Jl. Tiban Indah', '2025-04-08', 1.2, 15000, 'Transfer', 'Kurir B', 'pesanan diterima'],
-                        ['111222', 'Rizal Pratama', 'Jl. Sadai No.45', 'Rani Wijaya', 'Jl. Batu Aji Lama', '2025-04-07', 3.0, 30000, 'COD', 'Kurir C', 'pesanan diterima'],
-                        ['333444', 'Nina Fitria', 'Jl. Marina No.3', 'Yanto Pratama', 'Jl. Citra Mas', '2025-04-06', 1.5, 18000, 'Transfer', 'Kurir D', 'pesanan diterima'],
-                        ['555666', 'Tommy Lim', 'Jl. Barelang No.20', 'Sinta Ayu', 'Jl. Gajah Mada', '2025-04-05', 2.0, 22000, 'COD', 'Kurir E', 'pesanan diterima'],
-                        ['777888', 'Indah Mulyani', 'Jl. Bengkong Laut', 'Agus Salim', 'Jl. Ruko Mega Legenda', '2025-04-04', 4.0, 40000, 'Transfer', 'Kurir F', 'pesanan diterima'],
-                        ['999000', 'Laila Rachmawati', 'Jl. Hang Nadim', 'Putri Wahyuni', 'Jl. Kepri Mall', '2025-04-03', 1.8, 20000, 'COD', 'Kurir G', 'pesanan diterima'],
-                        ['112233', 'Eko Setiawan', 'Jl. Baloi Permai', 'Rizky Hidayat', 'Jl. Nagoya Hill', '2025-04-02', 3.5, 35000, 'Transfer', 'Kurir H', 'pesanan diterima'],
-                        ['E445566', 'Dani Saputra', 'Jl. Tiban Koperasi', 'Dian Anggraini', 'Jl. Puri Agung', '2025-04-01', 2.3, 27000, 'COD', 'Kurir I', 'pesanan diterima'],
-                        ['E778899', 'Mia Sutanto', 'Jl. Sungai Harapan', 'Fajar Nugroho', 'Jl. Taman Raya', '2025-03-31', 1.9, 21000, 'Transfer', 'Kurir J', 'pesanan diterima'],
-                    ];
-                @endphp
-
-                @foreach ($pengiriman as $index => $data)
-                    <tr class="{{ $index % 2 === 0 ? 'bg-white' : 'bg-gray-100' }}">
-                        <td class="px-4 py-2 text-center">{{ $index + 1 }}</td>
-                        <td class="px-4 py-2 text-center">{{ $data[0] }}</td>
-                        <td class="px-4 py-2">{{ $data[1] }}</td>
-                        <td class="px-4 py-2">{{ $data[2] }}</td>
-                        <td class="px-4 py-2">{{ $data[3] }}</td>
-                        <td class="px-4 py-2">{{ $data[4] }}</td>
-                        <td class="px-4 py-2">{{ $data[5] }}</td>
-                        <td class="px-4 py-2 text-center">{{ $data[6] }}</td>
-                        <td class="px-4 py-2 text-center">{{ number_format($data[7], 0, ',', '.') }}</td>
-                        <td class="px-4 py-2 text-center">{{ $data[8] }}</td>
-                        <td class="px-4 py-2">{{ $data[9] }}</td>
-                        <td class="px-4 py-2 text-center font-semibold text-sm text-green-600">
-                            {{ ucfirst($data[10]) }}
-                        </td>
-                        <td class="px-4 py-2 text-center">
-                            <div class="flex justify-center gap-2">
-                                <a href="/path/to/download/{{ $data[0] }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-xs shadow-md shadow-gray-700" title="Unduh">
-                                    <i class="fas fa-download"></i>
-                                </a>
-                                <a href="/path/to/print/{{ $data[0] }}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-xs shadow-md shadow-gray-700" title="Print">
-                                    <i class="fas fa-print"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                @endforeach
+                    @forelse ($pengiriman as $index => $data)
+                        <tr class="{{ $loop->even ? 'bg-white' : 'bg-gray-100' }}">
+                            <td class="px-4 py-2 text-center">
+                                {{ ($pengiriman->currentPage() - 1) * $pengiriman->perPage() + $loop->iteration }}
+                            </td>
+                            <td class="px-4 py-2 text-center">{{ $data->resi }}</td>
+                            <td class="px-4 py-2">{{ $data->nama_pengirim }}</td>
+                            <td class="px-4 py-2">{{ $data->alamat_penjemputan }}</td>
+                            <td class="px-4 py-2">{{ $data->nama_penerima }}</td>
+                            <td class="px-4 py-2">{{ $data->alamat_tujuan }}</td>
+                            <td class="px-4 py-2">{{ \Carbon\Carbon::parse($data->tanggal_pemesanan)->format('Y-m-d') }}</td>
+                            <td class="px-4 py-2 text-center">{{ $data->berat }}</td>
+                            <td class="px-4 py-2 text-center">{{ number_format($data->harga, 0, ',', '.') }}</td>
+                            <td class="px-4 py-2 text-center">{{ $data->metode_pembayaran }}</td>
+                            <td class="px-4 py-2">{{ $data->kurir->username ?? $data->nama_kurir ?? 'N/A' }}</td>
+                            <td class="px-4 py-2 text-center font-semibold text-sm
+                                @if ($data->status_pengiriman === 'menunggu konfirmasi') text-gray-600
+                                @elseif ($data->status_pengiriman === 'sedang dikirim') text-red-600
+                                @elseif ($data->status_pengiriman === 'menuju alamat') text-blue-600
+                                @elseif ($data->status_pengiriman === 'pesanan diterima') text-green-600
+                                @else text-black
+                                @endif">
+                                {{ ucfirst($data->status_pengiriman) }}
+                            </td>
+                            <td class="px-4 py-2 text-center">
+                                <div class="flex justify-center gap-2">
+                                    <a href="/admin/pengiriman/download/{{ $data->resi }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-xs shadow-md shadow-gray-700" title="Unduh">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                    <a href="/admin/pengiriman/print/{{ $data->resi }}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-xs shadow-md shadow-gray-700" title="Print">
+                                        <i class="fas fa-print"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="13" class="px-4 py-4 text-center text-gray-500">Tidak ada data riwayat pengiriman yang ditemukan.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
 
-        {{-- Pagination --}}
-        <div class="flex justify-end mt-4 space-x-1 text-sm">
-            <button class="px-3 py-1 border rounded bg-gradient-to-r from-[#FFA500] to-[#FFD45B]">&lt;&lt;</button>
-            <button class="px-3 py-1 border rounded bg-gradient-to-r from-[#FFA500] to-[#FFD45B]">1</button>
-            <button class="px-3 py-1 border rounded bg-white hover:bg-gray-100">2</button>
-            <button class="px-3 py-1 border rounded bg-white hover:bg-gray-100">...</button>
-        </div>
+        {{-- Paginasi --}}
+        @if ($pengiriman->hasPages())
+            <div class="mt-6 flex justify-end pr-4">
+                <nav class="inline-flex -space-x-px text-sm shadow-sm" aria-label="Pagination">
+                    @if ($pengiriman->onFirstPage())
+                        <span class="px-3 py-2 rounded-l-md border border-gray-300 bg-gray-100 text-gray-400 cursor-default">Sebelumnya</span>
+                    @else
+                        <a href="{{ $pengiriman->previousPageUrl() }}" class="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-200">Sebelumnya</a>
+                    @endif
+
+                    @foreach ($pengiriman->getUrlRange(1, $pengiriman->lastPage()) as $page => $url)
+                        @if ($page == $pengiriman->currentPage())
+                            <span class="px-3 py-2 border border-gray-300 bg-blue-500 text-white font-semibold">{{ $page }}</span>
+                        @else
+                            <a href="{{ $url }}" class="px-3 py-2 border border-gray-300 bg-white text-gray-700 hover:bg-blue-100">{{ $page }}</a>
+                        @endif
+                    @endforeach
+
+                    @if ($pengiriman->hasMorePages())
+                        <a href="{{ $pengiriman->nextPageUrl() }}" class="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-200">Berikutnya</a>
+                    @else
+                        <span class="px-3 py-2 rounded-r-md border border-gray-300 bg-gray-100 text-gray-400 cursor-default">Berikutnya</span>
+                    @endif
+                </nav>
+            </div>
+        @endif
     </div>
 </div>
 @endsection

@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Nama File: CourierLoginController.php
+ * Deskripsi: Controller ini dibuat agar kurir dapat melakukan login pada aplikasi
+ * Dibuat Oleh: [Aulia Sabrina] - NIM [3312301002]
+ * Tanggal: 25 Mei 2025
+ */
+
+
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;

@@ -3,10 +3,12 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CourierLoginController;
-use App\Http\Controllers\CreateCourierController; // Kamu tulis CreateLoginController sebelumnya, harusnya CreateCourierController
+use App\Http\Controllers\CreateCourierController;
 use App\Http\Controllers\DeleteCourierController;
 use App\Http\Controllers\EditCourierController;
 use App\Http\Controllers\KelolaPengirimanController;
+use App\Http\Controllers\DashboardAdminController;
+use App\Http\Controllers\KelolaKurirController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,17 +43,20 @@ Route::get('/login/user', fn() => view('auth.user.masuk'))->name('user.login');
 
 // ------------------- Admin - Kelola Kurir -------------------
 Route::prefix('admin')->middleware('auth')->group(function () {
-    Route::get('/kelola_kurir', [CreateCourierController::class, 'index'])->name('admin.kelola_kurir');
+    Route::get('/kelola_kurir', [KelolaKurirController::class, 'index'])->name('admin.kelola_kurir');
     Route::get('/tambah_kurir', [CreateCourierController::class, 'create'])->name('admin.tambah_kurir');
     Route::post('/simpan_kurir', [CreateCourierController::class, 'store'])->name('admin.simpan_kurir');
-Route::delete('/kurir/{id}', [DeleteCourierController::class, 'destroy'])->name('admin.hapus_kurir');
+    Route::delete('/kurir/{id}', [DeleteCourierController::class, 'destroy'])->name('admin.hapus_kurir');
     Route::get('/edit_kurir/{id}', [EditCourierController::class, 'editKurir'])->name('admin.edit_kurir');
     Route::put('/update_kurir/{id}', [EditCourierController::class, 'updateKurir'])->name('admin.update_kurir');
 
     // ------------------- Halaman Admin -------------------
-    Route::get('/status_pengiriman', fn() => view('admin.status_pengiriman'))->name('admin.status_pengiriman');
-    Route::get('/history_pengiriman', fn() => view('admin.history_pengiriman'))->name('admin.history_pengiriman');
-    Route::get('/dashboard_admin', fn() => view('admin.dashboard_admin'))->name('admin.dashboard_admin');
+    // Remove the redundant route that only returns a view
+    // Route::get('/status_pengiriman', fn() => view('admin.status_pengiriman'))->name('admin.status_pengiriman');
+
+  
+    Route::get('/dashboard_admin', [DashboardAdminController::class, 'index'])->name('admin.dashboard_admin');
+    Route::get('/api/pengiriman-per-wilayah', [DashboardAdminController::class, 'getPengirimanPerWilayah']);
 
     // ----- Kelola Pengiriman dan Penugasan Kurir -----
     Route::get('/kelola_pengiriman', [KelolaPengirimanController::class, 'index'])->name('admin.kelola_pengiriman');
@@ -59,12 +64,13 @@ Route::delete('/kurir/{id}', [DeleteCourierController::class, 'destroy'])->name(
     // API Routes untuk AJAX
     Route::get('/api/kurir-by-wilayah/{wilayah}', [KelolaPengirimanController::class, 'getKurirByWilayah'])->name('kurir.byWilayah');
     Route::post('/api/assign-kurir', [KelolaPengirimanController::class, 'assignKurir'])->name('assign.kurir');
-       Route::get('/kurir-by-username', [KelolaPengirimanController::class, 'getCourierByUsername'])->name('kurir.byUsername');
+    Route::get('/kurir-by-username', [KelolaPengirimanController::class, 'getCourierByUsername'])->name('kurir.byUsername');
 
+    // THIS IS THE CORRECTED ROUTE NAME
+    Route::get('/status_pengiriman', [KelolaPengirimanController::class, 'statusPengiriman'])->name('admin.status_pengiriman');
+    Route::get('/history_pengiriman', [KelolaPengirimanController::class, 'historyPengiriman'])->name('admin.history_pengiriman');
 });
 
- Route::get('/kurir/daftar_pengiriman', function () {
-        return view('kurir.daftar_pengiriman');
-    })->name('kurir.daftar_pengiriman');
+Route::get('/kurir/daftar_pengiriman', [KelolaPengirimanController::class, 'daftarPengirimanKurir'])->name('kurir.daftar_pengiriman');
+Route::get('/kurir/kelola_status', [KelolaPengirimanController::class, 'updateStatus'])->name('kurir.kelola_status');
 
- Route::get('/kurir/daftar_pengiriman', [KelolaPengirimanController::class, 'daftarPengirimanKurir'])->name('kurir.daftar_pengiriman');

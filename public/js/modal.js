@@ -19,3 +19,4 @@ function tutupModal() {
     document.getElementById('popup-modal').classList.add('hidden');
     headerEl.classList.remove('darken');
 }
+

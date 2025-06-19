@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * Nama File: DeleteCourierController.php
+ * Deskripsi: Controller ini berfungsi untuk menghapus data kurir jika sekiranya kurir tersebut sudah tidak bekerja lagi dengan SJ Courier Service
+ * Dibuat Oleh: [Aulia Sabrina] - NIM [3312301002]
+ * Tanggal: 25 Mei 2025
+ */
+
 namespace App\Http\Controllers;
 
 use App\Models\Kurir; // Pastikan ini adalah model yang benar untuk kurir

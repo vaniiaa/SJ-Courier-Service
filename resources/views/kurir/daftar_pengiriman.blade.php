@@ -1,4 +1,4 @@
-@extends('layouts.kurir_page') {{-- Pastikan layout ini ada dan sesuai dengan struktur proyek Anda --}}
+@extends('layouts.kurir_page') 
 
 @section('title', 'Daftar Pengiriman Anda')
 
@@ -95,11 +95,34 @@
             </table>
         </div>
 
-        {{-- Laravel Pagination Links --}}
-        <div class="mt-4">
-            {{ $pengiriman->links() }}
-        </div>
+      @if ($pengiriman->hasPages())
+    <div class="mt-6 flex justify-end pr-4">
+        <nav class="inline-flex -space-x-px text-sm shadow-sm" aria-label="Pagination">
+            {{-- Previous Page Link --}}
+            @if ($pengiriman->onFirstPage())
+                <span class="px-3 py-2 rounded-l-md border border-gray-300 bg-gray-100 text-gray-400 cursor-default">Sebelumnya</span>
+            @else
+                <a href="{{ $pengiriman->previousPageUrl() }}" class="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-200">Sebelumnya</a>
+            @endif
+
+            {{-- Page Numbers --}}
+            @foreach ($pengiriman->getUrlRange(1, $pengiriman->lastPage()) as $page => $url)
+                @if ($page == $pengiriman->currentPage())
+                    <span class="px-3 py-2 border border-gray-300 bg-yellow-400 text-white font-semibold">{{ $page }}</span>
+                @else
+                    <a href="{{ $url }}" class="px-3 py-2 border border-gray-300 bg-white text-gray-700 hover:bg-yellow-100">{{ $page }}</a>
+                @endif
+            @endforeach
+
+            {{-- Next Page Link --}}
+            @if ($pengiriman->hasMorePages())
+                <a href="{{ $pengiriman->nextPageUrl() }}" class="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-200">Berikutnya</a>
+            @else
+                <span class="px-3 py-2 rounded-r-md border border-gray-300 bg-gray-100 text-gray-400 cursor-default">Berikutnya</span>
+            @endif
+        </nav>
     </div>
+@endif
 
     {{-- Modal Detail Pengiriman --}}
     {{-- TAMBAHKAN x-cloak DI SINI --}}

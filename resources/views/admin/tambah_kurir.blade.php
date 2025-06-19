@@ -1,3 +1,13 @@
+{{--
+ * Nama File: edit_kurir.php
+ * Deskripsi: view ini berfungsi untuk menampilkan interface dari halaman edit kurir yang berisi form untuk mengedit data kurir 
+ * termasuk nama, email, no.hp, alamat, username dan password
+ * Dibuat Oleh: [Aulia Sabrina] - NIM [3312301002]
+ * Tanggal: 25 Mei 2025
+ --}}
+
+
+
 @extends('layouts.admin')
 
 @include('components.admin.sidebar')

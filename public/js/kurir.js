@@ -195,3 +195,40 @@ document.addEventListener('DOMContentLoaded', function() {
             return str.charAt(0).toUpperCase() + str.slice(1);
         }
     });
+
+    document.addEventListener('DOMContentLoaded', function() {
+    const successAlert = document.getElementById('success-alert');
+    const errorAlert = document.getElementById('error-alert');
+
+    function showNotification(alertElement) {
+        if (alertElement) {
+            alertElement.style.display = 'block';
+            setTimeout(() => {
+                alertElement.classList.add('show');
+            }, 100);
+        }
+    }
+
+    function hideNotification(alertElement) {
+        if (alertElement) {
+            alertElement.classList.remove('show');
+            alertElement.addEventListener('transitionend', function() {
+                alertElement.style.display = 'none';
+            }, { once: true });
+        }
+    }
+
+    if (successAlert) {
+        showNotification(successAlert);
+        setTimeout(() => {
+            hideNotification(successAlert);
+        }, 5000); // tampil 8 detik
+    }
+
+    if (errorAlert) {
+        showNotification(errorAlert);
+        setTimeout(() => {
+            hideNotification(errorAlert);
+        }, 5000); // tampil 8 detik
+    }
+});
