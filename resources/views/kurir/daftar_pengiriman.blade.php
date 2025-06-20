@@ -1,10 +1,16 @@
+{{-- 
+    Nama File   : daftar_pengiriman.blade.php
+    Deskripsi   : Menampilkan daftar pengiriman untuk kurir, termasuk detail pengiriman melalui modal.
+    Dibuat Oleh : [Vania] - [3312301024]
+    Tanggal     : 1 Juni 2025
+--}}
+
 @extends('layouts.kurir_page') 
 
-@section('title', 'Daftar Pengiriman Anda')
+@section('title', 'Daftar Pengiriman')
 
 @section('content')
 
-{{-- Tambahkan CSS untuk x-cloak di sini atau di file CSS Anda --}}
 <style>
     [x-cloak] {
         display: none !important;
@@ -60,7 +66,7 @@
                                 @if ($data->status_pengiriman === 'menunggu konfirmasi') text-gray-600
                                 @elseif ($data->status_pengiriman === 'sedang dikirim') text-red-600
                                 @elseif ($data->status_pengiriman === 'menuju alamat') text-blue-600
-                                @elseif ($data->status_pengiriman === 'pesanan diterima') text-green-600
+                                @elseif ($data->status_pengiriman === 'pesanan selesai') text-green-600
                                 @endif">
                                 {{ ucfirst($data->status_pengiriman) }}
                             </td>
@@ -79,7 +85,9 @@
                                             kurir: '{{ $data->nama_kurir ?? 'Belum Ditentukan' }}',
                                             status: '{{ ucfirst($data->status_pengiriman) }}',
                                             catatan: '{{ $data->catatan ?? '' }}',
-                                            tanggal_pengiriman: '{{ $data->tanggal_pengiriman ?? 'Belum Ditentukan' }}'
+                                            tanggal_pengiriman: '{{ $data->tanggal_pengiriman ?? 'Belum Ditentukan' }}',
+                                            bukti: '{{ $data->bukti_pengiriman ? asset('storage/bukti_pengiriman/' . $data->bukti_pengiriman) : '' }}'
+
                                         }">
                                         Detail
                                     </button>
@@ -94,8 +102,9 @@
                 </tbody>
             </table>
         </div>
-
-      @if ($pengiriman->hasPages())
+        
+    {{-- Paginasi --}}
+    @if ($pengiriman->hasPages())
     <div class="mt-6 flex justify-end pr-4">
         <nav class="inline-flex -space-x-px text-sm shadow-sm" aria-label="Pagination">
             {{-- Previous Page Link --}}
@@ -125,7 +134,6 @@
 @endif
 
     {{-- Modal Detail Pengiriman --}}
-    {{-- TAMBAHKAN x-cloak DI SINI --}}
     <div x-show="showModal" x-cloak class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
         <div class="bg-white p-4 rounded-lg shadow-md shadow-gray-700 w-[1000px] max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center">
@@ -188,14 +196,26 @@
                     <label class="w-40 text-left font-medium text-gray-700 after:content-[':']">Catatan</label>
                     <textarea rows="2" :value="selectedData.catatan" class="flex-1 pl-4 py-1.5 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-sm" readonly></textarea>
                 </div>
-            </form>
 
+                <div class="flex items-start gap-4">
+                        <label class="w-40 text-sm font-medium text-gray-700 after:content-[':']">Bukti Pengiriman</label>
+                        <div class="flex-1">
+                            <template x-if="selectedData.bukti">
+                                <img :src="selectedData.bukti" alt="Bukti Pengiriman" class="w-32 rounded-md">
+                            </template>
+                            <template x-if="!selectedData.bukti">
+                                <p class="text-sm text-gray-500 italic">Bukti belum tersedia</p>
+                            </template>
+                        </div>
+                    </div>
+            </form>
             <div class="flex justify-end mt-6">
                 <button @click="showModal = false" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 shadow">
                     Tutup
                 </button>
             </div>
-        </div>
+        </div>   
     </div>
 </div>
+
 @endsection

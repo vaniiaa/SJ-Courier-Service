@@ -102,39 +102,31 @@ class KelolaPengirimanController extends Controller
         return view('kurir.daftar_pengiriman', compact('pengiriman'));
     }
 
-     public function updateStatus(Request $request)
-    {
-        // Memastikan pengguna adalah kurir yang terautentikasi. Jika tidak, arahkan kembali ke login kurir.
-        if (!Auth::guard('kurir')->check()) {
-            return redirect()->route('kurir.login')->with('error', 'Silakan masuk sebagai kurir untuk mengupdate status.');
-        }
-
-        // Mendapatkan ID kurir yang sedang login.
-        $kurirId = Auth::guard('kurir')->id();
-
-        // Membangun query untuk pengiriman yang ditugaskan kepada kurir ini.
-        $query = Pengiriman::where('kurir_id', $kurirId);
-
-        // Menambahkan fungsionalitas pencarian jika ada input 'search'.
-        if ($request->has('search') && $request->search != '') {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                // Mencari berdasarkan nomor resi, nama pengirim, atau nama penerima.
-                $q->where('resi', 'like', '%' . $search . '%')
-                  ->orWhere('nama_pengirim', 'like', '%' . $search . '%')
-                  ->orWhere('nama_penerima', 'like', '%' . $search . '%');
-            });
-        }
-
-        // Mengambil pengiriman dengan paginasi, diurutkan dari yang terbaru ke terlama.
-        $pengiriman = $query->orderBy('tanggal_pemesanan', 'desc')
-                            ->paginate(10);
-
-        // Mengembalikan view daftar pengiriman kurir.
-        return view('kurir.kelola_status', compact('pengiriman'));
+    public function updateStatus(Request $request)
+{
+    if (!Auth::guard('kurir')->check()) {
+        return redirect()->route('kurir.login')->with('error', 'Silakan masuk sebagai kurir untuk mengupdate status.');
     }
 
+    $kurirId = Auth::guard('kurir')->id();
 
+    // Membangun query untuk pengiriman yang ditugaskan kepada kurir ini DAN BELUM SELESAI
+    $query = Pengiriman::where('kurir_id', $kurirId)
+                        ->whereRaw("TRIM(LOWER(status_pengiriman)) NOT IN ('pesanan selesai')"); // <--- TAMBAHKAN INI
+
+    if ($request->has('search') && $request->search != '') {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->where('resi', 'like', '%' . $search . '%')
+              ->orWhere('nama_pengirim', 'like', '%' . $search . '%')
+              ->orWhere('nama_penerima', 'like', '%' . $search . '%');
+        });
+    }
+
+     $pengiriman = $query->orderBy('tanggal_pemesanan', 'desc')->paginate(10);
+
+    return view('kurir.kelola_status', compact('pengiriman'));
+}
 
 
 

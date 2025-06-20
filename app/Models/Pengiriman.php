@@ -20,7 +20,7 @@ class Pengiriman extends Model
 
     //Nama tabel di database yang direpresentasikan oleh model ini. Harus ditulis sesuai persis dengan nama tabel di database (termasuk huruf besar/kecil).
     protected $table = 'shipments';
-
+    protected $primaryKey = 'id'; 
     //Daftar atribut yang dapat diisi secara massal (mass assignable). Ini berguna saat melakukan insert atau update data menggunakan metode create() atau update().
     protected $fillable = [
         'resi',
@@ -37,6 +37,7 @@ class Pengiriman extends Model
         'status_pengiriman',
         'catatan',
         'tanggal_pemesanan',
+        'bukti_pengiriman',
     ];
 
     //Relasi: Setiap pengiriman dimiliki oleh satu kurir. foreign key: kurir_id pada tabel shipments return: Objek relasi belongsTo ke model Kurir

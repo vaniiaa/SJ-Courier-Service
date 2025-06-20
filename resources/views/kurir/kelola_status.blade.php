@@ -1,6 +1,12 @@
-{{-- resources/views/kurir/kelola_status.blade.php --}}
+{{-- 
+    Nama File   : kelola_status.blade.php
+    Deskripsi   : Menampilkan daftar kelola status, modal konfirmasi status dan detail status pengiriman
+    Dibuat Oleh : [Vania] - [3312301024]
+    Tanggal     : 1 Juni 2025
+--}}
 
-@extends('layouts.kurir_page') {{-- Pastikan ini mengarah ke layout kurir Anda --}}
+@extends('layouts.kurir_page') 
+
 @section('title', 'Kelola Status')
 
 @section('content')
@@ -8,18 +14,20 @@
     /* CSS untuk paginasi */
     nav[role="navigation"] > div > span,
     nav[role="navigation"] > div > a {
-        margin-right: 8px; /* jarak antar tombol */
+        margin-right: 8px; 
         padding: 6px 12px;
         border-radius: 0.375rem;
-        border: 1px solid #d1d5db; /* gray-300 */
-        color: #1f2937; /* gray-800 */
+        border: 1px solid #d1d5db; 
+        color: #1f2937; 
     }
 
     nav[role="navigation"] > div > span[aria-current="page"] {
-        background-color: #3b82f6; /* blue-500 */
+        background-color: #3b82f6;
         color: white;
         border-color: #3b82f6;
     }
+
+    [x-cloak] { display: none !important; }
 </style>
 
 <div class="absolute top-32 left-0 right-0 px-4" x-data="{ showModal: false, showStatus: false, selectedData: {} }" @keydown.escape.window="showModal = false; showStatus = false">
@@ -46,7 +54,7 @@
                         <th class="px-4 py-2 text-left">Nama Penerima</th>
                         <th class="px-4 py-2 text-left">Alamat Tujuan</th>
                         <th class="px-4 py-2 text-left">Tanggal</th>
-                        <th class="px-4 py-2 text-left">Berat (Kg)</th>
+                        <th class="px-4 py-2 text-center">Berat (Kg)</th>
                         <th class="px-4 py-2 text-center">Harga (Rp)</th>
                         <th class="px-4 py-2 text-center">Kurir</th>
                         <th class="px-4 py-2 text-center">Status Pengiriman</th>
@@ -55,9 +63,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {{-- Hapus blok @php ... @endphp yang berisi data dummy --}}
-
-                    {{-- Gunakan @forelse untuk mengulang data dari controller --}}
                     @forelse ($pengiriman as $index => $data)
                         <tr class="{{ $loop->even ? 'bg-white' : 'bg-gray-100' }}">
                             <td class="px-4 py-2 text-center">
@@ -72,7 +77,6 @@
                             <td class="px-4 py-2">{{ \Carbon\Carbon::parse($data->tanggal_pemesanan)->format('Y-m-d') }}</td>
                             <td class="px-4 py-2 text-center">{{ $data->berat }}</td>
                             <td class="px-4 py-2 text-center">{{ number_format($data->harga, 0, ',', '.') }}</td>
-                            {{-- Tampilkan username kurir dari relasi jika ada, atau langsung dari kolom `nama_kurir` --}}
                             <td class="px-4 py-2 text-center">
                                 {{ $data->kurir->username ?? $data->nama_kurir ?? 'N/A' }}
                             </td>
@@ -80,22 +84,22 @@
                                 @if ($data->status_pengiriman === 'menunggu konfirmasi') text-gray-600
                                 @elseif ($data->status_pengiriman === 'sedang dikirim') text-red-600
                                 @elseif ($data->status_pengiriman === 'menuju alamat') text-blue-600
-                                @elseif ($data->status_pengiriman === 'pesanan diterima') text-green-600
+                                @elseif ($data->status_pengiriman === 'pesanan selesai') text-green-600
                                 @endif">
                                 {{ ucfirst($data->status_pengiriman) }}
                             </td>
                             <td class="px-4 py-2 text-center">
-                                {{-- Tampilkan gambar bukti jika ada, atau teks 'Belum ada' --}}
+                                {{-- Tampilkan gambar bukti jika ada, atau teks 'Menunggu Konfirmasi' --}}
                                 @if ($data->bukti_pengiriman)
                                     <img src="{{ asset('storage/' . $data->bukti_pengiriman) }}" alt="Bukti" class="w-16 h-16 object-cover mx-auto rounded-md">
                                 @else
-                                    Belum ada
+                                    Menunggu Konfirmasi
                                 @endif
                             </td>
                             <td class="px-4 py-2 text-center">
                                 <div class="flex justify-center gap-2">
                                     <button
-                                        @click="showStatus = true; selectedData = {
+                                        @click="showModal = false; showStatus = true; selectedData = {
                                             id: {{ $data->id }}, {{-- Penting untuk mengidentifikasi data saat update --}}
                                             resi: '{{ $data->resi }}',
                                             pengirim: '{{ $data->nama_pengirim }}',
@@ -108,14 +112,13 @@
                                             kurir: '{{ $data->kurir->username ?? $data->nama_kurir ?? 'N/A' }}',
                                             status: '{{ $data->status_pengiriman }}',
                                             tanggal_pengiriman: '{{ \Carbon\Carbon::parse($data->tanggal_pemesanan)->format('Y-m-d') }}',
-                                            catatan: '{{ $data->catatan ?? 'Tidak ada catatan' }}', {{-- Pastikan ada kolom 'catatan' di DB atau berikan default --}}
-                                            bukti: '{{ $data->bukti_pengiriman ? asset('storage/' . $data->bukti_pengiriman) : asset('images/kurir/welcome.jpg') }}'
+                                            catatan: '{{ $data->catatan ?? 'Tidak ada catatan' }}' {{-- Pastikan ada kolom 'catatan' di DB atau berikan default --}}
                                         }"
                                         class="w-28 bg-red-500 text-white py-1 rounded text-xs hover:bg-red-600 shadow-md shadow-gray-700">
                                         Konfirmasi Status
                                     </button>
                                     <button
-                                        @click="showModal = true; selectedData = {
+                                        @click="showStatus = false; showModal = true; selectedData = {
                                             id: {{ $data->id }},
                                             resi: '{{ $data->resi }}',
                                             pengirim: '{{ $data->nama_pengirim }}',
@@ -128,8 +131,7 @@
                                             kurir: '{{ $data->kurir->username ?? $data->nama_kurir ?? 'N/A' }}',
                                             status: '{{ $data->status_pengiriman }}',
                                             tanggal_pengiriman: '{{ \Carbon\Carbon::parse($data->tanggal_pemesanan)->format('Y-m-d') }}',
-                                            catatan: '{{ $data->catatan ?? 'Tidak ada catatan' }}',
-                                            bukti: '{{ $data->bukti_pengiriman ? asset('storage/' . $data->bukti_pengiriman) : asset('images/kurir/welcome.jpg') }}'
+                                            catatan: '{{ $data->catatan ?? 'Tidak ada catatan' }}'
                                         }"
                                         class="px-3 bg-blue-500 text-white py-1 rounded text-xs hover:bg-blue-600 shadow-md shadow-gray-700">
                                         Detail
@@ -146,8 +148,7 @@
             </table>
         </div>
 
-        {{-- Pagination --}}
-        {{-- Pastikan ini menggunakan paginasi Laravel yang dinamis --}}
+        {{-- Paginasi --}}
         @if ($pengiriman->hasPages())
             <div class="mt-6 flex justify-end pr-4">
                 <nav class="inline-flex -space-x-px text-sm shadow-sm" aria-label="Pagination">
@@ -161,9 +162,9 @@
                     {{-- Page Numbers --}}
                     @foreach ($pengiriman->getUrlRange(1, $pengiriman->lastPage()) as $page => $url)
                         @if ($page == $pengiriman->currentPage())
-                            <span class="px-3 py-2 border border-gray-300 bg-blue-500 text-white font-semibold">{{ $page }}</span>
+                            <span class="px-3 py-2 border border-gray-300 bg-yellow-400 text-white font-semibold">{{ $page }}</span>
                         @else
-                            <a href="{{ $url }}" class="px-3 py-2 border border-gray-300 bg-white text-gray-700 hover:bg-blue-100">{{ $page }}</a>
+                            <a href="{{ $url }}" class="px-3 py-2 border border-gray-300 bg-white text-gray-700 hover:bg-yellow-100">{{ $page }}</a>
                         @endif
                     @endforeach
 
@@ -252,19 +253,11 @@
                         <textarea readonly :value="selectedData.catatan" class="flex-1 pl-4 border border-gray-300 rounded-md shadow-sm sm:text-sm"></textarea>
                     </div>
 
-                    <div class="flex items-start gap-4">
-                        <label class="w-40 text-sm font-medium text-gray-700 after:content-[':']">Bukti Pengiriman</label>
-                        <div class="flex-1">
-                            {{-- Tampilkan gambar bukti jika ada, atau gambar default --}}
-                            <img :src="selectedData.bukti" alt="Bukti Pengiriman" class="w-32 rounded-md">
-                        </div>
+                    <div class="flex justify-end mt-6">
+                        <button @click="showModal = false" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md">
+                            Tutup
+                        </button>
                     </div>
-                </div>
-
-                <div class="flex justify-end mt-6">
-                    <button @click="showModal = false" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md">
-                        Tutup
-                    </button>
                 </div>
             </div>
         </div>
@@ -278,6 +271,7 @@
         >
             <div
                 @click.away="showStatus = false"
+                x-data="{ open: false, selected: 'Pilih Status' }" {{-- Pindahkan x-data ke sini --}}
                 class="bg-white rounded-xl shadow-xl w-full max-w-2xl mx-4 min-h-[40px] overflow-visible relative"
             >
                 <button
@@ -285,58 +279,119 @@
                     class="absolute top-2 right-2 text-gray-600 text-xl font-bold focus:outline-none"
                     aria-label="Tutup"
                 >
-                ×
+                    ×
                 </button>
 
                 <div class="flex items-center gap-3 px-6 py-3 border-b border-gray-200">
                     <img src="{{ asset('images/admin/logo2.jpg') }}" alt="Logo" class="w-16 h-16 object-cover rounded-full">
-                    <h2 class="text-lg font-semibold text-gray-800">Konfirmasi Status untuk Resi: <span x-text="selectedData.resi"></span></h2>
+                    <h2 class="text-lg font-semibold text-gray-800">Konfirmasi Status</h2>
                 </div>
 
-                <div x-data="{ open: false, currentStatus: selectedData.status, selected: selectedData.status }" x-cloak class="px-6 py-5 grid grid-cols-1 gap-6 text-gray-700 text-sm">
-                    {{-- Form untuk update status --}}
-                    {{-- Arahkan action ke route yang akan menghandle update status --}}
-                    <form :action="'{{ url('kurir/update_status') }}/' + selectedData.id" method="POST" enctype="multipart/form-data">
+                <div class="px-6 py-5 grid grid-cols-1 gap-6 text-gray-700 text-sm">
+                    <form
+                        action="{{ route('shipment.updateStatus') }}"
+                        method="POST"
+                        enctype="multipart/form-data"
+                        x-init="
+                            // Set nilai awal dropdown jika selectedData.status ada
+                            if (selectedData.status) {
+                                // Normalisasi status string agar cocok dengan pilihan dropdown
+                                let normalizedStatus = selectedData.status.toLowerCase();
+                                if (normalizedStatus.includes('sedang dikirim')) {
+                                    selected = 'Sedang Dikirim';
+                                } else if (normalizedStatus.includes('menuju alamat')) {
+                                    selected = 'Menuju Alamat';
+                                } else if (normalizedStatus.includes('pesanan selesai')) {
+                                    selected = 'Pesanan Selesai';
+                                } else {
+                                    selected = 'Pilih Status'; // Default jika tidak cocok
+                                }
+                            } else {
+                                selected = 'Pilih Status';
+                            }
+                        "
+                    >
                         @csrf
-                        @method('PUT') {{-- Gunakan PUT atau PATCH untuk update --}}
+
+                        <input type="hidden" name="shipment_id" :value="selectedData.id">
+
+                        @if ($errors->any())
+                            <div class="mb-4 text-red-600">
+                                <ul class="list-disc list-inside">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+                        @if (session('success'))
+                            <div class="mb-4 text-green-600">
+                                {{ session('success') }}
+                            </div>
+                        @endif
 
                         <div class="mb-4 relative">
                             <label for="status" class="font-semibold">Status Pengiriman:</label>
-                            <button type="button" @click="open = !open" class="w-full input input-neutral border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-left pl-4 pr-10 py-2 relative">
+                            <button
+                                type="button"
+                                @click="open = !open"
+                                class="w-full input input-neutral border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-left pl-4 pr-10 py-2 relative"
+                                aria-haspopup="listbox"
+                                :aria-expanded="open.toString()"
+                            >
                                 <span x-text="selected"></span>
                                 <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                                    <svg class="w-4 h-4 transform transition-transform duration-300"
+                                    <svg
+                                        class="w-4 h-4 transform transition-transform duration-300"
                                         :class="open ? 'rotate-180' : ''"
-                                        fill="none" stroke="currentColor" stroke-width="2"
-                                        viewBox="0 0 24 24">
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        viewBox="0 0 24 24"
+                                        aria-hidden="true"
+                                    >
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </div>
                             </button>
 
-                            <ul x-show="open" @click.away="open = false" x-transition class="absolute w-full mt-1 bg-white border border-gray-300 rounded shadow z-10">
-                                <li><a href="#" @click.prevent="selected = 'sedang dikirim'; open = false" class="block px-4 py-2 hover:bg-gray-100">Sedang Dikirim</a></li>
-                                <li><a href="#" @click.prevent="selected = 'menuju alamat'; open = false" class="block px-4 py-2 hover:bg-gray-100">Menuju Alamat</a></li>
-                                <li><a href="#" @click.prevent="selected = 'pesanan diterima'; open = false" class="block px-4 py-2 hover:bg-gray-100">Pesanan Diterima</a></li>
+                            <ul
+                                x-show="open"
+                                @click.away="open = false"
+                                x-transition
+                                class="absolute w-full mt-1 bg-white border border-gray-300 rounded shadow z-10 max-h-48 overflow-auto"
+                                role="listbox"
+                                tabindex="-1"
+                            >
+                                <li><a href="#" @click.prevent="selected = 'Sedang Dikirim'; open = false" class="block px-4 py-2 hover:bg-gray-100" role="option">Sedang Dikirim</a></li>
+                                <li><a href="#" @click.prevent="selected = 'Menuju Alamat'; open = false" class="block px-4 py-2 hover:bg-gray-100" role="option">Menuju Alamat</a></li>
+                                <li><a href="#" @click.prevent="selected = 'Pesanan Selesai'; open = false" class="block px-4 py-2 hover:bg-gray-100" role="option">Pesanan Selesai</a></li>
                             </ul>
 
-                            <input type="hidden" name="status_pengiriman" :value="selected"> {{-- Nama input harus sesuai dengan kolom DB --}}
+                            <input type="hidden" name="status_pengiriman" :value="selected">
+
                         </div>
 
-                        <div x-show="selected === 'pesanan diterima'" class="mb-4" x-transition>
+                        <div x-show="selected === 'Pesanan Selesai'" class="mb-4" x-transition>
                             <label for="bukti_pengiriman" class="font-semibold">Bukti Pengiriman:</label>
-                            <input type="file" id="bukti_pengiriman" name="bukti_pengiriman" class="file file-input w-full border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 pl-4" />
+                            <input
+                                type="file"
+                                id="bukti_pengiriman"
+                                name="bukti_pengiriman"
+                                class="file file-input w-full border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 pl-4"
+                            />
                         </div>
 
                         <div class="flex justify-end items-center gap-2 border-t border-gray-200 pt-4">
                             <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                                Kirim
+                                Konfirmasi Status
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 @endsection

@@ -11,6 +11,7 @@ use App\Http\Controllers\KelolaPengirimanController;
 use App\Http\Controllers\KelolaKurirController;
 use App\Http\Controllers\DashboardAdminController;
 use App\Http\Controllers\ShipmentController;
+use App\Http\Controllers\KelolaStatusController;
 
 /*
 |--------------------------------------------------------------------------
@@ -96,3 +97,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
 Route::get('/kurir/daftar_pengiriman', [KelolaPengirimanController::class, 'daftarPengirimanKurir'])->name('kurir.daftar_pengiriman');
 Route::get('/kurir/kelola_status', [KelolaPengirimanController::class, 'updateStatus'])->name('kurir.kelola_status');
 
+Route::post('/shipment/update-status', [KelolaStatusController::class, 'konfirmasiStatus'])->name('shipment.updateStatus');
+Route::get('/kurir/history_pengiriman_kurir', [KelolaStatusController::class, 'history'])->name('kurir.history_pengiriman_kurir');
+Route::get('/kurir/resi/{id}/download', [KelolaStatusController::class, 'downloadResi'])->name('kurir.downloadResi');
+Route::get('/kurir/print-resi/{id}', [KelolaStatusController::class, 'printResi'])->name('kurir.printResi');
