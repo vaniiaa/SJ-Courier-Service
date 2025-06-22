@@ -76,8 +76,13 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     public function savedAddresses()
-{
+    {
     return $this->hasMany(SavedAddress::class, 'user_id');
-}
+    }
+
+    public function deliveryArea()
+    {
+        return $this->belongsTo(DeliveryArea::class, 'area_id', 'area_id');
+    }
 
 }

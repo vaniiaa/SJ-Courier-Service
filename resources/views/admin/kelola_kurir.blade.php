@@ -104,11 +104,10 @@
                     <tr class="border border-gray-300">
                         <th class="px-4 py-2">No</th>
                         <th class="text-left px-4 py-2">Nama</th>
-                        <th class="text-left px-4 py-2">Email</th>
                         <th class="text-left px-4 py-2">No. HP</th>
                         <th class="text-left px-4 py-2">Alamat</th>
                         <th class="text-left px-4 py-2">Wilayah Pengiriman</th>
-                        <th class="text-left px-4 py-2">Username</th>
+                        <th class="text-left px-4 py-2">Email</th>
                         <th class="px-4 py-2">Aksi</th>
                     </tr>
                 </thead>
@@ -118,15 +117,14 @@
                       <td class="px-4 py-2 text-center">
     {{ ($kurirs->currentPage() - 1) * $kurirs->perPage() + $loop->iteration }}
 </td>
-                            <td class="px-4 py-2">{{ $kurir->nama }}</td>
+                            <td class="px-4 py-2">{{ $kurir->name }}</td>
+                            <td class="px-4 py-2">{{ $kurir->phone }}</td>
+                            <td class="px-4 py-2">{{ $kurir->address }}</td>
+                            <td class="px-4 py-2">{{ $kurir->deliveryArea ? $kurir->DeliveryArea->area_name : '-' }}</td>
                             <td class="px-4 py-2">{{ $kurir->email }}</td>
-                            <td class="px-4 py-2">{{ $kurir->no_hp }}</td>
-                            <td class="px-4 py-2">{{ $kurir->alamat }}</td>
-                            <td class="px-4 py-2">{{ $kurir->wilayah_pengiriman }}</td>
-                            <td class="px-4 py-2">{{ $kurir->username }}</td>
                             <td class="px-4 py-2 text-center">
                                 <div style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; height: 100%;">
-                                    <a href="{{ route('admin.edit_kurir', $kurir->id) }}"
+                                    <a href="{{ route('admin.kelola_kurir.edit', $kurir->user_id) }}"
                                        style="background-color: #22c55e; color: white; padding: 0.3rem 0.75rem; border-radius: 0.375rem;
                                               box-shadow: 0 2px 6px rgba(0,0,0,0.15); text-decoration: none; font-size: 0.875rem;
                                               transition: background-color 0.3s ease;"
@@ -134,11 +132,11 @@
                                        onmouseout="this.style.backgroundColor='#22c55e'">
                                         Edit
                                     </a>
-                                    <form id="hapusForm-{{ $kurir->id }}" action="{{ route('admin.hapus_kurir', $kurir->id) }}" method="POST" style="margin: 0;">
+                                    <form id="hapusForm-{{ $kurir->user_id }}" action="{{ route('admin.kelola_kurir.destroy', $kurir->user_id) }}" method="POST" style="margin: 0;">
                                         @csrf
                                         @method('DELETE')
                                         <button type="button"
-                                                onclick="bukaModal('{{ $kurir->id }}', '{{ addslashes($kurir->nama) }}')"
+                                                onclick="bukaModal('{{ $kurir->user_id }}', '{{ addslashes($kurir->name) }}')"
                                                 style="background-color: #ef4444; color: white; padding: 0.3rem 0.75rem; border-radius: 0.375rem;
                                                        box-shadow: 0 2px 6px rgba(0,0,0,0.15); font-size: 0.875rem; border: none; cursor: pointer;
                                                        transition: background-color 0.3s ease;"

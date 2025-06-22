@@ -45,7 +45,7 @@
                 <div>
                     <h3 class="text-white text-lg font-semibold">Total Wilayah</h3>
                     {{-- Menampilkan jumlah total wilayah dari controller. --}}
-                    <p class="text-white text-3xl font-bold">{{ $totalWilayah }}</p>
+                    <p class="text-white text-3xl font-bold"></p>
                 </div>
                 <div class="bg-green-600 rounded-full p-3">
                     <i data-lucide="map-pin" class="w-8 h-8 text-white"></i>

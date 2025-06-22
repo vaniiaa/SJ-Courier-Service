@@ -12,7 +12,7 @@
 
 {{-- Pastikan file layouts/admin.blade.php memiliki meta tag CSRF token di dalam bagian <head>:
 <meta name="csrf-token" content="{{ csrf_token() }}">
-Ini penting untuk keamanan Laravel, terutama saat mengirimkan data via AJAX. --}}
+Ini penting untuk keamanan Laravel, terutama saat mengirimkan shipment via AJAX. --}}
 
 {{-- Sidebar --}}
 @include('components.admin.sidebar')
@@ -144,62 +144,59 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan data via AJAX. --}
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($pengiriman as $index => $data)
-                        <tr class="{{ $loop->even ? 'bg-white' : 'bg-gray-100' }}" id="row-{{ $data->id }}">
+                    @forelse ($shipments as $shipment)
+                        <tr class="{{ $loop->even ? 'bg-white' : 'bg-gray-100' }}" id="row-{{ $shipment->id }}">
                             <td class="px-4 py-2 text-center">
-                                {{ ($pengiriman->currentPage() - 1) * $pengiriman->perPage() + $loop->iteration }}
+                                {{ ($shipments->currentPage() - 1) * $shipments->perPage() + $loop->iteration }}
                             </td>
-                            <td class="px-4 py-2 text-center">{{ $data->resi }}</td>
-                            <td class="px-4 py-2">{{ $data->nama_pengirim }}</td>
-                            <td class="px-4 py-2">{{ $data->alamat_penjemputan }}</td>
-                            <td class="px-4 py-2">{{ $data->nama_penerima }}</td>
-                            <td class="px-4 py-2">{{ $data->alamat_tujuan }}</td>
-                            {{-- Format tanggal pemesanan --}}
-                            <td class="px-4 py-2">{{ \Carbon\Carbon::parse($data->tanggal_pemesanan)->format('Y-m-d') }}</td>
-                            <td class="px-4 py-2 text-center">{{ $data->berat }}</td>
-                            {{-- Format harga dengan pemisah ribuan --}}
-                            <td class="px-4 py-2 text-center">{{ number_format($data->harga, 0, ',', '.') }}</td>
-                            <td class="px-4 py-2 text-center">{{ $data->metode_pembayaran }}</td>
-                            {{-- Menampilkan nama kurir dari kolom `nama_kurir` di tabel `pengiriman` --}}
-                            <td class="px-4 py-2 text-center">{{ $data->nama_kurir ?? 'Belum Ditentukan' }}</td>
+                            <td class="px-4 py-2 text-center">{{ $shipment->tracking_number }}</td>
+                            <td class="px-4 py-2">{{ $shipment->order->sender->name ?? 'N/A' }}</td>
+                            <td class="px-4 py-2">{{ Str::limit($shipment->order->pickupAddress, 20) }}</td>
+                            <td class="px-4 py-2">{{ $shipment->order->receiverName }}</td>
+                            <td class="px-4 py-2">{{ Str::limit($shipment->order->receiverAddress, 20) }}</td>
+                            <td class="px-4 py-2 text-center">{{ $shipment->created_at->format('d/m/y') }}</td>
+                            <td class="px-4 py-2 text-center">{{ $shipment->weightKG }} Kg</td>
+                            <td class="px-4 py-2 text-center">Rp{{ number_format($shipment->finalPrice) }}</td>
+                            <td class="px-4 py-2 text-center">{{ $shipment->order->payments->first()->paymentMethod ?? 'N/A' }}</td>
+                            <td class="px-4 py-2 text-center">{{ $shipment->courier->name ?? 'Belum Ditentukan' }}</td>
                             {{-- Menampilkan status pengiriman dengan warna berdasarkan status --}}
                             <td class="px-4 py-2 text-center font-semibold text-sm
-                                @if ($data->status_pengiriman === 'menunggu konfirmasi') text-gray-600
-                                @elseif ($data->status_pengiriman === 'sedang dikirim') text-red-600
-                                @elseif ($data->status_pengiriman === 'menuju alamat') text-blue-600
-                                @elseif ($data->status_pengiriman === 'pesanan diterima') text-green-600
+                                @if ($shipment->status_pengiriman === 'menunggu konfirmasi') text-gray-600
+                                @elseif ($shipment->status_pengiriman === 'sedang dikirim') text-red-600
+                                @elseif ($shipment->status_pengiriman === 'menuju alamat') text-blue-600
+                                @elseif ($shipment->status_pengiriman === 'pesanan diterima') text-green-600
                                 @endif">
-                                {{ ucfirst($data->status_pengiriman) }}
+                                {{ $shipment->currentStatus }}
                             </td>
                             <td class="px-4 py-2 text-center">
                                 <div class="flex justify-center gap-2">
                                     {{-- Tombol Print --}}
-                                    <button onclick="printData('{{ $data->resi }}')" class="w-16 bg-green-500 hover:bg-green-600 text-white py-1 rounded text-xs shadow-md shadow-gray-700 flex justify-center items-center">
+                                    <button onclick="printshipment('{{ $shipment->resi }}')" class="w-16 bg-green-500 hover:bg-green-600 text-white py-1 rounded text-xs shadow-md shadow-gray-700 flex justify-center items-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V4h12v5M6 14h12v6H6v-6zM6 14H4a2 2 0 01-2-2V9a2 2 0 012-2h16a2 2 0 012 2v3a2 2 0 01-2 2h-2" />
                                         </svg>
                                     </button>
 
                                     {{-- Tombol "Kurir" hanya muncul jika `kurir_id` belum ditentukan (NULL) --}}
-                                    @if (empty($data->kurir_id))
-                                        <button class="w-16 bg-red-500 text-white py-1 rounded text-xs hover:bg-red-600 shadow-md shadow-gray-700" onclick="openModal('{{ $data->id }}')">Kurir</button>
+                                    @if (empty($shipment->kurir_id))
+                                        <button class="w-16 bg-red-500 text-white py-1 rounded text-xs hover:bg-red-600 shadow-md shadow-gray-700" onclick="openModal('{{ $shipment->id }}')">Kurir</button>
                                     @endif
 
                                     {{-- Tombol "Detail" --}}
                                     <button
                                         class="px-3 bg-blue-500 text-white py-1 rounded text-xs hover:bg-blue-600 shadow-md shadow-gray-700 px-4 py-2"
                                         onclick="showDetailModal(
-                                            '{{ $data->resi }}',
-                                            '{{ $data->nama_pengirim }}',
-                                            '{{ $data->alamat_penjemputan }}',
-                                            '{{ $data->nama_penerima }}',
-                                            '{{ $data->alamat_tujuan }}',
-                                            '{{ $data->nama_kurir ?? 'Belum Ditentukan' }}', {{-- Menggunakan nama_kurir untuk detail --}}
-                                            '{{ \Carbon\Carbon::parse($data->tanggal_pemesanan)->format('Y-m-d') }}',
-                                            '{{ $data->berat }}',
-                                            '{{ number_format($data->harga, 0, ',', '.') }}',
-                                            '{{ ucfirst($data->status_pengiriman) }}',
-                                            '{{ $data->catatan ?? '' }}' {{-- Meneruskan catatan ke modal detail --}}
+                                            '{{ $shipment->tracking_number }}',
+                                            '{{ $shipment->order->sender->name }}',
+                                            '{{ $shipment->order->pickupAddress }}',
+                                            '{{ $shipment->order->receiverName }}',
+                                            '{{ $shipment->order->receiverAddress }}',
+                                            '{{ $shipment->courier->name ?? 'Belum Ditentukan' }}',
+                                            '{{ \Carbon\Carbon::parse($shipment->created_at)->format('Y-m-d') }}',
+                                            '{{ $shipment->weightKG }}',
+                                            '{{ number_format($shipment->finalPrice, 0, ',', '.') }}',
+                                            '{{ ucfirst($shipment->currentStatus) }}',
+                                            '{{ $shipment->catatan ?? '' }}' {{-- Meneruskan catatan ke modal detail --}}
                                         )"
                                     > Detail
                                     </button>
@@ -208,26 +205,26 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan data via AJAX. --}
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="13" class="px-4 py-4 text-center text-gray-500">Tidak ada data pengiriman.</td>
+                            <td colspan="13" class="px-4 py-4 text-center text-gray-500">Tidak ada shipment pengiriman.</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
 
-@if ($pengiriman->hasPages())
+@if ($shipments->hasPages())
     <div class="mt-6 flex justify-end pr-4">
         <nav class="inline-flex -space-x-px text-sm shadow-sm" aria-label="Pagination">
             {{-- Previous Page Link --}}
-            @if ($pengiriman->onFirstPage())
+            @if ($shipments->onFirstPage())
                 <span class="px-3 py-2 rounded-l-md border border-gray-300 bg-gray-100 text-gray-400 cursor-default">Sebelumnya</span>
             @else
-                <a href="{{ $pengiriman->previousPageUrl() }}" class="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-200">Sebelumnya</a>
+                <a href="{{ $shipments->previousPageUrl() }}" class="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-200">Sebelumnya</a>
             @endif
 
             {{-- Page Numbers --}}
-            @foreach ($pengiriman->getUrlRange(1, $pengiriman->lastPage()) as $page => $url)
-                @if ($page == $pengiriman->currentPage())
+            @foreach ($shipments->getUrlRange(1, $pengiriman->lastPage()) as $page => $url)
+                @if ($page == $shipments->currentPage())
                     <span class="px-3 py-2 border border-gray-300 bg-yellow-400 text-white font-semibold">{{ $page }}</span>
                 @else
                     <a href="{{ $url }}" class="px-3 py-2 border border-gray-300 bg-white text-gray-700 hover:bg-yellow-100">{{ $page }}</a>
@@ -235,8 +232,8 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan data via AJAX. --}
             @endforeach
 
             {{-- Next Page Link --}}
-            @if ($pengiriman->hasMorePages())
-                <a href="{{ $pengiriman->nextPageUrl() }}" class="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-200">Berikutnya</a>
+            @if ($shipments->hasMorePages())
+                <a href="{{ $shipments->nextPageUrl() }}" class="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-200">Berikutnya</a>
             @else
                 <span class="px-3 py-2 rounded-r-md border border-gray-300 bg-gray-100 text-gray-400 cursor-default">Berikutnya</span>
             @endif
@@ -548,7 +545,7 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan data via AJAX. --}
             adminHeader.classList.remove('header-darken');
         };
 
-        window.printData = function(resi) {
+        window.printshipment = function(resi) {
             alert('Fungsi print untuk Resi: ' + resi + ' akan ditambahkan di sini.');
             // Implement printing logic here
             // Example: window.open('/print/resi/' + resi, '_blank');
@@ -564,15 +561,15 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan data via AJAX. --}
                 try {
                     const response = await fetch(url);
                     if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+                        const errorshipment = await response.json();
+                        throw new Error(errorshipment.message || `HTTP error! Status: ${response.status}`);
                     }
-                    const data = await response.json();
+                    const shipment = await response.json();
                     kurirSelectDropdown.innerHTML = '<option value="">Pilih kurir...</option>';
-                    if (data.length === 0) {
+                    if (shipment.length === 0) {
                         kurirSelectDropdown.innerHTML = '<option value="">Tidak ada kurir untuk wilayah ini</option>';
                     } else {
-                        data.forEach(kurir => {
+                        shipment.forEach(kurir => {
                             const option = document.createElement('option');
                             option.value = kurir.id;
                             option.textContent = kurir.username;
@@ -580,7 +577,7 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan data via AJAX. --}
                         });
                     }
                 } catch (error) {
-                    console.error('Error fetching courier data by region:', error);
+                    console.error('Error fetching courier shipment by region:', error);
                     kurirSelectDropdown.innerHTML = '<option value="">Gagal memuat kurir</option>';
                     createAndShowDynamicNotification('Gagal memuat daftar kurir: ' + error.message, 'error');
                 }
@@ -608,28 +605,28 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan data via AJAX. --}
                 return;
             }
 
-            const formData = new FormData(this);
-            formData.set('kurir_id', selectedKurirIdInput.value); // Pastikan ini yang dikirim
+            const formshipment = new Formshipment(this);
+            formshipment.set('kurir_id', selectedKurirIdInput.value); // Pastikan ini yang dikirim
 
             try {
                 const response = await fetch(this.action, {
                     method: 'POST',
-                    body: formData,
+                    body: formshipment,
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     }
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    let errorMessage = errorData.message || `Server error! Status: ${response.status}`;
-                    if (errorData.errors) {
-                        errorMessage += '\n\nDetail Kesalahan:\n' + Object.values(errorData.errors).flat().join('\n');
+                    const errorshipment = await response.json();
+                    let errorMessage = errorshipment.message || `Server error! Status: ${response.status}`;
+                    if (errorshipment.errors) {
+                        errorMessage += '\n\nDetail Kesalahan:\n' + Object.values(errorshipment.errors).flat().join('\n');
                     }
                     createAndShowDynamicNotification('Terjadi kesalahan saat menetapkan kurir: ' + errorMessage, 'error');
                 } else {
-                    const successData = await response.json();
-                    createAndShowDynamicNotification(successData.message, 'success');
+                    const successshipment = await response.json();
+                    createAndShowDynamicNotification(successshipment.message, 'success');
                     closeModal(); // Tutup modal setelah berhasil
                     // Consider a more granular update or simply reload for simplicity in this case
                     location.reload();

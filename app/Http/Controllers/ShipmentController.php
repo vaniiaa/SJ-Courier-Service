@@ -134,7 +134,7 @@ class ShipmentController extends Controller
                 $snapToken = $this->midtransService->createSnapToken($order);
                 DB::commit();
                 // Simpan snap token ke session untuk diambil oleh halaman konfirmasi
-                return redirect()->route('shipments.confirmation', ['orderID' => $order->orderID])->with('snap_token', $snapToken);
+                return redirect()->route('shipments.confirmation', ['order' => $order])->with('snap_token', $snapToken);
             }
             
             // Logika untuk COD
@@ -153,7 +153,7 @@ class ShipmentController extends Controller
             TrackingHistory::create(['shipmentID' => $shipment->shipmentID, 'statusDescription' => 'Pesanan COD dibuat, menunggu penjemputan.']);
 
             DB::commit();
-            return redirect()->route('shipments.confirmation', ['orderID' => $order->orderID]);
+            return redirect()->route('shipments.confirmation', ['order' => $order]);
 
         } catch (Exception $e) {
             DB::rollBack();
@@ -182,24 +182,40 @@ class ShipmentController extends Controller
         return view('User.confirmation', compact('order', 'shipment', 'snapToken'));
     }
 
+    // ... (method-method Anda yang sudah ada biarkan di atas sini) ...
+
+    // Daftar status yang dianggap "selesai" untuk dipindahkan ke riwayat
+    private $finishedStatuses = ['Delivered', 'Cancelled', 'Returned to Sender', 'Pesanan Diterima'];
+
     /**
-     * Menampilkan halaman riwayat pengiriman.
+     * Menampilkan halaman "Daftar Pengiriman" (yang masih aktif) untuk customer.
+     */
+    public function List()
+    {
+        $shipments = \App\Models\Shipment::whereHas('order', function ($query) {
+                $query->where('senderUserID', \Illuminate\Support\Facades\Auth::id());
+            })
+            ->whereNotIn('currentStatus', $this->finishedStatuses) // Ambil yang statusnya BUKAN selesai
+            ->with(['order.sender', 'courier', 'order.payments'])
+            ->latest()
+            ->paginate(10);
+
+        return view('User.Daftar_Pengiriman', compact('shipments'));
+    }
+    
+    /**
+     * Menampilkan halaman "History Pengiriman" (yang sudah selesai) untuk customer.
      */
     public function history()
     {
-        $shipments = Shipment::whereHas('order', function ($query) {
-                $query->where('senderUserID', Auth::id());
+        $shipments = \App\Models\Shipment::whereHas('order', function ($query) {
+                $query->where('senderUserID', \Illuminate\Support\Facades\Auth::id());
             })
-            ->with('order') // Eager load relasi order
-            ->orderBy('created_at', 'desc')
-            ->paginate(10); // Gunakan paginasi
+            ->whereIn('currentStatus', $this->finishedStatuses) // Ambil yang statusnya SUDAH selesai
+            ->with(['order.sender', 'courier'])
+            ->latest()
+            ->paginate(10);
 
-        return view('shipments.history', compact('shipments'));
-    }
-
-    // method paymentFinish tetap sama
-    public function paymentFinish(Request $request)
-    {
-        // ... kode sama seperti sebelumnya ...
+        return view('User.History_Pengiriman', compact('shipments'));
     }
 }

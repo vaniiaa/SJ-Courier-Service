@@ -26,7 +26,7 @@
         @endif
 
      {{-- Form untuk mengedit data kurir --}}
-        <form action="{{ route('admin.update_kurir', $kurir->id) }}" method="POST" class="space-y-6">
+        <form action="{{ route('admin.kelola_kurir.update', $kurir->user_id) }}" method="POST" class="space-y-6">
             @csrf
             {{-- Menggunakan metode HTTP PUT untuk pembaruan data --}}
 
@@ -36,8 +36,38 @@
             <div class="flex items-start mb-4">
                 <label for="nama" class="w-40 font-medium flex items-center mt-2">Nama</label>
                 <span class="mx-2 mt-2">:</span>
-                <input type="text" id="nama" name="nama" value="{{ old('nama', $kurir->nama) }}"
+                <input type="text" id="name" name="name" value="{{ old('name', $kurir->name) }}"
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+            </div>
+
+            {{-- Input field untuk No. HP --}}
+            <div class="flex items-start mb-4">
+                <label for="no_hp" class="w-40 font-medium flex items-center mt-2">No. HP</label>
+                <span class="mx-2 mt-2">:</span>
+                <input type="text" id="phone" name="phone" value="{{ old('phone', $kurir->phone) }}"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+            </div>
+
+            {{-- Textarea untuk Alamat --}}
+            <div class="flex items-start mb-4">
+                <label for="alamat" class="w-40 font-medium flex items-center mt-2">Alamat</label>
+                <span class="mx-2 mt-2">:</span>
+                <textarea id="address" name="address"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">{{ old('address', $kurir->address) }}</textarea>
+            </div>
+
+            {{-- Wilayah Pengiriman --}}
+            <div class="flex items-start mb-4">
+                <label for="area_id" class="w-40 font-medium flex items-center mt-2">Wilayah Pengiriman</label>
+                <span class="mx-2 mt-2">:</span>
+                <select id="area_id" name="area_id" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    <option value="">Pilih Wilayah</option>
+                @foreach($areas as $area)
+                    <option value="{{ $area->area_id }}" {{ old('area_id', $kurir->area_id) == $area->area_id ? 'selected' : '' }}>
+            {{ $area->area_name }}
+                    </option>
+                @endforeach
+                </select>
             </div>
 
             {{-- Input field untuk Email --}}          
@@ -47,36 +77,12 @@
                 <input type="email" id="email" name="email" value="{{ old('email', $kurir->email) }}"
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">
             </div>
-            
-            {{-- Input field untuk No. HP --}}
-            <div class="flex items-start mb-4">
-                <label for="no_hp" class="w-40 font-medium flex items-center mt-2">No. HP</label>
-                <span class="mx-2 mt-2">:</span>
-                <input type="text" id="no_hp" name="no_hp" value="{{ old('no_hp', $kurir->no_hp) }}"
-                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">
-            </div>
 
-          {{-- Textarea untuk Alamat --}}
+            {{-- Input field untuk Password --}}
             <div class="flex items-start mb-4">
-                <label for="alamat" class="w-40 font-medium flex items-center mt-2">Alamat</label>
+                <label for="password" class="w-40 font-medium flex items-center mt-2">Password</label>
                 <span class="mx-2 mt-2">:</span>
-                <textarea id="alamat" name="alamat"
-                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">{{ old('alamat', $kurir->alamat) }}</textarea>
-            </div>
-
-             {{-- Input field untuk Wilayah Pengiriman --}}
-            <div class="flex items-start mb-4">
-                <label for="wilayah_pengiriman" class="w-40 font-medium flex items-center mt-2">Wilayah Pengiriman</label>
-                <span class="mx-2 mt-2">:</span>
-                <input type="text" id="wilayah_pengiriman" name="wilayah_pengiriman" value="{{ old('wilayah_pengiriman', $kurir->wilayah_pengiriman) }}"
-                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">
-            </div>
-
-                {{-- Input field untuk Username --}}
-            <div class="flex items-start mb-4">
-                <label for="username" class="w-40 font-medium flex items-center mt-2">Username</label>
-                <span class="mx-2 mt-2">:</span>
-                <input type="text" id="username" name="username" value="{{ old('username', $kurir->username) }}"
+                <input type="password" id="password" name="password"
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">
             </div>
 

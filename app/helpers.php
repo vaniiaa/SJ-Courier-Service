@@ -22,8 +22,8 @@ if (!function_exists('getNavigationLinks')) {
             ['label' => 'Layanan', 'children' => [
                 ['label' => 'Live Tracking', 'url' => route('login')],
                 ['label' => 'Permintaan Pengiriman', 'url' => route('shipments.create.step1')],
-                ['label' => 'Daftar Pengiriman', 'url' => route('login')],
-                ['label' => 'History Pengiriman', 'url' => route('login')],
+                ['label' => 'Daftar Pengiriman', 'url' => route('active')],
+                ['label' => 'History Pengiriman', 'url' => route('history')],
             ]],
         ];
     }

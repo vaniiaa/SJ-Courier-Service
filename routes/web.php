@@ -8,8 +8,9 @@ use App\Http\Controllers\CreateCourierController;
 use App\Http\Controllers\DeleteCourierController;
 use App\Http\Controllers\EditCourierController;
 use App\Http\Controllers\KelolaPengirimanController;
-use App\Http\Controllers\KelolaKurirController;
-use App\Http\Controllers\DashboardAdminController;
+use App\Http\Controllers\Admin\KelolaKurirController;
+use App\Http\Controllers\Admin\DashboardAdminController;
+use App\Http\Controllers\Admin\ShipmentController as AdminShipmentController;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\KelolaStatusController;
 
@@ -24,23 +25,21 @@ Route::get('/', function() { return Auth::check() ? redirect()->route('dashboard
 });
 
 // ------------------- Authenticated User Routes -------------------
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:customer'])->group(function () {
     Route::get('/dashboard', fn() => view('User.dashboard'))->name('dashboard');
    // Langkah 1: Menampilkan form utama untuk mengisi detail pengiriman
     Route::get('/shipments/create-step-1', [ShipmentController::class, 'createStep1'])->name('shipments.create.step1');
     // Memproses data dari Langkah 1
     Route::post('/shipments/store-step-1', [ShipmentController::class, 'storeStep1'])->name('shipments.store.step1');
-    
     // Langkah 2: Menampilkan halaman ringkasan & pembayaran
     Route::get('/shipments/create-step-2', [ShipmentController::class, 'createStep2'])->name('shipments.create.step2');
     // Memproses data dari Langkah 2 (Final)
     Route::post('/shipments/store-final', [ShipmentController::class, 'storeFinal'])->name('shipments.store.final');
-
     // Halaman konfirmasi setelah berhasil
-    Route::get('/shipments/confirmation/{orderID}', [ShipmentController::class, 'confirmation'])->name('shipments.confirmation');
+    Route::get('/shipments/confirmation/{order}', [ShipmentController::class, 'confirmation'])->name('shipments.confirmation');
     
-    // Halaman riwayat pengiriman
-    Route::get('/shipments/history', [ShipmentController::class, 'history'])->name('shipments.history');
+    Route::get('/list', [ShipmentController::class, 'List'])->name('active');
+    Route::get('/history', [ShipmentController::class, 'history'])->name('history');
 
     // Rute untuk Midtrans tetap sama
     Route::get('/payment/finish', [ShipmentController::class, 'paymentFinish'])->name('payment.finish');
@@ -65,13 +64,13 @@ Route::get('/admin/login', fn() => view('auth.admin.masuk'))->name('admin.login'
 Route::get('/login/user', fn() => view('auth.user.masuk'))->name('user.login');
 
 // ------------------- Admin - Kelola Kurir -------------------
-Route::prefix('admin')->middleware('auth')->group(function () {
+Route::prefix('admin')->middleware(['auth','role:admin'])->group(function () {
     Route::get('/kelola_kurir', [KelolaKurirController::class, 'index'])->name('admin.kelola_kurir');
-    Route::get('/tambah_kurir', [CreateCourierController::class, 'create'])->name('admin.tambah_kurir');
-    Route::post('/simpan_kurir', [CreateCourierController::class, 'store'])->name('admin.simpan_kurir');
-    Route::delete('/kurir/{id}', [DeleteCourierController::class, 'destroy'])->name('admin.hapus_kurir');
-    Route::get('/edit_kurir/{id}', [EditCourierController::class, 'editKurir'])->name('admin.edit_kurir');
-    Route::put('/update_kurir/{id}', [EditCourierController::class, 'updateKurir'])->name('admin.update_kurir');
+    Route::get('/tambah_kurir', [KelolaKurirController::class, 'create'])->name('admin.tambah_kurir');
+    Route::post('/kelola_kurir', [KelolaKurirController::class, 'store'])->name('admin.kelola_kurir.store');
+    Route::get('/kelola_kurir/{id}/edit', [KelolaKurirController::class, 'edit'])->name('admin.kelola_kurir.edit');
+    Route::put('/kelola_kurir/{id}', [KelolaKurirController::class, 'update'])->name('admin.kelola_kurir.update');
+    Route::delete('/kelola_kurir/{id}', [KelolaKurirController::class, 'destroy'])->name('admin.kelola_kurir.destroy');
 
     // ------------------- Halaman Admin -------------------
     // Remove the redundant route that only returns a view
@@ -82,7 +81,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/api/pengiriman-per-wilayah', [DashboardAdminController::class, 'getPengirimanPerWilayah']);
 
     // ----- Kelola Pengiriman dan Penugasan Kurir -----
-    Route::get('/kelola_pengiriman', [KelolaPengirimanController::class, 'index'])->name('admin.kelola_pengiriman');
+    Route::get('/kelola_pengiriman', [AdminShipmentController::class, 'index'])->name('admin.kelola_pengiriman');
 
     // API Routes untuk AJAX
     Route::get('/api/kurir-by-wilayah/{wilayah}', [KelolaPengirimanController::class, 'getKurirByWilayah'])->name('kurir.byWilayah');
@@ -97,7 +96,17 @@ Route::prefix('admin')->middleware('auth')->group(function () {
 Route::get('/kurir/daftar_pengiriman', [KelolaPengirimanController::class, 'daftarPengirimanKurir'])->name('kurir.daftar_pengiriman');
 Route::get('/kurir/kelola_status', [KelolaPengirimanController::class, 'updateStatus'])->name('kurir.kelola_status');
 
+<<<<<<< Updated upstream
 Route::post('/shipment/update-status', [KelolaStatusController::class, 'konfirmasiStatus'])->name('shipment.updateStatus');
 Route::get('/kurir/history_pengiriman_kurir', [KelolaStatusController::class, 'history'])->name('kurir.history_pengiriman_kurir');
 Route::get('/kurir/resi/{id}/download', [KelolaStatusController::class, 'downloadResi'])->name('kurir.downloadResi');
 Route::get('/kurir/print-resi/{id}', [KelolaStatusController::class, 'printResi'])->name('kurir.printResi');
+=======
+
+Route::get('/force-logout', function () {
+    Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect('/login');
+});
+>>>>>>> Stashed changes
