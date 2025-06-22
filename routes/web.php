@@ -96,12 +96,12 @@ Route::prefix('admin')->middleware(['auth','role:admin'])->group(function () {
 Route::get('/kurir/daftar_pengiriman', [KelolaPengirimanController::class, 'daftarPengirimanKurir'])->name('kurir.daftar_pengiriman');
 Route::get('/kurir/kelola_status', [KelolaPengirimanController::class, 'updateStatus'])->name('kurir.kelola_status');
 
-<<<<<<< Updated upstream
+
 Route::post('/shipment/update-status', [KelolaStatusController::class, 'konfirmasiStatus'])->name('shipment.updateStatus');
 Route::get('/kurir/history_pengiriman_kurir', [KelolaStatusController::class, 'history'])->name('kurir.history_pengiriman_kurir');
 Route::get('/kurir/resi/{id}/download', [KelolaStatusController::class, 'downloadResi'])->name('kurir.downloadResi');
 Route::get('/kurir/print-resi/{id}', [KelolaStatusController::class, 'printResi'])->name('kurir.printResi');
-=======
+
 
 Route::get('/force-logout', function () {
     Auth::logout();
@@ -109,4 +109,4 @@ Route::get('/force-logout', function () {
     request()->session()->regenerateToken();
     return redirect('/login');
 });
->>>>>>> Stashed changes
+
