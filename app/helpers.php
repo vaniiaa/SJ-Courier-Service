@@ -13,7 +13,7 @@ if (!function_exists('getNavigationLinks')) {
         if ($user->isKurir()) {
             return [
                 ['label' => 'Dashboard', 'url' => route('kurir.dashboard')],
-                ['label' => 'Live Tracking', 'url' => route('kurir.live_tracking')],
+                ['label' => 'Live Tracking', 'url' => route('kurir.dashboard')],
             ];
         }
         // Default: customer

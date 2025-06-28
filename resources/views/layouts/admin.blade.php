@@ -20,6 +20,8 @@
     @yield('styles')
 </head>
 
+@stack('scripts')
+
 <body class="bg-gray-100 text-gray-900">
 
     {{-- Header Admin --}}

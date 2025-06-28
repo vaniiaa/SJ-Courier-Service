@@ -24,7 +24,7 @@ use App\Http\Controllers\KelolaStatusController;
 Route::get('/', function() { return Auth::check() ? redirect()->route('dashboard') : view('PublicUser.home');
 });
 
-// ------------------- Authenticated User Routes -------------------
+// ------------------- Authenticated Customer Routes -------------------
 Route::middleware(['auth', 'verified', 'role:customer'])->group(function () {
     Route::get('/dashboard', fn() => view('User.dashboard'))->name('dashboard');
    // Langkah 1: Menampilkan form utama untuk mengisi detail pengiriman
@@ -51,20 +51,16 @@ Route::middleware(['auth', 'verified', 'role:customer'])->group(function () {
     Route::get('/kurir/scan/{tracking_number}', [ShipmentController::class, 'scanTrack'])->name('kurir.scan.track');
 });
 
-require __DIR__.'/auth.php';
-
-// ------------------- Kurir Auth Routes -------------------
-Route::get('/auth/kurir/masuk', [CourierLoginController::class, 'showLoginForm'])->name('kurir.login');
-Route::post('/auth/kurir/masuk', [CourierLoginController::class, 'login']);
-Route::post('/kurir/logout', [CourierLoginController::class, 'logout'])->name('kurir.logout');
-Route::get('/kurir/dashboard', fn() => view('kurir.dashboard'))->name('dashboard.kurir');
-
-// ------------------- Admin Auth Routes -------------------
-Route::get('/admin/login', fn() => view('auth.admin.masuk'))->name('admin.login');
-Route::get('/login/user', fn() => view('auth.user.masuk'))->name('user.login');
-
-// ------------------- Admin - Kelola Kurir -------------------
+// ------------------- Authenticated Admin Roles -------------------
 Route::prefix('admin')->middleware(['auth','role:admin'])->group(function () {
+    Route::get('/dashboard_admin', [DashboardAdminController::class, 'index'])->name('admin.dashboard_admin');
+    // ----- Kelola Pengiriman dan Penugasan Kurir -----
+    Route::get('/kelola_pengiriman', [AdminShipmentController::class, 'index'])->name('admin.kelola_pengiriman');
+    // Rute untuk mengambil kurir berdasarkan area ID
+    Route::get('/couriers/by-area/{area_id}', [AdminShipmentController::class, 'getCouriersByArea'])->name('couriers.byArea');
+    // Rute untuk memproses form penugasan kurir
+    Route::post('/shipments/assign-courier', [AdminShipmentController::class, 'assignCourier'])->name('shipments.assignCourier');
+    // Rute untuk Kelola Akun Kurir
     Route::get('/kelola_kurir', [KelolaKurirController::class, 'index'])->name('admin.kelola_kurir');
     Route::get('/tambah_kurir', [KelolaKurirController::class, 'create'])->name('admin.tambah_kurir');
     Route::post('/kelola_kurir', [KelolaKurirController::class, 'store'])->name('admin.kelola_kurir.store');
@@ -72,36 +68,30 @@ Route::prefix('admin')->middleware(['auth','role:admin'])->group(function () {
     Route::put('/kelola_kurir/{id}', [KelolaKurirController::class, 'update'])->name('admin.kelola_kurir.update');
     Route::delete('/kelola_kurir/{id}', [KelolaKurirController::class, 'destroy'])->name('admin.kelola_kurir.destroy');
 
-    // ------------------- Halaman Admin -------------------
-    // Remove the redundant route that only returns a view
-    // Route::get('/status_pengiriman', fn() => view('admin.status_pengiriman'))->name('admin.status_pengiriman');
-
-  
-    Route::get('/dashboard_admin', [DashboardAdminController::class, 'index'])->name('admin.dashboard_admin');
-    Route::get('/api/pengiriman-per-wilayah', [DashboardAdminController::class, 'getPengirimanPerWilayah']);
-
-    // ----- Kelola Pengiriman dan Penugasan Kurir -----
-    Route::get('/kelola_pengiriman', [AdminShipmentController::class, 'index'])->name('admin.kelola_pengiriman');
-
-    // API Routes untuk AJAX
-    Route::get('/api/kurir-by-wilayah/{wilayah}', [KelolaPengirimanController::class, 'getKurirByWilayah'])->name('kurir.byWilayah');
-    Route::post('/api/assign-kurir', [KelolaPengirimanController::class, 'assignKurir'])->name('assign.kurir');
-    Route::get('/kurir-by-username', [KelolaPengirimanController::class, 'getCourierByUsername'])->name('kurir.byUsername');
-
     // THIS IS THE CORRECTED ROUTE NAME
     Route::get('/status_pengiriman', [KelolaPengirimanController::class, 'statusPengiriman'])->name('admin.status_pengiriman');
     Route::get('/history_pengiriman', [KelolaPengirimanController::class, 'historyPengiriman'])->name('admin.history_pengiriman');
 });
 
-Route::get('/kurir/daftar_pengiriman', [KelolaPengirimanController::class, 'daftarPengirimanKurir'])->name('kurir.daftar_pengiriman');
-Route::get('/kurir/kelola_status', [KelolaPengirimanController::class, 'updateStatus'])->name('kurir.kelola_status');
+// ------------------- Authenticated Courier Routes -------------------
+Route::prefix('courier')->middleware(['auth', 'role:courier'])->group(function () {
+    Route::get('/dashboard', fn() => view('kurir.dashboard'))->name('kurir.dashboard');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('courier.profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('courier.profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('courier.profile.destroy');
+
+    Route::get('/kurir/daftar_pengiriman', [KelolaPengirimanController::class, 'daftarPengirimanKurir'])->name('kurir.daftar_pengiriman');
+    Route::get('/kurir/kelola_status', [KelolaPengirimanController::class, 'updateStatus'])->name('kurir.kelola_status');
 
 
-Route::post('/shipment/update-status', [KelolaStatusController::class, 'konfirmasiStatus'])->name('shipment.updateStatus');
-Route::get('/kurir/history_pengiriman_kurir', [KelolaStatusController::class, 'history'])->name('kurir.history_pengiriman_kurir');
-Route::get('/kurir/resi/{id}/download', [KelolaStatusController::class, 'downloadResi'])->name('kurir.downloadResi');
-Route::get('/kurir/print-resi/{id}', [KelolaStatusController::class, 'printResi'])->name('kurir.printResi');
+    Route::post('/shipment/update-status', [KelolaStatusController::class, 'konfirmasiStatus'])->name('shipment.updateStatus');
+    Route::get('/kurir/history_pengiriman_kurir', [KelolaStatusController::class, 'history'])->name('kurir.history_pengiriman_kurir');
+    Route::get('/kurir/resi/{id}/download', [KelolaStatusController::class, 'downloadResi'])->name('kurir.downloadResi');
+    Route::get('/kurir/print-resi/{id}', [KelolaStatusController::class, 'printResi'])->name('kurir.printResi');
+});
 
+
+require __DIR__.'/auth.php';
 
 Route::get('/force-logout', function () {
     Auth::logout();

@@ -40,12 +40,12 @@
                 </label>
                 <span class="mx-2 mt-2">:</span>
                 <input type="text" id="name" name="name" placeholder="Tulis nama lengkap Pengguna"
-                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    class="flex-1 px-3 py-2 border border-gray-300 bg-white rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">
             </div>
 
             {{--Phone--}}
             <div class="flex items-start mb-4">
-                <label for="no_hp" class="w-40 font-medium flex items-center mt-2">
+                <label for="phone" class="w-40 font-medium flex items-center mt-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a3 3 0 00-3-3h-3a3 3 0 00-3 3v3.75M5.25 10.5h13.5A2.25 2.25 0 0121 12.75v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18.75v-6A2.25 2.25 0 015.25 10.5z" />
                     </svg>
@@ -53,12 +53,12 @@
                 </label>
                 <span class="mx-2 mt-2">:</span>
                 <input type="text" id="phone" name="phone" placeholder="Tulis nomor handphone"
-                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    class="flex-1 px-3 py-2 border border-gray-300 bg-white rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">
             </div>
             
             {{-- Alamat --}}
             <div class="flex items-start mb-4">
-                <label for="alamat" class="w-40 font-medium flex items-center mt-2">
+                <label for="address" class="w-40 font-medium flex items-center mt-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M4.5 10.5v9.75a.75.75 0 00.75.75h3.75a.75.75 0 00.75-.75V15a.75.75 0 01.75-.75h3a.75.75 0 01.75.75v5.25a.75.75 0 00.75.75h3.75a.75.75 0 00.75-.75V10.5" />
                     </svg>
@@ -66,7 +66,7 @@
                 </label>
                 <span class="mx-2 mt-2">:</span>
                 <textarea id="address" name="address" rows="3" placeholder="Tulis alamat lengkap Pengguna"
-                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500"></textarea>
+                    class="flex-1 px-3 py-2 border border-gray-300 bg-white rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500"></textarea>
             </div>
 
             {{-- Wilayah Pengiriman --}}
@@ -78,7 +78,7 @@
                     Wilayah Pengiriman
                 </label>
                 <span class="mx-2 mt-2">:</span>
-                <select id="area_id" name="area_id" class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                <select id="area_id" name="area_id" class="flex-1 px-3 py-2 border border-gray-300 bg-white rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">
                 <option value="">Pilih Wilayah</option>
                 @foreach($areas as $area)
                 <option value="{{ $area->area_id }}">{{ $area->area_name }}</option>
@@ -96,7 +96,7 @@
                 </label>
                 <span class="mx-2 mt-2">:</span>
                 <input type="email" id="email" name="email" placeholder="Masukkan email yang valid"
-                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    class="flex-1 px-3 py-2 border border-gray-300 bg-white rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">
             </div>
 
             {{-- Sandi --}}
@@ -109,7 +109,7 @@
                 </label>
                 <span class="mx-2 mt-2">:</span>
                 <input type="password" id="password" name="password" placeholder="Tulis sandi minimal 6 karakter"
-                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    class="flex-1 px-3 py-2 border border-gray-300 bg-white rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">
             </div>
 
             {{-- Submit --}}

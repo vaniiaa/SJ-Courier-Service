@@ -72,7 +72,7 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan shipment via AJAX.
         <div class="flex justify-end items-center mb-4">
             <form action="{{ route('admin.kelola_pengiriman') }}" method="GET" class="flex items-center gap-2">
                 <label for="search" class="font-medium text-sm">Search:</label>
-                <input type="text" id="search" name="search" placeholder="Cari resi / nama" class="border px-2 py-1 rounded text-sm" value="{{ request('search') }}" />
+                <input type="text" id="search" name="search" placeholder="Cari resi / nama" class="border px-2 py-1 rounded text-sm bg-white" value="{{ request('search') }}" />
                 <button type="submit" class="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600">Cari</button>
             </form>
         </div>
@@ -145,7 +145,8 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan shipment via AJAX.
                 </thead>
                 <tbody>
                     @forelse ($shipments as $shipment)
-                        <tr class="{{ $loop->even ? 'bg-white' : 'bg-gray-100' }}" id="row-{{ $shipment->id }}">
+                        <tr class="{{ $loop->even ? 'bg-white' : 'bg-gray-100' }}" id="row-{{ $shipment->shipmentID }}">
+                            {{-- Menggunakan $loop->iteration untuk nomor urut --}}
                             <td class="px-4 py-2 text-center">
                                 {{ ($shipments->currentPage() - 1) * $shipments->perPage() + $loop->iteration }}
                             </td>
@@ -161,10 +162,10 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan shipment via AJAX.
                             <td class="px-4 py-2 text-center">{{ $shipment->courier->name ?? 'Belum Ditentukan' }}</td>
                             {{-- Menampilkan status pengiriman dengan warna berdasarkan status --}}
                             <td class="px-4 py-2 text-center font-semibold text-sm
-                                @if ($shipment->status_pengiriman === 'menunggu konfirmasi') text-gray-600
-                                @elseif ($shipment->status_pengiriman === 'sedang dikirim') text-red-600
-                                @elseif ($shipment->status_pengiriman === 'menuju alamat') text-blue-600
-                                @elseif ($shipment->status_pengiriman === 'pesanan diterima') text-green-600
+                                @if ($shipment->currentStatus === 'menunggu konfirmasi') text-gray-600
+                                @elseif ($shipment->currentStatus === 'sedang dikirim') text-red-600
+                                @elseif ($shipment->currentStatus === 'menuju alamat') text-blue-600
+                                @elseif ($shipment->currentStatus === 'pesanan diterima') text-green-600
                                 @endif">
                                 {{ $shipment->currentStatus }}
                             </td>
@@ -178,13 +179,13 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan shipment via AJAX.
                                     </button>
 
                                     {{-- Tombol "Kurir" hanya muncul jika `kurir_id` belum ditentukan (NULL) --}}
-                                    @if (empty($shipment->kurir_id))
-                                        <button class="w-16 bg-red-500 text-white py-1 rounded text-xs hover:bg-red-600 shadow-md shadow-gray-700" onclick="openModal('{{ $shipment->id }}')">Kurir</button>
+                                    @if (empty($shipment->courierUserID))
+                                        <button type="button" class="w-16 bg-red-500 text-white py-1 rounded text-xs hover:bg-red-600 shadow-md shadow-gray-700"  onclick="openModal('{{ $shipment->shipmentID }}')">Kurir</button>
                                     @endif
 
                                     {{-- Tombol "Detail" --}}
                                     <button
-                                        class="px-3 bg-blue-500 text-white py-1 rounded text-xs hover:bg-blue-600 shadow-md shadow-gray-700 px-4 py-2"
+                                        class="px-3 bg-blue-500 text-white py-1 rounded text-xs hover:bg-blue-600 shadow-md shadow-gray-700"
                                         onclick="showDetailModal(
                                             '{{ $shipment->tracking_number }}',
                                             '{{ $shipment->order->sender->name }}',
@@ -196,7 +197,7 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan shipment via AJAX.
                                             '{{ $shipment->weightKG }}',
                                             '{{ number_format($shipment->finalPrice, 0, ',', '.') }}',
                                             '{{ ucfirst($shipment->currentStatus) }}',
-                                            '{{ $shipment->catatan ?? '' }}' {{-- Meneruskan catatan ke modal detail --}}
+                                            '{{ $shipment->catatan ?? '' }}', //Meneruskan catatan ke modal detail 
                                         )"
                                     > Detail
                                     </button>
@@ -243,6 +244,7 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan shipment via AJAX.
 
 {{-- Modal Detail Pengiriman --}}
 <div id="modalDetail" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50 hidden">
+    {{-- Wadah untuk modal detail --}}
     <div class="bg-white p-4 rounded-lg shadow-md shadow-gray-700 w-[1000px] max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center">
             <img src="{{ asset('images/admin/logo2.jpg') }}" alt="Logo" class="w-12 h-12 object-cover rounded-full">
@@ -309,338 +311,135 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan shipment via AJAX.
 
 {{-- Modal Tentukan Kurir --}}
 <div id="modalTentukanKurir" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50 hidden">
-    <div class="bg-white p-6 rounded-lg shadow-md shadow-gray-700 w-[1000px]">
-        <div class="flex justify-between items-center">
-            {{-- Sesuaikan path gambar logo Anda --}}
-            <img src="{{ asset('images/admin/logo2.jpg') }}" alt="Logo" class="w-16 h-16 object-cover rounded-full">
-            <h5 class="text-xl font-semibold flex-1 ml-4">Penjadwalan Kurir</h5>
-            <button class="text-gray-500 hover:text-gray-700 text-2xl" onclick="closeModal()">&times;</button>
+        <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-lg">
+            <div class="flex justify-between items-center">
+                <h5 class="text-xl font-semibold">Penjadwalan Kurir</h5>
+                <button class="text-gray-500 hover:text-gray-700 text-2xl" onclick="closeModal()">&times;</button>
+            </div>
+            <hr class="my-4">
+
+            <form id="formTentukanKurir">
+                @csrf
+                <input type="hidden" id="shipmentIdToAssign" name="shipment_id" value="">
+
+                {{-- Dropdown Wilayah --}}
+                <div class="mb-4">
+                    <label for="area_id" class="block text-sm font-medium text-gray-700">Wilayah Pengiriman</label>
+                    <select id="area_id" name="area_id" required class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md focus:ring-blue-500 focus:border-blue-500">
+                       <option value="">Pilih wilayah...</option>
+                       {{-- Loop untuk menampilkan semua area dari controller --}}
+                       @foreach($deliveryAreas as $area)
+                           <option value="{{ $area->area_id }}">{{ $area->area_name }}</option>
+                       @endforeach
+                    </select>
+                </div>
+
+                {{-- Dropdown Kurir (akan diisi oleh JavaScript) --}}
+                <div class="mb-4">
+                    <label for="kurir_id" class="block text-sm font-medium text-gray-700">Pilih Kurir</label>
+                    <select id="kurir_id" name="kurir_id" required class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Pilih wilayah dahulu...</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label for="pickupTimestamp" class="block text-sm font-medium text-gray-700">Tanggal Pengiriman</label>
+                    <input type="datetime-local" id="pickupTimestamp" name="pickupTimestamp" required class="mt-1 block w-full px-3 py-2 border bg-white border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">                </div>
+
+                <div class="mb-4">
+                    <label for="noteadmin" class="block text-sm font-medium text-gray-700">Catatan</label>
+                    <textarea id="noteadmin" name="noteadmin" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
+                </div>
+
+                <div class="flex justify-end space-x-4 mt-6">
+                    <button type="button" onclick="closeModal()" class="btn btn-ghost">Batal</button>
+                    <button type="submit" class="btn btn-primary">Tugaskan Kurir</button>
+                </div>
+            </form>
         </div>
-        <hr class="my-4 border-gray-300">
-
-        <form action="{{ route('assign.kurir') }}" method="POST" id="formTentukanKurir">
-            @csrf
-            {{-- Hidden input untuk ID pengiriman. Ini akan diisi oleh JavaScript. --}}
-            <input type="hidden" id="shipmentIdToAssign" name="shipment_id">
-            {{-- Hidden input untuk ID kurir yang dipilih --}}
-            <input type="hidden" id="selectedKurirId" name="kurir_id">
-
-            {{-- Content for "Pilih Berdasarkan Wilayah" (now the only mode) --}}
-            <div id="contentWilayah" class="tab-content"> {{-- ID contentWilayah tetap dipertahankan untuk JavaScript --}}
-                <div class="mb-4">
-                    <label for="wilayahPengiriman" class="block text-sm font-medium text-gray-700">Wilayah Pengiriman</label>
-                    <select id="wilayahPengiriman" name="wilayahPengiriman"
-                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                       <option value="">Pilih wilayah pengiriman...</option>
-            <option value="Batam Kota">Batam Kota</option>
-            <option value="Batu Aji">Batu Aji</option>
-            <option value="Batu Ampar">Batu Ampar</option>
-            <option value="Belakang Padang">Belakang Padang</option>
-            <option value="Bengkong">Bengkong</option>
-            <option value="Galang">Galang</option>
-            <option value="Lubuk Baja">Lubuk Baja</option>
-            <option value="Nongsa">Nongsa</option>
-            <option value="Sagulung">Sagulung</option>
-            <option value="Sei Beduk">Sei Beduk</option>
-            <option value="Sekupang">Sekupang</option>
-            <option value="Sungai Beduk">Sungai Beduk</option>
-                    </select>
-                </div>
-
-                <div class="mb-4">
-                    <label for="kurirSelect" class="block text-sm font-medium text-gray-700">Pilih Kurir</label>
-                    <select id="kurirSelect" name="kurir_dropdown"
-                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">Pilih kurir...</option>
-                        {{-- Opsi kurir akan diisi secara dinamis melalui JavaScript --}}
-                    </select>
-                </div>
-            </div>
-
-            {{-- Common Fields --}}
-            <div class="mb-4">
-                <label for="tanggalPengiriman" class="block text-sm font-medium text-gray-700">Tanggal Pengiriman</label>
-                <input type="date" id="tanggalPengiriman" name="tanggalPengiriman" required
-                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-            </div>
-
-            <div class="mb-4">
-                <label for="catatan" class="block text-sm font-medium text-gray-700">Catatan</label>
-                <textarea id="catatan" name="catatan" rows="3" placeholder="Masukkan catatan khusus"
-                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:focus:border-blue-500"></textarea>
-            </div>
-
-            <div class="flex justify-end space-x-4">
-                <button type="button" onclick="closeModal()"
-                    class="text-sm py-3 px-5 bg-red-500 text-white rounded-lg hover:bg-red-600 shadow-md shadow-gray-700">Batal</button>
-                <button type="submit"
-                    class="text-sm py-3 px-5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 shadow-md shadow-gray-700">Kirim</button>
-            </div>
-        </form>
     </div>
-</div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const successAlert = document.getElementById('success-alert');
-        const errorAlert = document.getElementById('error-alert');
-        const dynamicNotificationContainer = document.getElementById('dynamic-notification-container');
+ {{-- Script JavaScript --}}
+    @push('scripts')
+    <script>
 
-        // Fungsi untuk menampilkan notifikasi dengan transisi
-        window.showNotification = function(alertElement) { // Dijadikan global agar bisa dipanggil dari onclick di HTML
-            if (alertElement) {
-                // Pastikan elemen terlihat (display: block) sebelum menambahkan kelas 'show'
-                alertElement.style.display = 'block';
-                setTimeout(() => {
-                    alertElement.classList.add('show');
-                }, 100); // Memberi sedikit delay (100ms) untuk memastikan browser merender status awal sebelum transisi
-            }
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const areaSelect = document.getElementById('area_id');
+            const kurirSelect = document.getElementById('kurir_id');
+            const formTentukanKurir = document.getElementById('formTentukanKurir');
 
-        // Fungsi untuk menyembunyikan notifikasi dengan transisi
-        window.hideNotification = function(alertElement) { // Dijadikan global
-            if (alertElement) {
-                alertElement.classList.remove('show'); // Hapus kelas 'show' untuk memicu transisi menghilang
-                // Setelah transisi selesai, sembunyikan elemen sepenuhnya (display: none)
-                alertElement.addEventListener('transitionend', function() {
-                    alertElement.style.display = 'none';
-                    alertElement.remove(); // Remove the element from DOM after hiding
-                }, { once: true }); // Listener ini hanya akan berjalan sekali
-            }
-        }
+            // Event listener untuk dropdown area
+        areaSelect.addEventListener('change', async function() {
+            const selectedAreaId = this.value;
+            kurirSelect.innerHTML = '<option value="">Memuat kurir...</option>';
+            kurirSelect.disabled = true;
 
-        // Fungsi untuk membuat dan menampilkan notifikasi dinamis
-        function createAndShowDynamicNotification(message, type = 'success') {
-            const alertDiv = document.createElement('div');
-            alertDiv.classList.add('notification-transition', 'p-4', 'rounded-lg', 'shadow-lg', 'relative', 'mb-4');
-            alertDiv.style.display = 'none'; // Initially hidden
-
-            let bgColor, borderColor, textColor, strongText, svgColor;
-
-            if (type === 'success') {
-                bgColor = '#d1fae5'; // Light green
-                borderColor = '#34d399'; // Green
-                textColor = '#047857'; // Dark green
-                strongText = 'Berhasil!';
-                svgColor = '#10b981';
-            } else if (type === 'error') {
-                bgColor = '#fee2e2'; // Light red
-                borderColor = '#f87171'; // Red
-                textColor = '#b91c1c'; // Dark red
-                strongText = 'Gagal!';
-                svgColor = '#ef4444';
-            } else {
-                // Default to success if type is not recognized
-                bgColor = '#d1fae5';
-                borderColor = '#34d399';
-                textColor = '#047857';
-                strongText = 'Informasi!';
-                svgColor = '#10b981';
-            }
-
-            alertDiv.style.backgroundColor = bgColor;
-            alertDiv.style.border = `1px solid ${borderColor}`;
-            alertDiv.style.color = textColor;
-
-            alertDiv.innerHTML = `
-                <strong style="font-weight: bold;">${strongText}</strong>
-                <span style="display: inline;">${message}</span>
-                <span style="position: absolute; top: 0; bottom: 0; right: 0; padding: 1rem; cursor: pointer;">
-                    <svg style="height: 1.5rem; width: 1.5rem; fill: currentColor; color: ${svgColor};" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                        <title>Close</title>
-                        <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 2.651a1.2 1.2 0 1 1-1.697-1.697L8.303 10l-2.651-2.651a1.2 1.2 0 1 1 1.697-1.697L10 8.181l2.651-2.651a1.2 1.2 0 1 1 1.697 1.697L11.697 10l2.651 2.651a1.2 1.2 0 0 1 0 1.697z"/>
-                    </svg>
-                </span>
-            `;
-
-            dynamicNotificationContainer.appendChild(alertDiv);
-
-            // Add click listener to close button
-            alertDiv.querySelector('span:last-child').addEventListener('click', function() {
-                hideNotification(alertDiv);
-            });
-
-            showNotification(alertDiv); // Show with transition
-            // Durasi notifikasi dinamis: 5000 milidetik (5 detik)
-            setTimeout(() => {
-                hideNotification(alertDiv);
-            }, 5000);
-        }
-
-        // Jalankan logika untuk notifikasi sukses yang ada di sesi
-        if (successAlert) {
-            showNotification(successAlert); // Tampilkan notifikasi
-            // Durasi notifikasi sukses (session-based): 5000 milidetik (5 detik)
-            setTimeout(() => {
-                hideNotification(successAlert);
-            }, 5000);
-        }
-        
-        // Jalankan logika untuk notifikasi error yang ada di sesi
-        if (errorAlert) {
-            showNotification(errorAlert); // Tampilkan notifikasi
-            // Durasi notifikasi error (session-based): 5000 milidetik (5 detik)
-            setTimeout(() => {
-                hideNotification(errorAlert);
-            }, 5000);
-        }
-
-
-        const wilayahSelect = document.getElementById('wilayahPengiriman');
-        const kurirSelectDropdown = document.getElementById('kurirSelect');
-        const formTentukanKurir = document.getElementById('formTentukanKurir');
-        const shipmentIdToAssignInput = document.getElementById('shipmentIdToAssign');
-        const selectedKurirIdInput = document.getElementById('selectedKurirId');
-        const modalTentukanKurir = document.getElementById('modalTentukanKurir');
-        const modalDetail = document.getElementById('modalDetail');
-        // Pastikan elemen header Anda memiliki ID 'admin-header'
-        const adminHeader = document.getElementById('admin-header');
-
-        // Periksa elemen yang *masih* ada
-        if (!wilayahSelect || !kurirSelectDropdown || !formTentukanKurir || !shipmentIdToAssignInput || !selectedKurirIdInput || !modalTentukanKurir || !modalDetail || !adminHeader || !dynamicNotificationContainer) {
-            console.error('One or more critical HTML elements for modal/form/notifications are missing. Please check your IDs and ensure admin-header and dynamic-notification-container exist.');
-            // Jika ada elemen penting yang hilang, hentikan eksekusi script untuk mencegah error lebih lanjut.
+            if (!selectedAreaId) {
+            kurirSelect.innerHTML = '<option value="">Pilih wilayah dahulu...</option>';
             return;
+    }
+
+    const url = `{{ url('/admin/couriers/by-area') }}/${selectedAreaId}`;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Gagal mengambil data kurir');
+        const couriers = await response.json();
+        kurirSelect.innerHTML = '<option value="">Pilih kurir...</option>';
+        if (couriers.length === 0) {
+            kurirSelect.innerHTML = '<option value="">Tidak ada kurir di area ini</option>';
+        } else {
+            couriers.forEach(kurir => {
+                const option = document.createElement('option');
+                option.value = kurir.id;
+                option.textContent = kurir.name;
+                kurirSelect.appendChild(option);
+            });
         }
+        kurirSelect.disabled = false;
+    } catch (error) {
+        kurirSelect.innerHTML = '<option value="">Gagal memuat kurir</option>';
+        kurirSelect.disabled = false;
+    }
+});
 
-        window.openModal = function(shipmentId) {
-            modalTentukanKurir.classList.remove('hidden');
-            // Add the class to darken the header
-            adminHeader.classList.add('header-darken');
-            shipmentIdToAssignInput.value = shipmentId;
-            // Reset modal state
-            wilayahSelect.value = '';
-            kurirSelectDropdown.innerHTML = '<option value="">Pilih kurir...</option>';
-            selectedKurirIdInput.value = ''; // Ensure no courier ID is pre-selected
-            document.getElementById('tanggalPengiriman').valueAsDate = new Date();
-            document.getElementById('catatan').value = '';
-        };
+            // Event listener untuk submit form (AJAX)
+            formTentukanKurir.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                const formData = new FormData(this);
+                const submitButton = this.querySelector('button[type="submit"]');
+                submitButton.classList.add('btn-disabled');
+                submitButton.textContent = 'Menyimpan...';
 
-        window.closeModal = function() {
-            modalTentukanKurir.classList.add('hidden');
-            // Remove the class to revert the header
-            adminHeader.classList.remove('header-darken');
-        };
-
-        window.showDetailModal = function(resi, pengirim, alamatJemput, penerima, alamatTujuan, kurir, tanggalPemesanan, berat, harga, status, catatan) {
-            document.getElementById('resiDetail').value = resi;
-            document.getElementById('pengirimDetail').value = pengirim;
-            document.getElementById('alamatJemputDetail').value = alamatJemput;
-            document.getElementById('penerimaDetail').value = penerima;
-            document.getElementById('alamatTujuanDetail').value = alamatTujuan;
-            document.getElementById('kurirDetail').value = kurir;
-            document.getElementById('tanggalDetail').value = tanggalPemesanan;
-            document.getElementById('beratDetail').value = berat;
-            document.getElementById('hargaDetail').value = harga;
-            document.getElementById('statusDetail').value = status;
-            document.getElementById('catatanDetail').value = catatan;
-            modalDetail.classList.remove('hidden');
-            // Add the class to darken the header
-            adminHeader.classList.add('header-darken');
-        };
-
-        window.closeDetailModal = function() {
-            modalDetail.classList.add('hidden');
-            // Remove the class to revert the header
-            adminHeader.classList.remove('header-darken');
-        };
-
-        window.printshipment = function(resi) {
-            alert('Fungsi print untuk Resi: ' + resi + ' akan ditambahkan di sini.');
-            // Implement printing logic here
-            // Example: window.open('/print/resi/' + resi, '_blank');
-        };
-
-        wilayahSelect.addEventListener('change', async function() {
-            const selectedWilayah = this.value;
-            kurirSelectDropdown.innerHTML = '<option value="">Loading...</option>';
-            selectedKurirIdInput.value = ''; // Reset selected ID when region changes
-
-            if (selectedWilayah) {
-                const url = `{{ route('kurir.byWilayah', ['wilayah' => '__WILAYAH__']) }}`.replace('__WILAYAH__', encodeURIComponent(selectedWilayah));
                 try {
-                    const response = await fetch(url);
+                    const response = await fetch("{{ route('shipments.assignCourier') }}", {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Accept': 'application/json',
+                        }
+                    });
+
+                    const result = await response.json();
+
                     if (!response.ok) {
-                        const errorshipment = await response.json();
-                        throw new Error(errorshipment.message || `HTTP error! Status: ${response.status}`);
-                    }
-                    const shipment = await response.json();
-                    kurirSelectDropdown.innerHTML = '<option value="">Pilih kurir...</option>';
-                    if (shipment.length === 0) {
-                        kurirSelectDropdown.innerHTML = '<option value="">Tidak ada kurir untuk wilayah ini</option>';
+                        // Tampilkan error validasi atau server
+                        alert('Gagal: ' + (result.message || 'Terjadi kesalahan.'));
                     } else {
-                        shipment.forEach(kurir => {
-                            const option = document.createElement('option');
-                            option.value = kurir.id;
-                            option.textContent = kurir.username;
-                            kurirSelectDropdown.appendChild(option);
-                        });
+                        // Tampilkan notifikasi sukses
+                        alert('Sukses: ' + result.message);
+                        closeModal();
+                        location.reload(); // Reload halaman untuk melihat perubahan status
                     }
                 } catch (error) {
-                    console.error('Error fetching courier shipment by region:', error);
-                    kurirSelectDropdown.innerHTML = '<option value="">Gagal memuat kurir</option>';
-                    createAndShowDynamicNotification('Gagal memuat daftar kurir: ' + error.message, 'error');
+                    console.error('Error submitting form:', error);
+                    alert('Gagal mengirim permintaan. Periksa koneksi Anda.');
+                } finally {
+                    submitButton.classList.remove('btn-disabled');
+                    submitButton.textContent = 'Tugaskan Kurir';
                 }
-            } else {
-                kurirSelectDropdown.innerHTML = '<option value="">Pilih kurir...</option>';
-            }
+            });
         });
-
-        // Update hidden kurir_id input when dropdown selection changes
-        kurirSelectDropdown.addEventListener('change', function() {
-            // Hanya set selectedKurirIdInput jika nilai yang dipilih bukan kosong
-            if (this.value) {
-                selectedKurirIdInput.value = this.value;
-            } else {
-                selectedKurirIdInput.value = ''; // Jika memilih "Pilih kurir...", reset ID
-            }
-        });
-
-        formTentukanKurir.addEventListener('submit', async function(event) {
-            event.preventDefault();
-
-            // Basic validation for courier selection
-            if (!selectedKurirIdInput.value) {
-                createAndShowDynamicNotification('Harap pilih kurir terlebih dahulu dari daftar wilayah.', 'error');
-                return;
-            }
-
-            const formshipment = new Formshipment(this);
-            formshipment.set('kurir_id', selectedKurirIdInput.value); // Pastikan ini yang dikirim
-
-            try {
-                const response = await fetch(this.action, {
-                    method: 'POST',
-                    body: formshipment,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
-                });
-
-                if (!response.ok) {
-                    const errorshipment = await response.json();
-                    let errorMessage = errorshipment.message || `Server error! Status: ${response.status}`;
-                    if (errorshipment.errors) {
-                        errorMessage += '\n\nDetail Kesalahan:\n' + Object.values(errorshipment.errors).flat().join('\n');
-                    }
-                    createAndShowDynamicNotification('Terjadi kesalahan saat menetapkan kurir: ' + errorMessage, 'error');
-                } else {
-                    const successshipment = await response.json();
-                    createAndShowDynamicNotification(successshipment.message, 'success');
-                    closeModal(); // Tutup modal setelah berhasil
-                    // Consider a more granular update or simply reload for simplicity in this case
-                    location.reload();
-                }
-            } catch (error) {
-                console.error('Error submitting form:', error);
-                createAndShowDynamicNotification('Gagal mengirim permintaan: ' + error.message, 'error');
-            }
-        });
-
-        function ucfirst(str) {
-            if (!str) return str;
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        }
-    });
-</script>
+    </script>
+    @endpush
 @endsection

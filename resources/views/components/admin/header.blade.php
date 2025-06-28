@@ -6,7 +6,7 @@
     </button>
 
     <div class="flex items-center flex-grow mx-4 ">
-        <input type="text" placeholder="Search..." class="w-auto py-2 px-4 rounded-lg text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500" />
+        <input type="text" placeholder="Search..." class="w-auto py-2 px-4 rounded-lg text-sm border bg-white border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500" />
     </div>
 
     <div class="ml-auto mr-4">

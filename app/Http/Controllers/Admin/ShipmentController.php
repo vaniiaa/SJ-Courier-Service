@@ -5,6 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Shipment;
 use Illuminate\Http\Request;
+use App\Models\DeliveryArea;
+use App\Models\User;
+use App\Models\TrackingHistory;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 
 class ShipmentController extends Controller
 {
@@ -38,6 +44,66 @@ class ShipmentController extends Controller
         // withQueryString() agar filter pencarian tidak hilang saat pindah halaman
         $shipments = $query->paginate(10)->withQueryString();
 
-        return view('admin.kelola_pengiriman', compact('shipments'));
+        // Ambil semua area pengiriman dari database
+        $deliveryAreas = DeliveryArea::orderBy('area_name')->get();
+
+        return view('admin.kelola_pengiriman', compact('shipments', 'deliveryAreas'));
+    }
+
+    /**
+     * Mengambil daftar kurir berdasarkan area_id.
+     * Dipanggil oleh JavaScript (AJAX/Fetch).
+     */
+    public function getCouriersByArea(Request $request, $area_id)
+    {
+        // Cari user dengan peran role_id = 2 dan area_id yang cocok
+        $couriers = User::where('role_id', 2)
+            ->where('area_id', $area_id)
+            ->select('user_id as id', 'name') // Hanya ambil ID dan nama
+            ->get();
+
+        return response()->json($couriers);
+    }
+
+    /**
+     * Menugaskan kurir ke sebuah pengiriman.
+     */
+    public function assignCourier(Request $request)
+    {
+        $request->validate([
+            'shipment_id' => 'required|exists:shipments,shipmentID',
+            'kurir_id' => 'required|exists:users,user_id',
+            'pickupTimestamp' => 'required|date_format:Y-m-d\TH:i', // Format timestamp pengambilan
+            'noteadmin' => 'nullable|string|max:255',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $shipment = Shipment::findOrFail($request->shipment_id);
+            $kurir = User::findOrFail($request->kurir_id);
+
+            // Perbarui data pengiriman
+            $shipment->courierUserID = $kurir->user_id;
+            $shipment->currentStatus = 'Menunggu Diambil Kurir';
+            $shipment->pickupTimestamp = $request->pickupTimestamp; // Simpan timestamp pengambilan
+            $shipment->noteadmin = $request->noteadmin; // Simpan catatan admin
+            $shipment->save();
+
+            // Buat entri baru di riwayat pelacakan
+            TrackingHistory::create([
+                'shipmentID' => $shipment->shipmentID,
+                'statusDescription' => 'Kurir (' . $kurir->name . ') telah ditugaskan oleh admin.',
+                'updatedByUserID' => auth()->id(),
+            ]);
+
+            DB::commit();
+
+            return response()->json(['message' => 'Kurir ' . $kurir->name . ' berhasil ditugaskan untuk resi ' . $shipment->tracking_number]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Gagal menugaskan kurir: " . $e->getMessage());
+            return response()->json(['message' => 'Terjadi kesalahan internal.'], 500);
+        }
     }
 }
