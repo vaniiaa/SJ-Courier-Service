@@ -21,7 +21,10 @@
 <body class="bg-gray-100 text-gray-900">
 <div class="min-h-screen flex flex-col">
     {{-- Navbar khusus kurir --}}
-    @include('components.kurir.header')
+    @include('components.header', [
+        'user' => Auth::user(),
+        'links' => getNavigationLinks(Auth::user())
+    ])
 
     {{-- Breadcrumbs Kurir --}}
     @include('components.kurir.breadcrumbs_kurir', ['title' => View::getSection('title')])

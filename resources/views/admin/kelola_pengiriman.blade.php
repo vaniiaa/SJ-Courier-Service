@@ -197,7 +197,7 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan shipment via AJAX.
                                             '{{ $shipment->weightKG }}',
                                             '{{ number_format($shipment->finalPrice, 0, ',', '.') }}',
                                             '{{ ucfirst($shipment->currentStatus) }}',
-                                            '{{ $shipment->catatan ?? '' }}', //Meneruskan catatan ke modal detail 
+                                            '{{ $shipment->noteadmin ?? '' }}', //Meneruskan catatan ke modal detail 
                                         )"
                                     > Detail
                                     </button>

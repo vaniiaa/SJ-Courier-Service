@@ -29,6 +29,12 @@ class Order extends Model
         'midtrans_order_id',
     ];
 
+    protected $casts = [
+        'orderDate' => 'date',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
     public function sender()
     {
         // Secara eksplisit beritahu foreign key dan owner key (PK di tabel users)

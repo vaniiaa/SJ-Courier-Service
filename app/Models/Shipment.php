@@ -13,7 +13,8 @@ class Shipment extends Model
     protected $primaryKey = 'shipmentID';
     protected $fillable = [
         'orderID', 'tracking_number', 'courierUserID', 'itemType', 'weightKG',
-        'currentStatus', 'pickupTimestamp', 'deliveredTimestamp', 'finalPrice'
+        'currentStatus', 'pickupTimestamp', 'deliveredTimestamp', 'finalPrice',
+        'delivery_proof'
     ];
 
     protected $casts = [

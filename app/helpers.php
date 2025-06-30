@@ -13,7 +13,12 @@ if (!function_exists('getNavigationLinks')) {
         if ($user->isKurir()) {
             return [
                 ['label' => 'Dashboard', 'url' => route('kurir.dashboard')],
-                ['label' => 'Live Tracking', 'url' => route('kurir.dashboard')],
+                ['label' => 'Layanan Kami', 'children' => [
+                    ['label' => 'Live Tracking', 'url' => route('kurir.dashboard')],
+                    ['label' => 'Kelola Status', 'url' => route('kurir.kelola_status')],
+                    ['label' => 'History Pengiriman', 'url' => route('kurir.history_pengiriman_kurir')],
+                ]],
+                ['label' => 'Daftar Pengiriman', 'url' => route('kurir.dashboard')],
             ];
         }
         // Default: customer

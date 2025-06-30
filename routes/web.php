@@ -3,16 +3,12 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\CourierLoginController;
-use App\Http\Controllers\CreateCourierController;
-use App\Http\Controllers\DeleteCourierController;
-use App\Http\Controllers\EditCourierController;
 use App\Http\Controllers\KelolaPengirimanController;
 use App\Http\Controllers\Admin\KelolaKurirController;
 use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\ShipmentController as AdminShipmentController;
 use App\Http\Controllers\ShipmentController;
-use App\Http\Controllers\KelolaStatusController;
+use App\Http\Controllers\Kurir\KelolaStatusController as KelolaStatusController;
 
 /*
 |--------------------------------------------------------------------------
@@ -69,9 +65,9 @@ Route::prefix('admin')->middleware(['auth','role:admin'])->group(function () {
     Route::delete('/kelola_kurir/{id}', [KelolaKurirController::class, 'destroy'])->name('admin.kelola_kurir.destroy');
 
     // THIS IS THE CORRECTED ROUTE NAME
-    Route::get('/status_pengiriman', [KelolaPengirimanController::class, 'statusPengiriman'])->name('admin.status_pengiriman');
-    Route::get('/history_pengiriman', [KelolaPengirimanController::class, 'historyPengiriman'])->name('admin.history_pengiriman');
-});
+    Route::get('/status_pengiriman', [App\Http\Controllers\Admin\ShipmentController::class, 'statusPengiriman'])->name('admin.status_pengiriman');
+    Route::get('/history_pengiriman', [App\Http\Controllers\Admin\ShipmentController::class, 'historyPengiriman'])->name('admin.history_pengiriman');
+    });
 
 // ------------------- Authenticated Courier Routes -------------------
 Route::prefix('courier')->middleware(['auth', 'role:courier'])->group(function () {
@@ -80,15 +76,13 @@ Route::prefix('courier')->middleware(['auth', 'role:courier'])->group(function (
     Route::patch('/profile', [ProfileController::class, 'update'])->name('courier.profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('courier.profile.destroy');
 
-    Route::get('/kurir/daftar_pengiriman', [KelolaPengirimanController::class, 'daftarPengirimanKurir'])->name('kurir.daftar_pengiriman');
-    Route::get('/kurir/kelola_status', [KelolaPengirimanController::class, 'updateStatus'])->name('kurir.kelola_status');
-
-
+    Route::get('/daftar_pengiriman', [KelolaPengirimanController::class, 'daftarPengirimanKurir'])->name('kurir.daftar_pengiriman');
+    Route::get('/kelola_status', [KelolaStatusController::class, 'Index'])->name('kurir.kelola_status');
     Route::post('/shipment/update-status', [KelolaStatusController::class, 'konfirmasiStatus'])->name('shipment.updateStatus');
-    Route::get('/kurir/history_pengiriman_kurir', [KelolaStatusController::class, 'history'])->name('kurir.history_pengiriman_kurir');
-    Route::get('/kurir/resi/{id}/download', [KelolaStatusController::class, 'downloadResi'])->name('kurir.downloadResi');
-    Route::get('/kurir/print-resi/{id}', [KelolaStatusController::class, 'printResi'])->name('kurir.printResi');
-});
+    Route::get('/history_pengiriman_kurir', [KelolaStatusController::class, 'history'])->name('kurir.history_pengiriman_kurir');
+    Route::get('/resi/{id}/download', [KelolaStatusController::class, 'downloadResi'])->name('kurir.downloadResi');
+    Route::get('/print-resi/{id}', [KelolaStatusController::class, 'printResi'])->name('kurir.printResi');
+}); 
 
 
 require __DIR__.'/auth.php';

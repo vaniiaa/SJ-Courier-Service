@@ -15,14 +15,24 @@
     {{-- Alpine.js --}}
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <style>
+        .main-content {
+            margin-top: 80px; /* Sesuaikan dengan tinggi navbar */  
+        }
+    </style>
 </head>
 <body class="bg-gray-100 text-gray-900">
 
     {{-- Navbar khusus kurir --}}
-    @include('components.kurir.header')
+    @include('components.header', [
+        'user' => Auth::user(),
+        'links' => getNavigationLinks(Auth::user())
+    ])
+
+    {{-- Breadcrumbs Kurir --}}
 
     {{-- Main Content --}}
-    <main class="w-full p-0 m-0">
+    <main class="main-content w-full p-0 m-0">
         @yield('content')
     </main>
 

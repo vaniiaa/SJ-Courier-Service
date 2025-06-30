@@ -106,4 +106,54 @@ class ShipmentController extends Controller
             return response()->json(['message' => 'Terjadi kesalahan internal.'], 500);
         }
     }
+
+    /**
+     * Menampilkan halaman status pengiriman yang sedang berlangsung.
+     */
+    public function statusPengiriman(Request $request)
+    {
+        $search = $request->input('search');
+        $query = Shipment::query();
+
+        if ($search) {
+            $query->where('tracking_number', 'like', '%' . $search . '%')
+                ->orWhereHas('order.sender', function($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%');
+                })
+                ->orWhereHas('order', function($q) use ($search) {
+                    $q->where('receiverName', 'like', '%' . $search . '%');
+                });
+        }
+
+
+        $pengiriman = $query->whereRaw('TRIM(LOWER("currentStatus")) NOT IN (?)', ['Pesanan selesai'])
+                                ->latest()->paginate(10);
+
+        return view('admin.status_pengiriman', compact('pengiriman'));
+    }
+    /**
+     * Menampilkan halaman riwayat pengiriman yang sudah selesai.
+     */
+
+    public function historyPengiriman(Request $request)
+    {
+        $search = $request->input('search');
+        $query = Shipment::query();
+
+        if ($search) {
+            $query->where('tracking_number', 'like', '%' . $search . '%')
+                ->orWhereHas('order.sender', function($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%');
+                })
+                ->orWhereHas('order', function($q) use ($search) {
+                    $q->where('receiverName', 'like', '%' . $search . '%');
+                });
+        }
+
+        $pengiriman = $query->whereRaw('TRIM(LOWER("currentStatus")) NOT IN (?)', ['Pesanan selesai'])
+                                ->latest()->paginate(10);
+
+        return view('admin.history_pengiriman', compact('pengiriman'));
+    }
+
 }

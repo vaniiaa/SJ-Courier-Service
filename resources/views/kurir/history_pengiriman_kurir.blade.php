@@ -32,7 +32,7 @@
                         <th class="px-4 py-2 text-center">Resi</th>
                         <th class="px-4 py-2 text-left">Nama Pengirim</th>
                         <th class="px-4 py-2 text-left">Alamat Penjemputan</th>
-                        <th class="px-4 py-2 text-left">Nama Penerima</th>
+                        <th class="px-4 py-2 text-left">Nama Penerima</th> 
                         <th class="px-4 py-2 text-left">Alamat Tujuan</th>
                         <th class="px-4 py-2 text-left">Kurir</th>
                         <th class="px-4 py-2 text-left">Tanggal</th>
@@ -44,26 +44,26 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($shipments as $index => $data)
-                        <tr class="{{ $index % 2 === 0 ? 'bg-white' : 'bg-gray-100' }}">
-                            <td class="px-4 py-2 text-center">{{ $index + 1 }}</td>
-                            <td class="px-4 py-2 text-center">{{ $data->resi }}</td>
-                            <td class="px-4 py-2">{{ $data->nama_pengirim }}</td>
-                            <td class="px-4 py-2">{{ $data->alamat_penjemputan }}</td>
-                            <td class="px-4 py-2">{{ $data->nama_penerima }}</td>
-                            <td class="px-4 py-2">{{ $data->alamat_tujuan }}</td>
-                            <td class="px-4 py-2">{{ $data->nama_kurir }}</td>
-                            <td class="px-4 py-2">{{ \Carbon\Carbon::parse($data->tanggal_pemesanan)->format('Y-m-d') }}</td>
-                            <td class="px-4 py-2 text-center">{{ $data->berat }}</td>
-                            <td class="px-4 py-2 text-center">{{ number_format($data->harga, 0, ',', '.') }}</td>
-                            <td class="px-4 py-2 text-center">{{ $data->metode_pembayaran ?? '-' }}</td>
-                            <td class="px-4 py-2 text-center font-semibold text-green-600">{{ ucfirst($data->status_pengiriman) }}</td>
+                    @forelse ($shipments as $shipment)
+                        <tr class="{{ $loop->even ? 'bg-white' : 'bg-gray-100' }}">
+                            <td class="px-4 py-2 text-center">{{ $loop->iteration + $shipments->firstItem() - 1 }}</td>
+                            <td class="px-4 py-2 text-center">{{ $shipment->tracking_number }}</td>
+                            <td class="px-4 py-2">{{ $shipment->order->sender->name }}</td>
+                            <td class="px-4 py-2">{{ $shipment->order->pickupAddress }}</td>
+                            <td class="px-4 py-2">{{ $shipment->order->receiverName }}</td>
+                            <td class="px-4 py-2">{{ $shipment->order->receiverAddress }}</td>
+                            <td class="px-4 py-2">{{ $shipment->courier->name ?? N/A }}</td>
+                            <td class="px-4 py-2">{{ \Carbon\Carbon::parse($shipment->order->orderDate)->format('Y-m-d') }}</td>
+                            <td class="px-4 py-2 text-center">{{ $shipment->weightKG }}</td>
+                            <td class="px-4 py-2 text-center">{{ number_format($shipment->finalPrice, 0, ',', '.') }}</td>
+                            <td class="px-4 py-2 text-center">{{ $shipment->order->payments->first()->paymentMethod ?? '-' }}</td>
+                            <td class="px-4 py-2 text-center font-semibold text-green-600">{{ ucfirst($shipment->currentStatus) }}</td>
                             <td class="px-4 py-2 text-center">
                                 <div class="flex justify-center gap-2">
-                                    <a href="{{ route('kurir.downloadResi', $data->id) }}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs" title="Unduh">
+                                    <a href="{{ route('kurir.downloadResi', ['shipmentID' => $shipment->shipmentID]) }}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs" title="Unduh">
                                         <i class="fas fa-download"></i>
                                     </a>
-                                    <a href="{{ route('kurir.printResi', $data->id) }}" target="_blank" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs" title="Cetak">
+                                    <a href="{{ route('kurir.printResi', ['shipmentID' => $shipment->shipmentID]) }}" target="_blank" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs" title="Cetak">
                                         <i class="fa-solid fa-print"></i>
                                     </a>
                                 </div>

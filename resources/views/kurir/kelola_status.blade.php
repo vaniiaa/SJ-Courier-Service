@@ -63,35 +63,32 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($pengiriman as $index => $data)
+                    @forelse ($shipments as $index => $shipment) {{-- Ubah $pengiriman menjadi $shipments, $data menjadi $shipment --}}
                         <tr class="{{ $loop->even ? 'bg-white' : 'bg-gray-100' }}">
                             <td class="px-4 py-2 text-center">
-                                {{-- Menghitung nomor urut dengan paginasi --}}
-                                {{ ($pengiriman->currentPage() - 1) * $pengiriman->perPage() + $loop->iteration }}
+                            {{ ($shipments->currentPage() - 1) * $shipments->perPage() + $loop->iteration }}
                             </td>
-                            <td class="px-4 py-2 text-center">{{ $data->resi }}</td>
-                            <td class="px-4 py-2">{{ $data->nama_pengirim }}</td>
-                            <td class="px-4 py-2">{{ $data->alamat_penjemputan }}</td>
-                            <td class="px-4 py-2">{{ $data->nama_penerima }}</td>
-                            <td class="px-4 py-2">{{ $data->alamat_tujuan }}</td>
-                            <td class="px-4 py-2">{{ \Carbon\Carbon::parse($data->tanggal_pemesanan)->format('Y-m-d') }}</td>
-                            <td class="px-4 py-2 text-center">{{ $data->berat }}</td>
-                            <td class="px-4 py-2 text-center">{{ number_format($data->harga, 0, ',', '.') }}</td>
-                            <td class="px-4 py-2 text-center">
-                                {{ $data->kurir->username ?? $data->nama_kurir ?? 'N/A' }}
-                            </td>
+                            <td class="px-4 py-2 text-center">{{ $shipment->tracking_number }}</td>
+                            <td class="px-4 py-2">{{ $shipment->order->sender->name }}</td>
+                            <td class="px-4 py-2">{{ $shipment->order->pickupAddress }}</td>
+                            <td class="px-4 py-2">{{ $shipment->order->receiverName }}</td>
+                            <td class="px-4 py-2">{{ $shipment->order->receiverAddress }}</td>
+                            <td class="px-4 py-2">{{ $shipment->order->orderDate ? $shipment->order->orderDate->format('Y-m-d') : '-' }}</td>
+                            <td class="px-4 py-2 text-center">{{ $shipment->weightKG }}</td>
+                            <td class="px-4 py-2 text-center">{{ number_format($shipment->finalPrice, 0, ',', '.') }}</td>
+                            <td class="px-4 py-2 text-center">{{ $shipment->courier->name ?? 'N/A' }}</td>
                             <td class="px-4 py-2 text-center font-semibold text-sm
-                                @if ($data->status_pengiriman === 'menunggu konfirmasi') text-gray-600
-                                @elseif ($data->status_pengiriman === 'sedang dikirim') text-red-600
-                                @elseif ($data->status_pengiriman === 'menuju alamat') text-blue-600
-                                @elseif ($data->status_pengiriman === 'pesanan selesai') text-green-600
+                                @if ($shipment->currentStatus === 'menunggu konfirmasi') text-gray-600
+                                @elseif ($shipment->currentStatus === 'sedang dikirim') text-red-600
+                                @elseif ($shipment->currentStatus === 'menuju alamat') text-blue-600
+                                @elseif ($shipment->currentStatus === 'pesanan selesai') text-green-600
                                 @endif">
-                                {{ ucfirst($data->status_pengiriman) }}
+                                {{ ucfirst($shipment->currentStatus) }}
                             </td>
                             <td class="px-4 py-2 text-center">
                                 {{-- Tampilkan gambar bukti jika ada, atau teks 'Menunggu Konfirmasi' --}}
-                                @if ($data->bukti_pengiriman)
-                                    <img src="{{ asset('storage/' . $data->bukti_pengiriman) }}" alt="Bukti" class="w-16 h-16 object-cover mx-auto rounded-md">
+                                @if ($shipment->delivery_proof)
+                                    <img src="{{ asset('storage/' . $shipment->delivery_proof) }}" alt="Bukti" class="w-16 h-16 object-cover mx-auto rounded-md">
                                 @else
                                     Menunggu Konfirmasi
                                 @endif
@@ -100,38 +97,38 @@
                                 <div class="flex justify-center gap-2">
                                     <button
                                         @click="showModal = false; showStatus = true; selectedData = {
-                                            id: {{ $data->id }}, {{-- Penting untuk mengidentifikasi data saat update --}}
-                                            resi: '{{ $data->resi }}',
-                                            pengirim: '{{ $data->nama_pengirim }}',
-                                            alamat_jemput: '{{ $data->alamat_penjemputan }}',
-                                            penerima: '{{ $data->nama_penerima }}',
-                                            alamat_tujuan: '{{ $data->alamat_tujuan }}',
-                                            tanggal: '{{ \Carbon\Carbon::parse($data->tanggal_pemesanan)->format('Y-m-d') }}',
-                                            berat: '{{ $data->berat }}',
-                                            harga: '{{ number_format($data->harga, 0, ',', '.') }}',
-                                            kurir: '{{ $data->kurir->username ?? $data->nama_kurir ?? 'N/A' }}',
-                                            status: '{{ $data->status_pengiriman }}',
-                                            tanggal_pengiriman: '{{ \Carbon\Carbon::parse($data->tanggal_pemesanan)->format('Y-m-d') }}',
-                                            catatan: '{{ $data->catatan ?? 'Tidak ada catatan' }}' {{-- Pastikan ada kolom 'catatan' di DB atau berikan default --}}
+                                            id: {{ $shipment->shipmentID }}, {{-- Penting untuk mengidentifikasi data saat update --}}
+                                            resi: '{{ $shipment->tracking_number }}',
+                                            pengirim: '{{ $shipment->order->sender->name }}',
+                                            alamat_jemput: '{{ $shipment->order->pickupAddress }}',
+                                            penerima: '{{ $shipment->order->receiverName }}',
+                                            alamat_tujuan: '{{ $shipment->order->receiverAddress }}',
+                                            tanggal: '{{ \Carbon\Carbon::parse($shipment->order->orderDate)->format('Y-m-d') }}',
+                                            berat: '{{ $shipment->weightKG }}',
+                                            harga: '{{ number_format($shipment->finalPrice, 0, ',', '.') }}',
+                                            kurir: '{{ $shipment->courier->name ?? 'N/A' }}',
+                                            status: '{{ $shipment->currentStatus }}',
+                                            tanggal_pengiriman: '{{ \Carbon\Carbon::parse($shipment->pickupTimestamp)->format('Y-m-d') }}',
+                                            catatan: '{{ $shipment->noteadmin ?? 'Tidak ada catatan' }}' {{-- Pastikan ada kolom 'catatan' di DB atau berikan default --}}
                                         }"
                                         class="w-28 bg-red-500 text-white py-1 rounded text-xs hover:bg-red-600 shadow-md shadow-gray-700">
                                         Konfirmasi Status
                                     </button>
                                     <button
                                         @click="showStatus = false; showModal = true; selectedData = {
-                                            id: {{ $data->id }},
-                                            resi: '{{ $data->resi }}',
-                                            pengirim: '{{ $data->nama_pengirim }}',
-                                            alamat_jemput: '{{ $data->alamat_penjemputan }}',
-                                            penerima: '{{ $data->nama_penerima }}',
-                                            alamat_tujuan: '{{ $data->alamat_tujuan }}',
-                                            tanggal: '{{ \Carbon\Carbon::parse($data->tanggal_pemesanan)->format('Y-m-d') }}',
-                                            berat: '{{ $data->berat }}',
-                                            harga: '{{ number_format($data->harga, 0, ',', '.') }}',
-                                            kurir: '{{ $data->kurir->username ?? $data->nama_kurir ?? 'N/A' }}',
-                                            status: '{{ $data->status_pengiriman }}',
-                                            tanggal_pengiriman: '{{ \Carbon\Carbon::parse($data->tanggal_pemesanan)->format('Y-m-d') }}',
-                                            catatan: '{{ $data->catatan ?? 'Tidak ada catatan' }}'
+                                            id: {{ $shipment->shipmentID }},
+                                            resi: '{{ $shipment->tracking_number }}',
+                                            pengirim: '{{ $shipment->order->sender->name }}',
+                                            alamat_jemput: '{{ $shipment->order->pickupAddress }}',
+                                            penerima: '{{ $shipment->order->receiverName }}',
+                                            alamat_tujuan: '{{ $shipment->order->receiverAddress }}',
+                                            tanggal: '{{ \Carbon\Carbon::parse($shipment->order->orderDate)->format('Y-m-d') }}',
+                                            berat: '{{ $shipment->weightKG }}',
+                                            harga: '{{ number_format($shipment->finalPrice, 0, ',', '.') }}',
+                                            kurir: '{{ $shipment->courier->name ?? $shipment->courier->name ?? 'N/A' }}',
+                                            status: '{{ $shipment->currentStatus }}',
+                                            tanggal_pengiriman: '{{ \Carbon\Carbon::parse($shipment->pickupTimestamp)->format('Y-m-d') }}',
+                                            catatan: '{{ $shipment->noteadmin ?? 'Tidak ada catatan' }}'
                                         }"
                                         class="px-3 bg-blue-500 text-white py-1 rounded text-xs hover:bg-blue-600 shadow-md shadow-gray-700">
                                         Detail
@@ -149,7 +146,7 @@
         </div>
 
         {{-- Paginasi --}}
-        @if ($pengiriman->hasPages())
+        @if ($shipments->hasPages())
             <div class="mt-6 flex justify-end pr-4">
                 <nav class="inline-flex -space-x-px text-sm shadow-sm" aria-label="Pagination">
                     {{-- Previous Page Link --}}
@@ -313,7 +310,7 @@
                     >
                         @csrf
 
-                        <input type="hidden" name="shipment_id" :value="selectedData.id">
+                        <input type="hidden" name="shipmentID" :value="selectedData.shipmentID">
 
                         @if ($errors->any())
                             <div class="mb-4 text-red-600">
@@ -368,16 +365,16 @@
                                 <li><a href="#" @click.prevent="selected = 'Pesanan Selesai'; open = false" class="block px-4 py-2 hover:bg-gray-100" role="option">Pesanan Selesai</a></li>
                             </ul>
 
-                            <input type="hidden" name="status_pengiriman" :value="selected">
+                            <input type="hidden" name="currentStatus" :value="selected">
 
                         </div>
 
                         <div x-show="selected === 'Pesanan Selesai'" class="mb-4" x-transition>
-                            <label for="bukti_pengiriman" class="font-semibold">Bukti Pengiriman:</label>
+                            <label for="delivery_proof" class="font-semibold">Bukti Pengiriman:</label>
                             <input
                                 type="file"
-                                id="bukti_pengiriman"
-                                name="bukti_pengiriman"
+                                id="delivery_proof"
+                                name="delivery_proof"
                                 class="file file-input w-full border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 pl-4"
                             />
                         </div>

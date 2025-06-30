@@ -59,37 +59,33 @@
                 <tbody>
                     {{-- Loop melalui data pengiriman --}}
                     @forelse ($pengiriman as $index => $data)
-                        <tr class="{{ $loop->even ? 'bg-white' : 'bg-gray-100' }}">
-                            <td class="px-4 py-2 text-center">
-                                {{-- Menghitung nomor urut dengan paginasi --}}
-                                {{ ($pengiriman->currentPage() - 1) * $pengiriman->perPage() + $loop->iteration }}
-                            </td>
-                            <td class="px-4 py-2 text-center">{{ $data->resi }}</td>
-                            <td class="px-4 py-2">{{ $data->nama_pengirim }}</td>
-                            <td class="px-4 py-2">{{ $data->alamat_penjemputan }}</td>
-                            <td class="px-4 py-2">{{ $data->nama_penerima }}</td>
-                            <td class="px-4 py-2">{{ $data->alamat_tujuan }}</td>
-                            <td class="px-4 py-2 text-center">{{ \Carbon\Carbon::parse($data->tanggal_pemesanan)->format('Y-m-d') }}</td>
-                            <td class="px-4 py-2 text-center">{{ $data->berat }}</td>
-                            <td class="px-4 py-2 text-center">{{ number_format($data->harga, 0, ',', '.') }}</td>
-                            <td class="px-4 py-2 text-center">{{ $data->metode_pembayaran }}</td>
-                            {{-- Tampilkan username kurir dari relasi jika ada, atau langsung dari kolom `nama_kurir` --}}
-                            <td class="px-4 py-2 text-center">
-                                {{ $data->kurir->username ?? $data->nama_kurir ?? 'Belum Ditentukan' }}
-                            </td>
-                            <td class="px-4 py-2 text-center font-bold
-                                @if ($data->status_pengiriman === 'menunggu konfirmasi') text-gray-600
-                                @elseif ($data->status_pengiriman === 'sedang dikirim') text-red-600
-                                @elseif ($data->status_pengiriman === 'menuju alamat') text-blue-600
-                                @elseif ($data->status_pengiriman === 'pesanan diterima') text-green-600
-                                @endif">
-                                {{ ucfirst($data->status_pengiriman) }}
-                            </td>
-                        </tr>
+                    <tr class="{{ $loop->even ? 'bg-white' : 'bg-gray-100' }}">
+                        <td class="px-4 py-2 text-center">
+                            {{ ($pengiriman->currentPage() - 1) * $pengiriman->perPage() + $loop->iteration }}
+                        </td>
+                        <td class="px-4 py-2 text-center">{{ $data->tracking_number }}</td>
+                        <td class="px-4 py-2">{{ $data->order->sender->name ?? '-' }}</td>
+                        <td class="px-4 py-2">{{ $data->order->pickupAddress ?? '-' }}</td>
+                        <td class="px-4 py-2">{{ $data->order->receiverName ?? '-' }}</td>
+                        <td class="px-4 py-2">{{ $data->order->receiverAddress ?? '-' }}</td>
+                        <td class="px-4 py-2 text-center">{{ $data->created_at ? $data->created_at->format('Y-m-d') : '-' }}</td>
+                        <td class="px-4 py-2 text-center">{{ $data->weightKG }}</td>
+                        <td class="px-4 py-2 text-center">{{ number_format($data->finalPrice, 0, ',', '.') }}</td>
+                        <td class="px-4 py-2 text-center">{{ $data->order->payments->first()->paymentMethod ?? 'N/A' }}</td>
+                        <td class="px-4 py-2 text-center">{{ $data->courier->name ?? 'Belum Ditentukan' }}</td>
+                        <td class="px-4 py-2 text-center font-bold
+                            @if ($data->currentStatus === 'menunggu konfirmasi') text-gray-600
+                            @elseif ($data->currentStatus === 'sedang dikirim') text-red-600
+                            @elseif ($data->currentStatus === 'menuju alamat') text-blue-600
+                            @elseif ($data->currentStatus === 'pesanan diterima') text-green-600
+                            @endif">
+                            {{ ucfirst($data->currentStatus) }}
+                        </td>
+                    </tr>
                     @empty
-                        <tr>
-                            <td colspan="12" class="px-4 py-4 text-center text-gray-500">Tidak ada data pengiriman.</td>
-                        </tr>
+                    <tr>
+                        <td colspan="12" class="px-4 py-4 text-center text-gray-500">Tidak ada data pengiriman.</td>
+                    </tr>
                     @endforelse
                 </tbody>
             </table>
