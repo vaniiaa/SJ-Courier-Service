@@ -7,8 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-use Illuminate\Support\Facades\Hash; // Penting: untuk mengenkripsi password baru
-use Illuminate\Validation\ValidationException; // Penting: untuk menangani error validasi
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
 {
@@ -33,32 +34,35 @@ class ProfileController extends Controller
         try {
             switch ($field) {
                 case 'name':
-                    // Validasi untuk nama
                     $request->validate([
                         'value' => ['required', 'string', 'max:255'],
                     ]);
                     $user->name = $request->input('value');
                     break;
                 case 'email':
-                    // Validasi untuk email: harus unik kecuali untuk email user itu sendiri
+                    // Email memerlukan password saat ini untuk keamanan.
+                    // Ini adalah praktik yang baik untuk perubahan sensitif seperti email.
                     $request->validate([
                         'value' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+                        'current_password' => ['required', 'string', 'current_password'],
+                    ], [
+                        'current_password.required' => 'Kata sandi saat ini wajib diisi untuk mengubah email.',
+                        'current_password.current_password' => 'Kata sandi saat ini salah.',
                     ]);
                     $user->email = $request->input('value');
-                    // Jika email diubah, set ulang status verifikasi
                     if ($user->isDirty('email')) {
                         $user->email_verified_at = null;
                     }
                     break;
                 case 'phone':
-                    // Validasi untuk nomor telepon: opsional, string, maks 20 karakter
+                    // Phone tidak memerlukan password saat ini.
                     $request->validate([
                         'value' => ['nullable', 'string', 'max:20'],
                     ]);
                     $user->phone = $request->input('value');
                     break;
                 case 'address':
-                    // Validasi untuk alamat: opsional, string, maks 255 karakter
+                    // Address tidak memerlukan password saat ini.
                     $request->validate([
                         'value' => ['nullable', 'string', 'max:255'],
                     ]);
@@ -66,34 +70,40 @@ class ProfileController extends Controller
                     break;
                 case 'password':
                     // Validasi untuk password baru: minimal 8 karakter dan harus dikonfirmasi
+                    // DAN memerlukan password saat ini
                     $request->validate([
-                        'value' => ['required', 'string', 'min:8', 'confirmed'], // 'confirmed' akan memverifikasi dengan input 'value_confirmation'
+                        'current_password' => ['required', 'string', 'current_password'], // Wajib ada untuk perubahan password
+                        'value' => ['required', 'string', 'min:8', 'confirmed'],
+                        'value_confirmation' => ['required'], // Pastikan field konfirmasi juga wajib diisi
                     ], [
+                        'current_password.required' => 'Kata sandi saat ini wajib diisi.',
+                        'current_password.current_password' => 'Kata sandi saat ini salah.',
                         'value.required' => 'Kata sandi baru wajib diisi.',
                         'value.min' => 'Kata sandi baru harus minimal 8 karakter.',
-                        'value.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
+                        'value.confirmed' => 'Konfirmasi kata sandi baru tidak cocok.',
+                        'value_confirmation.required' => 'Konfirmasi kata sandi baru wajib diisi.',
                     ]);
-                    $user->password = Hash::make($request->input('value')); // Enkripsi password baru
+                    $user->password = Hash::make($request->input('value'));
                     break;
                 default:
-                    // Jika bidang yang dikirim tidak valid atau tidak dikenali
-                    return Redirect::back()->with('status', 'error')->withErrors(['field' => 'Bidang yang tidak valid untuk diperbarui.']);
+                    throw ValidationException::withMessages([
+                        'general' => 'Bidang yang tidak valid untuk diperbarui.',
+                    ]);
             }
 
-            $user->save(); // Simpan perubahan ke database
+            $user->save();
 
-            // Tentukan pesan status yang akan dikirim kembali ke tampilan
             $statusMessage = ($field === 'password') ? 'password-updated' : 'profile-updated';
 
-            // Redirect kembali ke halaman profil dengan pesan status sukses
-            return Redirect::route('profile.edit')->with('status', $statusMessage);
+            // Redirect ke halaman profile.edit dengan pesan status dan field yang diupdate
+            return Redirect::route('profile.edit')->with('status', $statusMessage)->with('field', $field);
 
         } catch (ValidationException $e) {
-            // Tangani error validasi (misalnya, password tidak cocok, email sudah terdaftar)
+            // Jika ada error validasi, kembali ke halaman sebelumnya dengan error dan input
             return Redirect::back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
-            // Tangani error umum lainnya (misal: masalah database, dll.)
-            // Anda bisa menggunakan Log::error($e->getMessage()) untuk debugging
+            // Tangani error umum
+            Log::error("Error updating profile field '{$field}': " . $e->getMessage());
             return Redirect::back()->with('status', 'error')->withErrors(['general' => 'Terjadi kesalahan saat memperbarui profil. Silakan coba lagi.']);
         }
     }
@@ -104,28 +114,31 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        // Validasi password pengguna yang dimasukkan di modal
-        // 'current_password' adalah aturan validasi Laravel yang membandingkan input dengan password user yang sedang login
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ], [
-            'password.required' => 'Kata sandi wajib diisi untuk menghapus akun.',
-            'password.current_password' => 'Kata sandi yang Anda masukkan salah.',
-        ]);
+        try {
+            $request->validate([
+                'password' => ['required', 'current_password'],
+            ], [
+                'password.required' => 'Kata sandi wajib diisi untuk menghapus akun.',
+                'password.current_password' => 'Kata sandi yang Anda masukkan salah.',
+            ]);
 
-        $user = $request->user();
+            $user = $request->user();
 
-        // Logout pengguna dari sesi saat ini
-        Auth::logout();
+            Auth::logout();
 
-        // Hapus pengguna dari database
-        $user->delete();
+            $user->delete();
 
-        // Invalidasi sesi dan regenerasi token CSRF untuk keamanan
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
 
-        // Redirect ke halaman utama dengan pesan status sukses
-        return Redirect::to('/')->with('status', 'account-deleted');
+            return Redirect::to('/')->with('status', 'account-deleted');
+
+        } catch (ValidationException $e) {
+            // Jika ada error validasi dari modal hapus akun
+            return Redirect::back()->withErrors($e->errors())->withInput()->with('from_delete_modal', true);
+        } catch (\Exception $e) {
+            Log::error("Error deleting user account: " . $e->getMessage());
+            return Redirect::back()->with('status', 'error')->withErrors(['general' => 'Terjadi kesalahan saat menghapus akun. Silakan coba lagi.']);
+        }
     }
 }

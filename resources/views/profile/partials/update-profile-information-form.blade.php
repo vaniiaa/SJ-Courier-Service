@@ -1,7 +1,7 @@
 <div class="bg-yellow-400 p-6 shadow-md h-40 w-full absolute top-0 left-0 z-0"></div>
- 
-    <section class="max-w-[90rem] mx-auto relative z-40 -mt-[190px]">
-        <div class="bg-white rounded-lg shadow-lg p-6"> {{-- Ini adalah "kartu besar" putih yang membungkus semua --}}
+
+<section class="max-w-[90rem] mx-auto relative z-40 -mt-[190px]">
+    <div class="bg-white rounded-lg shadow-lg p-6"> {{-- Ini adalah "kartu besar" putih yang membungkus semua --}}
 
     {{-- Bagian Informasi Profil Utama --}}
     <div class="flex flex-col md:flex-row gap-6 items-center w-full">
@@ -29,6 +29,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
                         </svg>
                     </div>
+                    {{-- Notifikasi untuk Nama --}}
+                    <div id="status-name" class="status-message text-sm mt-1"></div>
                 </div>
             </div>
 
@@ -49,6 +51,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
                         </svg>
                     </div>
+                    {{-- Notifikasi untuk Phone --}}
+                    <div id="status-phone" class="status-message text-sm mt-1"></div>
                 </div>
             </div>
 
@@ -69,6 +73,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
                         </svg>
                     </div>
+                    {{-- Notifikasi untuk Email --}}
+                    <div id="status-email" class="status-message text-sm mt-1"></div>
                 </div>
             </div>
 
@@ -89,6 +95,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
                         </svg>
                     </div>
+                    {{-- Notifikasi untuk Address --}}
+                    <div id="status-address" class="status-message text-sm mt-1"></div>
                 </div>
             </div>
 
@@ -108,6 +116,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                         </svg>
                     </div>
+                    {{-- Notifikasi untuk Kata Sandi --}}
+                    <div id="status-password" class="status-message text-sm mt-1"></div>
                 </div>
             </div>
 
@@ -125,7 +135,8 @@
                     </form>
                 </div>
                 @if (session('status') === 'verification-link-sent')
-                    <div class="md:col-span-2 mt-2 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
+                    {{-- Notifikasi Verifikasi Email (Menggunakan CSS Inline) --}}
+                    <div class="md:col-span-2 mt-2 p-3 rounded-lg text-sm" style="background-color: #e6ffe6; border: 1px solid #cceccc; color: #338833;">
                         {{ __('Tautan verifikasi baru telah dikirim ke alamat email Anda.') }}
                     </div>
                 @endif
@@ -144,28 +155,7 @@
         </button>
     </div>
 
-    {{-- Pesan Status Global --}}
-    @if (session('status') === 'profile-updated' || session('status') === 'password-updated' || session('status') === 'account-deleted')
-        <div id="status-message"
-            class="fixed bottom-4 right-4 p-3 bg-green-500 text-white rounded-md shadow-lg text-sm font-medium z-50">
-            @if (session('status') === 'profile-updated')
-                {{ __('Profil berhasil diperbarui.') }}
-            @elseif (session('status') === 'password-updated')
-                {{ __('Kata sandi berhasil diperbarui.') }}
-            @elseif (session('status') === 'account-deleted')
-                {{ __('Akun berhasil dihapus.') }}
-            @endif
-        </div>
-        <script>
-            setTimeout(() => {
-                const statusMessage = document.getElementById('status-message');
-                if (statusMessage) {
-                    statusMessage.classList.add('hidden');
-                }
-            }, 2000);
-        </script>
-    @endif
-
+    </div>
 </section>
 
 <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-start z-50 hidden">
@@ -189,11 +179,8 @@
                 <input type="text" id="modalFieldValue" name="value"
                     class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 text-sm">
                 
-                {{-- *** TAMBAHKAN BAGIAN INI UNTUK MENAMPILKAN ERROR VALIDASI *** --}}
-                @error('value')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                @enderror
-                {{-- ********************************************************** --}}
+                {{-- *** Notifikasi Error untuk Nilai Baru di Modal Edit *** --}}
+                <div id="modal-status-value" class="status-message text-sm mt-1"></div>
             </div>
 
             {{-- Tambahan untuk Konfirmasi Password (akan ditampilkan hanya untuk password) --}}
@@ -202,12 +189,18 @@
                 <input type="password" id="modalFieldValueConfirmation" name="value_confirmation"
                     class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 text-sm">
                 
-                {{-- *** TAMBAHKAN BAGIAN INI UNTUK MENAMPILKAN ERROR VALIDASI KONFIRMASI PASSWORD *** --}}
-                @error('value_confirmation')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                @enderror
-                {{-- ******************************************************************************** --}}
+                {{-- *** Notifikasi Error untuk Konfirmasi Kata Sandi di Modal Edit *** --}}
+                <div id="modal-status-value_confirmation" class="status-message text-sm mt-1"></div>
             </div>
+
+            {{-- Input Kata Sandi Saat Ini (Hanya untuk perubahan password) --}}
+            <div id="currentPasswordField" class="mb-4 hidden">
+                <label for="current_password" class="block text-sm font-medium text-gray-700">Kata Sandi Saat Ini</label>
+                <input type="password" id="current_password" name="current_password"
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 text-sm">
+                <div id="modal-status-current_password" class="status-message text-sm mt-1"></div>
+            </div>
+
 
             <div class="flex justify-end gap-3 mt-4">
                 <button type="button"
@@ -215,14 +208,14 @@
                         onclick="closeModal()">Batal</button>
                 <button type="submit"
                         style="padding: 10px 20px;
-                               background-color: #facc15;
-                               color: black;
-                               border: 1px solid #eab308;
-                               border-radius: 6px;
-                               font-weight: bold;
-                               cursor: pointer;
-                               box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-                               transition: background-color 0.2s ease;"
+                                background-color: #facc15;
+                                color: black;
+                                border: 1px solid #eab308;
+                                border-radius: 6px;
+                                font-weight: bold;
+                                cursor: pointer;
+                                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                                transition: background-color 0.2s ease;"
                         onmouseover="this.style.backgroundColor='#eab308'"
                         onmouseout="this.style.backgroundColor='#facc15'">
                     Simpan
@@ -231,6 +224,7 @@
         </form>
     </div>
 </div>
+
 <div id="deleteAccountModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-start z-50 hidden">
     <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl mx-auto" style="margin-top: 8vh;">
         <div class="flex justify-between items-center mb-4">
@@ -252,6 +246,8 @@
                 <label for="deleteAccountPassword" class="block text-sm font-medium text-gray-700">Masukkan Kata Sandi Anda untuk Konfirmasi</label>
                 <input type="password" id="deleteAccountPassword" name="password" required
                     class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 text-sm">
+                {{-- Notifikasi Error untuk Kata Sandi Hapus Akun --}}
+                <div id="status-deleteAccountPassword" class="status-message text-sm mt-1"></div>
             </div>
 
             <div class="flex justify-end gap-3 mt-4">
@@ -269,69 +265,136 @@
     </div>
 </div>
 
-
 <script>
+    // Fungsi untuk menampilkan pesan status di bawah kolom yang diedit atau modal
+    function showStatusMessage(elementId, message, type = 'success') {
+        const statusElement = document.getElementById(elementId);
+        if (statusElement) {
+            statusElement.textContent = '';
+            statusElement.classList.add('p-2', 'rounded-md'); // Tetap pakai Tailwind untuk padding & radius
+
+            if (type === 'success') {
+                statusElement.style.backgroundColor = '#e6ffe6'; // Hijau soft
+                statusElement.style.borderColor = '#cceccc';    // Border hijau soft
+                statusElement.style.color = '#338833';          // Teks hijau agak gelap
+                statusElement.style.borderWidth = '1px';
+                statusElement.style.borderStyle = 'solid';
+            } else { // Jika type adalah 'error'
+                statusElement.style.backgroundColor = '#ffe6e6'; // Merah soft
+                statusElement.style.borderColor = '#ffcccc';    // Border merah soft
+                statusElement.style.color = '#cc3333';          // Teks merah agak gelap
+                statusElement.style.borderWidth = '1px';
+                statusElement.style.borderStyle = 'solid';
+            }
+            statusElement.textContent = message;
+
+            // Sembunyikan pesan setelah beberapa detik
+            setTimeout(() => {
+                statusElement.textContent = '';
+                statusElement.removeAttribute('style');
+                statusElement.classList.remove('p-2', 'rounded-md');
+                statusElement.className = 'status-message text-sm mt-1'; // Reset ke kelas dasar
+            }, 3000);
+        }
+    }
+
     // Fungsi yang sudah ada untuk modal edit
     function openModal(fieldName, currentValue) {
+        // Hapus semua pesan status yang mungkin ada sebelum membuka modal baru
+        document.querySelectorAll('.status-message').forEach(el => {
+            el.textContent = '';
+            el.removeAttribute('style');
+            el.classList.remove('p-2', 'rounded-md');
+            el.className = 'status-message text-sm mt-1';
+        });
+
         const modal = document.getElementById('editModal');
         const modalTitle = document.getElementById('modalTitle');
         const modalLabel = document.getElementById('modalLabel');
         const modalFieldName = document.getElementById('modalFieldName');
         const modalFieldValue = document.getElementById('modalFieldValue');
         const editForm = document.getElementById('editForm');
-        const passwordConfirmationField = document.getElementById('passwordConfirmationField'); // Ambil elemen konfirmasi password
-        const modalFieldValueConfirmation = document.getElementById('modalFieldValueConfirmation'); // Input konfirmasi
+        const passwordConfirmationField = document.getElementById('passwordConfirmationField');
+        const modalFieldValueConfirmation = document.getElementById('modalFieldValueConfirmation');
+        const currentPasswordField = document.getElementById('currentPasswordField');
+        const currentPasswordInput = document.getElementById('current_password');
 
         modalTitle.textContent = 'Edit ' + fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
         modalLabel.textContent = 'Masukkan ' + fieldName.charAt(0).toUpperCase() + fieldName.slice(1) + ' Baru:';
         modalFieldName.value = fieldName;
 
-        // Atur tipe input berdasarkan field
+        // Reset display
+        passwordConfirmationField.classList.add('hidden');
+        currentPasswordField.classList.add('hidden'); // Sembunyikan secara default
+        modalFieldValue.type = 'text'; // Default to text
+
         if (fieldName === 'email') {
             modalFieldValue.type = 'email';
             modalFieldValue.value = currentValue;
-            passwordConfirmationField.classList.add('hidden'); // Sembunyikan konfirmasi password
+            // Jika Anda ingin email memerlukan password juga, uncomment baris ini:
+            // currentPasswordField.classList.remove('hidden'); 
+            // currentPasswordInput.value = '';
         } else if (fieldName === 'password') {
             modalFieldValue.type = 'password';
-            modalFieldValue.value = ''; // Kosongkan untuk input password
-            passwordConfirmationField.classList.remove('hidden'); // Tampilkan field konfirmasi
-            modalFieldValueConfirmation.value = ''; // Kosongkan juga
-            modalFieldValue.setAttribute('autocomplete', 'new-password'); // Saran keamanan
-            modalFieldValueConfirmation.setAttribute('autocomplete', 'new-password'); // Saran keamanan
+            modalFieldValue.value = '';
+            passwordConfirmationField.classList.remove('hidden');
+            modalFieldValueConfirmation.value = '';
+            modalFieldValue.setAttribute('autocomplete', 'new-password');
+            modalFieldValueConfirmation.setAttribute('autocomplete', 'new-password');
+            currentPasswordField.classList.remove('hidden'); // Tampilkan hanya untuk perubahan password
+            currentPasswordInput.value = '';
         } else if (fieldName === 'phone') {
-            modalFieldValue.type = 'tel'; // Tipe input tel untuk nomor telepon
+            modalFieldValue.type = 'tel';
             modalFieldValue.value = currentValue;
-            passwordConfirmationField.classList.add('hidden'); // Sembunyikan konfirmasi password
-        } else {
+            // Jika Anda ingin phone memerlukan password juga, uncomment baris ini:
+            // currentPasswordField.classList.remove('hidden'); 
+            // currentPasswordInput.value = '';
+        } else if (fieldName === 'address') {
             modalFieldValue.type = 'text';
             modalFieldValue.value = currentValue;
-            passwordConfirmationField.classList.add('hidden'); // Sembunyikan konfirmasi password
+            // Jika Anda ingin address memerlukan password juga, uncomment baris ini:
+            // currentPasswordField.classList.remove('hidden'); 
+            // currentPasswordInput.value = '';
+        } else { // Untuk Nama, dll.
+            modalFieldValue.type = 'text';
+            modalFieldValue.value = currentValue;
+            // Jika Anda ingin nama memerlukan password juga, uncomment baris ini:
+            // currentPasswordField.classList.remove('hidden'); 
+            // currentPasswordInput.value = '';
         }
 
-        // --- PENTING: SESUAIKAN DENGAN RUTE BARU YANG BENAR ---
-        editForm.action = '/profile/update/' + fieldName; // Ini akan menghasilkan /profile/update/name, /profile/update/email, dll.
+        editForm.action = '/profile/update/' + fieldName; 
 
         modal.classList.remove('hidden');
     }
 
     function closeModal() {
         const modal = document.getElementById('editModal');
-        const passwordConfirmationField = document.getElementById('passwordConfirmationField');
-        passwordConfirmationField.classList.add('hidden'); // Pastikan tersembunyi saat modal ditutup
+        // Clear inputs and hide fields
+        document.getElementById('modalFieldValue').value = '';
+        document.getElementById('modalFieldValueConfirmation').value = '';
+        document.getElementById('current_password').value = '';
+        document.getElementById('passwordConfirmationField').classList.add('hidden');
+        document.getElementById('currentPasswordField').classList.add('hidden'); // Pastikan ini tersembunyi saat modal ditutup
+        
+        // Clear any error messages from the modal
+        document.querySelectorAll('#editModal .status-message').forEach(el => {
+            el.textContent = '';
+            el.removeAttribute('style');
+            el.classList.remove('p-2', 'rounded-md');
+            el.className = 'status-message text-sm mt-1';
+        });
+
         modal.classList.add('hidden');
     }
 
-    // Menutup modal jika klik di luar area modal (backdrop)
     document.getElementById('editModal').addEventListener('click', function(event) {
-        // Hanya tutup modal jika yang diklik adalah div modal itu sendiri (backdrop), bukan konten dalamnya
         if (event.target === this) {
             closeModal();
         }
     });
 
-    // Menutup modal dengan tombol ESC
     document.addEventListener('keydown', function(event) {
-        // Pastikan hanya satu modal yang aktif yang merespons tombol ESC
         if (event.key === 'Escape') {
             const editModal = document.getElementById('editModal');
             const deleteAccountModal = document.getElementById('deleteAccountModal');
@@ -344,31 +407,108 @@
         }
     });
 
-    // Fungsi untuk modal Hapus Akun
     const deleteAccountModal = document.getElementById('deleteAccountModal');
 
     function openDeleteModal() {
+        // Clear any previous error messages
+        document.getElementById('status-deleteAccountPassword').textContent = '';
+        document.getElementById('status-deleteAccountPassword').removeAttribute('style');
+        document.getElementById('status-deleteAccountPassword').classList.remove('p-2', 'rounded-md');
+        document.getElementById('status-deleteAccountPassword').className = 'status-message text-sm mt-1';
+
         deleteAccountModal.classList.remove('hidden');
+        // Fokuskan pada input password saat modal dibuka
+        document.getElementById('deleteAccountPassword').focus();
     }
 
     function closeDeleteModal() {
-        // Kosongkan input password saat modal ditutup
         document.getElementById('deleteAccountPassword').value = '';
+        // Clear any error messages when closing
+        document.getElementById('status-deleteAccountPassword').textContent = '';
+        document.getElementById('status-deleteAccountPassword').removeAttribute('style');
+        document.getElementById('status-deleteAccountPassword').classList.remove('p-2', 'rounded-md');
+        document.getElementById('status-deleteAccountPassword').className = 'status-message text-sm mt-1';
+
         deleteAccountModal.classList.add('hidden');
     }
 
-    // Menutup modal hapus jika klik di luar area modal (backdrop)
     deleteAccountModal.addEventListener('click', function(event) {
         if (event.target === this) {
             closeDeleteModal();
         }
     });
 
-    // Pesan Status Global (kode yang sudah ada)
-    setTimeout(() => {
-        const statusMessage = document.getElementById('status-message');
-        if (statusMessage) {
-            statusMessage.classList.add('hidden');
-        }
-    }, 2000);
+    // Menangani status setelah permintaan pembaruan berhasil (dari Laravel)
+    @if (session('status'))
+        @php
+            $status = session('status');
+            $message = '';
+            $type = 'success'; // Default type
+            $elementId = ''; // Element ID to show message
+
+            if ($status === 'profile-updated') {
+                $message = __('Profil berhasil diperbarui.');
+                $fieldName = session('field') ?? '';
+                $elementId = 'status-' . $fieldName;
+            } elseif ($status === 'password-updated') {
+                $message = __('Kata sandi berhasil diperbarui.');
+                $elementId = 'status-password';
+            } elseif ($status === 'account-deleted') {
+                $message = __('Akun berhasil dihapus.');
+                // For account deletion, you might redirect or show a global alert
+            }
+        @endphp
+
+        document.addEventListener('DOMContentLoaded', function() {
+            @if ($message && $elementId && $status !== 'account-deleted')
+                showStatusMessage('{{ $elementId }}', '{{ $message }}', '{{ $type }}');
+            @elseif ($status === 'account-deleted')
+                alert('{{ $message }}');
+                // window.location.href = '/login'; // Redirect if needed
+            @endif
+        });
+    @endif
+
+    // Menangani kesalahan validasi dari Laravel
+    @if ($errors->any())
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cek apakah ada error terkait penghapusan akun
+            @if ($errors->has('password') && session('from_delete_modal'))
+                openDeleteModal(); // Buka kembali modal hapus akun
+                showStatusMessage('status-deleteAccountPassword', '{{ $errors->first('password') }}', 'error');
+                document.getElementById('deleteAccountPassword').classList.add('border-red-500'); // Tambahkan border merah pada input
+                document.getElementById('deleteAccountPassword').focus(); // Fokuskan kembali input
+            @else
+                // Jika error berasal dari modal edit
+                const modal = document.getElementById('editModal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    const fieldName = document.getElementById('modalFieldName').value; // Get fieldName from hidden input in modal
+
+                    if (fieldName === 'password') {
+                        document.getElementById('passwordConfirmationField').classList.remove('hidden');
+                        document.getElementById('currentPasswordField').classList.remove('hidden'); // Tampilkan current password juga
+                    } else {
+                        // Untuk nama, email, phone, address, SEMBUNYIKAN current password field
+                        document.getElementById('passwordConfirmationField').classList.add('hidden');
+                        document.getElementById('currentPasswordField').classList.add('hidden');
+                    }
+                    
+                    // Tampilkan error validasi di bawah input terkait di dalam modal edit
+                    @foreach ($errors->all() as $error)
+                        @if (str_contains($error, 'nilai') && (session('field') === 'name' || session('field') === 'email' || session('field') === 'phone' || session('field') === 'address' || session('field') === 'password'))
+                            showStatusMessage('modal-status-value', '{{ $error }}', 'error');
+                            document.getElementById('modalFieldValue').classList.add('border-red-500');
+                        @elseif (str_contains($error, 'konfirmasi')) // Error for value_confirmation field
+                            showStatusMessage('modal-status-value_confirmation', '{{ $error }}', 'error');
+                            document.getElementById('modalFieldValueConfirmation').classList.add('border-red-500');
+                        @elseif (str_contains($error, 'saat ini')) // Error for current_password field
+                            showStatusMessage('modal-status-current_password', '{{ $error }}', 'error');
+                            document.getElementById('current_password').classList.add('border-red-500');
+                        @endif
+                    @endforeach
+                }
+            @endif
+        });
+    @endif
 </script>
