@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\ShipmentController as AdminShipmentController;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\Kurir\KelolaStatusController as KelolaStatusController;
+use App\Http\Controllers\TarifController;
 
 /*
 |--------------------------------------------------------------------------
@@ -94,3 +95,4 @@ Route::get('/force-logout', function () {
     return redirect('/login');
 });
 
+Route::post('/tarif/hitung', [TarifController::class, 'hitungTarif'])->name('tarif.hitung');
