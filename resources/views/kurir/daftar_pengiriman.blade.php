@@ -49,45 +49,45 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($pengiriman as $index => $data)
-                        <tr class="{{ $index % 2 === 0 ? 'bg-white' : 'bg-gray-100' }}">
-                            <td class="px-4 py-2 text-center">{{ $pengiriman->firstItem() + $index }}</td>
-                            <td class="px-4 py-2 text-center">{{ $data->resi }}</td>
-                            <td class="px-4 py-2">{{ $data->nama_pengirim }}</td>
-                            <td class="px-4 py-2">{{ $data->alamat_penjemputan }}</td>
-                            <td class="px-4 py-2">{{ $data->nama_penerima }}</td>
-                            <td class="px-4 py-2">{{ $data->alamat_tujuan }}</td>
-                            <td class="px-4 py-2">{{ \Carbon\Carbon::parse($data->tanggal_pemesanan)->format('Y-m-d') }}</td>
-                            <td class="px-4 py-2 text-center">{{ $data->berat }}</td>
-                            <td class="px-4 py-2 text-center">{{ number_format($data->harga, 0, ',', '.') }}</td>
-                            <td class="px-4 py-2 text-center">{{ $data->nama_kurir ?? 'Belum Ditentukan' }}</td>
-                            <td class="px-4 py-2 text-center">{{ $data->tanggal_pengiriman ?? 'Belum Ditentukan' }}</td>
+                    {{-- Ganti variabel $pengiriman menjadi $shipments dan $data menjadi $shipment --}}
+                    @forelse ($shipments as $shipment)
+                        <tr class="{{ $loop->even ? 'bg-white' : 'bg-gray-100' }}">
+                            <td class="px-4 py-2 text-center">{{ $shipments->firstItem() + $loop->index }}</td>
+                            <td class="px-4 py-2 text-center">{{ $shipment->tracking_number }}</td>
+                            <td class="px-4 py-2">{{ $shipment->order->sender->name ?? 'N/A' }}</td>
+                            <td class="px-4 py-2">{{ Str::limit($shipment->order->pickupAddress, 25) }}</td>
+                            <td class="px-4 py-2">{{ $shipment->order->receiverName }}</td>
+                            <td class="px-4 py-2">{{ Str::limit($shipment->order->receiverAddress, 25) }}</td>
+                            <td class="px-4 py-2">{{ $shipment->order->orderDate ? $shipment->order->orderDate->format('Y-m-d') : '-' }}</td>
+                            <td class="px-4 py-2 text-center">{{ $shipment->weightKG }}</td>
+                            <td class="px-4 py-2 text-center">{{ number_format($shipment->finalPrice, 0, ',', '.') }}</td>
+                            <td class="px-4 py-2 text-center">{{ $shipment->courier->name ?? 'Belum Ditentukan' }}</td>
+                            <td class="px-4 py-2 text-center">{{ $shipment->pickupTimestamp ? \Carbon\Carbon::parse($shipment->pickupTimestamp)->format('Y-m-d') : 'Belum Ditentukan' }}</td>
                             <td class="px-4 py-2 text-center font-semibold text-sm
-                                @if ($data->status_pengiriman === 'menunggu konfirmasi') text-gray-600
-                                @elseif ($data->status_pengiriman === 'sedang dikirim') text-red-600
-                                @elseif ($data->status_pengiriman === 'menuju alamat') text-blue-600
-                                @elseif ($data->status_pengiriman === 'pesanan selesai') text-green-600
+                                @if ($shipment->currentStatus === 'menunggu konfirmasi') text-gray-600
+                                @elseif ($shipment->currentStatus === 'sedang dikirim') text-red-600
+                                @elseif ($shipment->currentStatus === 'menuju alamat') text-blue-600
+                                @elseif ($shipment->currentStatus === 'pesanan selesai') text-green-600
                                 @endif">
-                                {{ ucfirst($data->status_pengiriman) }}
+                                {{ ucfirst($shipment->currentStatus) }}
                             </td>
                             <td class="px-4 py-2 text-center">
                                 <div class="flex justify-center gap-2">
                                     <button class="px-3 bg-blue-500 text-white py-1 rounded text-xs hover:bg-blue-600 shadow-md shadow-gray-700"
                                         @click="showModal = true; selectedData = {
-                                            resi: '{{ $data->resi }}',
-                                            pengirim: '{{ $data->nama_pengirim }}',
-                                            alamat_jemput: '{{ $data->alamat_penjemputan }}',
-                                            penerima: '{{ $data->nama_penerima }}',
-                                            alamat_tujuan: '{{ $data->alamat_tujuan }}',
-                                            tanggal: '{{ \Carbon\Carbon::parse($data->tanggal_pemesanan)->format('Y-m-d') }}',
-                                            berat: '{{ $data->berat }}',
-                                            harga: '{{ number_format($data->harga, 0, ',', '.') }}',
-                                            kurir: '{{ $data->nama_kurir ?? 'Belum Ditentukan' }}',
-                                            status: '{{ ucfirst($data->status_pengiriman) }}',
-                                            catatan: '{{ $data->catatan ?? '' }}',
-                                            tanggal_pengiriman: '{{ $data->tanggal_pengiriman ?? 'Belum Ditentukan' }}',
-                                            bukti: '{{ $data->bukti_pengiriman ? asset('storage/bukti_pengiriman/' . $data->bukti_pengiriman) : '' }}'
-
+                                            resi: '{{ $shipment->tracking_number }}',
+                                            pengirim: '{{ $shipment->order->sender->name ?? 'N/A' }}',
+                                            alamat_jemput: '{{ $shipment->order->pickupAddress }}',
+                                            penerima: '{{ $shipment->order->receiverName }}',
+                                            alamat_tujuan: '{{ $shipment->order->receiverAddress }}',
+                                            tanggal: '{{ $shipment->order->orderDate ? $shipment->order->orderDate->format('Y-m-d') : '-' }}',
+                                            berat: '{{ $shipment->weightKG }}',
+                                            harga: '{{ number_format($shipment->finalPrice, 0, ',', '.') }}',
+                                            kurir: '{{ $shipment->courier->name ?? 'Belum Ditentukan' }}',
+                                            status: '{{ ucfirst($shipment->currentStatus) }}',
+                                            catatan: '{{ $shipment->noteadmin ?? '' }}',
+                                            tanggal_pengiriman: '{{ $shipment->pickupTimestamp ? \Carbon\Carbon::parse($shipment->pickupTimestamp)->format('Y-m-d') : 'Belum Ditentukan' }}',
+                                            bukti: '{{ $shipment->delivery_proof ? asset('storage/' . $shipment->delivery_proof) : '' }}'
                                         }">
                                         Detail
                                     </button>
@@ -104,19 +104,19 @@
         </div>
         
     {{-- Paginasi --}}
-    @if ($pengiriman->hasPages())
+    @if ($shipments->hasPages())
     <div class="mt-6 flex justify-end pr-4">
         <nav class="inline-flex -space-x-px text-sm shadow-sm" aria-label="Pagination">
             {{-- Previous Page Link --}}
-            @if ($pengiriman->onFirstPage())
+            @if ($shipments->onFirstPage())
                 <span class="px-3 py-2 rounded-l-md border border-gray-300 bg-gray-100 text-gray-400 cursor-default">Sebelumnya</span>
             @else
-                <a href="{{ $pengiriman->previousPageUrl() }}" class="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-200">Sebelumnya</a>
+                <a href="{{ $shipments->previousPageUrl() }}" class="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-200">Sebelumnya</a>
             @endif
 
             {{-- Page Numbers --}}
-            @foreach ($pengiriman->getUrlRange(1, $pengiriman->lastPage()) as $page => $url)
-                @if ($page == $pengiriman->currentPage())
+            @foreach ($shipments->getUrlRange(1, $shipments->lastPage()) as $page => $url)
+                @if ($page == $shipments->currentPage())
                     <span class="px-3 py-2 border border-gray-300 bg-yellow-400 text-white font-semibold">{{ $page }}</span>
                 @else
                     <a href="{{ $url }}" class="px-3 py-2 border border-gray-300 bg-white text-gray-700 hover:bg-yellow-100">{{ $page }}</a>
@@ -124,8 +124,8 @@
             @endforeach
 
             {{-- Next Page Link --}}
-            @if ($pengiriman->hasMorePages())
-                <a href="{{ $pengiriman->nextPageUrl() }}" class="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-200">Berikutnya</a>
+            @if ($shipments->hasMorePages())
+                <a href="{{ $shipments->nextPageUrl() }}" class="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-200">Berikutnya</a>
             @else
                 <span class="px-3 py-2 rounded-r-md border border-gray-300 bg-gray-100 text-gray-400 cursor-default">Berikutnya</span>
             @endif

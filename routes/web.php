@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ShipmentController as AdminShipmentController;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\Kurir\KelolaStatusController as KelolaStatusController;
 use App\Http\Controllers\TarifController;
+use App\Http\Controllers\Kurir\DaftarPengirimanController as DaftarPengirimanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,8 +36,8 @@ Route::middleware(['auth', 'verified', 'role:customer'])->group(function () {
     // Halaman konfirmasi setelah berhasil
     Route::get('/shipments/confirmation/{order}', [ShipmentController::class, 'confirmation'])->name('shipments.confirmation');
     
-    Route::get('/list', [ShipmentController::class, 'List'])->name('active');
-    Route::get('/history', [ShipmentController::class, 'history'])->name('history');
+    Route::get('/list', [ShipmentController::class, 'List'])->name('customer.active');
+    Route::get('/history', [ShipmentController::class, 'history'])->name('customer.history');
 
     // Rute untuk Midtrans tetap sama
     Route::get('/payment/finish', [ShipmentController::class, 'paymentFinish'])->name('payment.finish');
@@ -58,6 +59,8 @@ Route::prefix('admin')->middleware(['auth','role:admin'])->group(function () {
     Route::get('/couriers/by-area/{area_id}', [AdminShipmentController::class, 'getCouriersByArea'])->name('couriers.byArea');
     // Rute untuk memproses form penugasan kurir
     Route::post('/shipments/assign-courier', [AdminShipmentController::class, 'assignCourier'])->name('shipments.assignCourier');
+    // Rute API untuk data chart di dashboard
+    Route::get('/api/pengiriman-per-wilayah', [DashboardAdminController::class, 'getPengirimanPerWilayah'])->name('admin.api.pengiriman-per-wilayah');
     // Rute untuk Kelola Akun Kurir
     Route::get('/kelola_kurir', [KelolaKurirController::class, 'index'])->name('admin.kelola_kurir');
     Route::get('/tambah_kurir', [KelolaKurirController::class, 'create'])->name('admin.tambah_kurir');
@@ -78,12 +81,12 @@ Route::prefix('courier')->middleware(['auth', 'role:courier'])->group(function (
     Route::patch('/profile', [ProfileController::class, 'update'])->name('courier.profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('courier.profile.destroy');
 
-    Route::get('/daftar_pengiriman', [KelolaPengirimanController::class, 'daftarPengirimanKurir'])->name('kurir.daftar_pengiriman');
+    Route::get('/daftar_pengiriman', [DaftarPengirimanController::class, 'index'])->name('kurir.daftar_pengiriman');
     Route::get('/kelola_status', [KelolaStatusController::class, 'Index'])->name('kurir.kelola_status');
     Route::post('/shipment/update-status', [KelolaStatusController::class, 'konfirmasiStatus'])->name('shipment.updateStatus');
     Route::get('/history_pengiriman_kurir', [KelolaStatusController::class, 'history'])->name('kurir.history_pengiriman_kurir');
-    Route::get('/resi/{id}/download', [KelolaStatusController::class, 'downloadResi'])->name('kurir.downloadResi');
-    Route::get('/print-resi/{id}', [KelolaStatusController::class, 'printResi'])->name('kurir.printResi');
+    Route::get('/resi/{shipmentID}/download', [KelolaStatusController::class, 'downloadResi'])->name('kurir.downloadResi');
+    Route::get('/print-resi/{shipmentID}', [KelolaStatusController::class, 'printResi'])->name('kurir.printResi');
 }); 
 
 

@@ -11,9 +11,11 @@
 namespace App\Http\Controllers\Admin; // Mendefinisikan namespace untuk controller ini, membantu dalam organisasi kode.
 
 use Illuminate\Http\Request; // Mengimpor kelas Request, meskipun tidak digunakan secara langsung di controller ini, seringkali ada secara default.
-use App\Models\Pengiriman; // Mengimpor model Pengiriman, merepresentasikan tabel 'pengiriman' di database.
+use App\Models\Shipment; // Mengimpor model Shipment yang baru
+use App\Models\DeliveryArea; // Mengimpor model DeliveryArea untuk data wilayah
 use App\Models\User; // Mengimpor model User, merepresentasikan tabel 'users' di database yang berisi data pengguna termasuk kurir.
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB; // Mengimpor DB facade untuk query kompleks
 
 class DashboardAdminController extends Controller // Mendefinisikan kelas controller, yang mewarisi fungsionalitas dasar dari kelas Controller Laravel.
 {
@@ -29,15 +31,16 @@ class DashboardAdminController extends Controller // Mendefinisikan kelas contro
         $totalKurir =User::whereHas('role', function($q) {
         $q->where('role_name', 'courier');
         })->count();
-        // Menghitung total jumlah pengiriman yang tercatat di database.
-        $totalPengiriman = Pengiriman::count();
+        
+        // Menghitung total jumlah pengiriman menggunakan model Shipment yang baru.
+        $totalPengiriman = Shipment::count();
 
-        // Menghitung total jumlah wilayah pengiriman unik berdasarkan kolom 'alamat_tujuan'.
-        // $totalWilayah = Pengiriman::distinct('alamat_tujuan')->count('alamat_tujuan');
+        // Menghitung total jumlah wilayah pengiriman dari tabel delivery_area.
+        $totalWilayah = DeliveryArea::count();
 
         // Mengembalikan view 'admin.dashboard_admin' dan meneruskan variabel-variabel statistik
         // agar dapat ditampilkan di halaman dashboard.
-        return view('admin.dashboard_admin', compact('totalKurir', 'totalPengiriman'));
+        return view('admin.dashboard_admin', compact('totalKurir', 'totalPengiriman', 'totalWilayah'));
     }
 
     /**
@@ -46,19 +49,24 @@ class DashboardAdminController extends Controller // Mendefinisikan kelas contro
      *
      * @return \Illuminate\Http\JsonResponse Mengembalikan data pengiriman per wilayah dalam format JSON.
      */
-    // public function getPengirimanPerWilayah()
-    // {
-    //     // Mengambil data pengiriman.
-    //     // Memilih kolom 'alamat_tujuan'.
-    //     // Menghitung jumlah pengiriman untuk setiap wilayah dan memberinya alias 'total'.
-    //     // Mengelompokkan hasil berdasarkan 'alamat_tujuan'.
-    //     // Menjalankan query dan mendapatkan hasilnya sebagai koleksi.
-    //     $data = Pengiriman::select('alamat_tujuan')
-    //         ->selectRaw('COUNT(*) as total')
-    //         ->groupBy('alamat_tujuan')
-    //         ->get();
+    public function getPengirimanPerWilayah()
+    {
+        // PERBAIKAN FINAL: Memperbaiki logika join agar benar-benar LEFT JOIN.
+        // 1. Mulai dari semua DeliveryArea.
+        // 2. LEFT JOIN ke users, TAPI HANYA users dengan role_id = 2 (kurir).
+        // 3. LEFT JOIN ke shipments berdasarkan kurir yang ditemukan.
+        $data = DeliveryArea::query()
+            ->leftJoin('users', function ($join) {
+                $join->on('delivery_area.area_id', '=', 'users.area_id')
+                     ->where('users.role_id', 2); // Filter kurir di dalam kondisi join
+            })
+            ->leftJoin('shipments', 'users.user_id', '=', 'shipments.courierUserID')
+            ->select('delivery_area.area_name', DB::raw('COUNT(shipments.shipmentID) as total'))
+            ->groupBy('delivery_area.area_name')
+            ->orderBy('delivery_area.area_name', 'asc') // Urutkan berdasarkan nama wilayah
+            ->get();
 
-    //     // Mengembalikan data yang diambil dalam format JSON.
-    //     return response()->json($data);
-    // }
+        // Mengembalikan data yang diambil dalam format JSON.
+        return response()->json($data);
+    }
 }

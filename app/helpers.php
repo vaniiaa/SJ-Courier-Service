@@ -18,7 +18,7 @@ if (!function_exists('getNavigationLinks')) {
                     ['label' => 'Kelola Status', 'url' => route('kurir.kelola_status')],
                     ['label' => 'History Pengiriman', 'url' => route('kurir.history_pengiriman_kurir')],
                 ]],
-                ['label' => 'Daftar Pengiriman', 'url' => route('kurir.dashboard')],
+                ['label' => 'Daftar Pengiriman', 'url' => route('kurir.daftar_pengiriman')],
             ];
         }
         // Default: customer
@@ -27,8 +27,8 @@ if (!function_exists('getNavigationLinks')) {
             ['label' => 'Layanan', 'children' => [
                 ['label' => 'Live Tracking', 'url' => route('login')],
                 ['label' => 'Permintaan Pengiriman', 'url' => route('shipments.create.step1')],
-                ['label' => 'Daftar Pengiriman', 'url' => route('active')],
-                ['label' => 'History Pengiriman', 'url' => route('history')],
+                ['label' => 'Daftar Pengiriman', 'url' => route('customer.active')],
+                ['label' => 'History Pengiriman', 'url' => route('customer.history')],
             ]],
         ];
     }

@@ -150,15 +150,15 @@
             <div class="mt-6 flex justify-end pr-4">
                 <nav class="inline-flex -space-x-px text-sm shadow-sm" aria-label="Pagination">
                     {{-- Previous Page Link --}}
-                    @if ($pengiriman->onFirstPage())
+                    @if ($shipments->onFirstPage())
                         <span class="px-3 py-2 rounded-l-md border border-gray-300 bg-gray-100 text-gray-400 cursor-default">Sebelumnya</span>
                     @else
-                        <a href="{{ $pengiriman->previousPageUrl() }}" class="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-200">Sebelumnya</a>
+                        <a href="{{ $shipments->previousPageUrl() }}" class="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-200">Sebelumnya</a>
                     @endif
 
                     {{-- Page Numbers --}}
-                    @foreach ($pengiriman->getUrlRange(1, $pengiriman->lastPage()) as $page => $url)
-                        @if ($page == $pengiriman->currentPage())
+                    @foreach ($shipments->getUrlRange(1, $shipments->lastPage()) as $page => $url)
+                        @if ($page == $shipments->currentPage())
                             <span class="px-3 py-2 border border-gray-300 bg-yellow-400 text-white font-semibold">{{ $page }}</span>
                         @else
                             <a href="{{ $url }}" class="px-3 py-2 border border-gray-300 bg-white text-gray-700 hover:bg-yellow-100">{{ $page }}</a>
@@ -166,8 +166,8 @@
                     @endforeach
 
                     {{-- Next Page Link --}}
-                    @if ($pengiriman->hasMorePages())
-                        <a href="{{ $pengiriman->nextPageUrl() }}" class="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-200">Berikutnya</a>
+                    @if ($shipments->hasMorePages())
+                        <a href="{{ $shipments->nextPageUrl() }}" class="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-200">Berikutnya</a>
                     @else
                         <span class="px-3 py-2 rounded-r-md border border-gray-300 bg-gray-100 text-gray-400 cursor-default">Berikutnya</span>
                     @endif
@@ -310,7 +310,8 @@
                     >
                         @csrf
 
-                        <input type="hidden" name="shipmentID" :value="selectedData.shipmentID">
+                        {{-- PERBAIKAN: Menggunakan selectedData.id yang sesuai dengan data yang disimpan --}}
+                        <input type="hidden" name="shipmentID" :value="selectedData.id">
 
                         @if ($errors->any())
                             <div class="mb-4 text-red-600">

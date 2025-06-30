@@ -4,9 +4,11 @@
         <div class="relative z-10 max-w-7xl mx-auto px-4 py-8">
             <h1 class="text-2xl font-bold text-black mb-8">History Pengiriman</h1>
             <div class="bg-white rounded-lg shadow-md p-6">
-                <div class="flex justify-end mb-4">
-                    <input type="text" placeholder="Search..." class="input input-bordered w-full max-w-xs">
-                </div>
+                {{-- Membuat form pencarian yang fungsional --}}
+                <form action="{{ route('customer.history') }}" method="GET" class="flex justify-end mb-4 gap-2">
+                    <input type="text" name="search" placeholder="Cari resi, penerima..." value="{{ request('search') }}" class="input input-bordered w-full max-w-xs">
+                    <button type="submit" class="btn btn-primary">Cari</button>
+                </form>
                 <div class="overflow-x-auto">
                     <table class="table w-full">
                         <thead>
@@ -31,13 +33,17 @@
                                 <td>{{ $shipment->courier->name ?? 'N/A' }}</td>
                                 <td>{{ $shipment->updated_at->format('d M Y') }}</td>
                                 <td><span class="badge badge-success text-white">{{ $shipment->currentStatus }}</span></td>
-                                <td class="flex gap-1">
-                                    <button class="btn btn-xs btn-outline btn-info" title="Cetak Invoice">
+                                <td class="flex gap-2">
+                                    {{-- Tombol untuk melihat detail/cetak label --}}
+                                    <a href="{{ route('shipments.confirmation', ['order' => $shipment->orderID]) }}" target="_blank" class="btn btn-xs btn-outline btn-info" title="Lihat Detail/Cetak">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
-                                    </button>
-                                    <button class="btn btn-xs btn-outline btn-primary" title="Unduh Bukti Pengiriman">
-                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                                    </button>
+                                    </a>
+                                    {{-- Tombol untuk mengunduh bukti pengiriman, hanya muncul jika file ada --}}
+                                    @if($shipment->delivery_proof)
+                                    <a href="{{ asset('storage/' . $shipment->delivery_proof) }}" download="bukti-{{ $shipment->tracking_number }}.jpg" class="btn btn-xs btn-outline btn-primary" title="Unduh Bukti Pengiriman">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                    </a>
+                                    @endif
                                 </td>
                             </tr>
                             @empty

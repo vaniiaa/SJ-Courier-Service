@@ -17,9 +17,10 @@
         
         {{-- Search Bar --}}
         <div class="flex justify-end items-center mb-4">
-            <form action="" method="GET" class="flex items-center gap-2">
+            <form action="{{ route('kurir.history_pengiriman_kurir') }}" method="GET" class="flex items-center gap-2">
                 <label for="search" class="font-medium text-sm">Search:</label>
-                <input type="text" id="search" name="search" placeholder="Cari resi / nama" class="border px-2 py-1 rounded text-sm" />
+                <input type="text" id="search" name="search" placeholder="Cari resi / nama" class="border px-2 py-1 rounded text-sm" value="{{ request('search') }}" />
+                <button type="submit" class="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600">Cari</button>
             </form>
         </div>
 
@@ -40,6 +41,7 @@
                         <th class="px-4 py-2 text-center">Harga (Rp)</th>
                         <th class="px-4 py-2 text-center">Metode Pembayaran</th>
                         <th class="px-4 py-2 text-center">Status Pengiriman</th>
+                        <th class="px-4 py-2 text-center">Bukti Pengiriman</th>
                         <th class="px-4 py-2 text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -59,6 +61,13 @@
                             <td class="px-4 py-2 text-center">{{ $shipment->order->payments->first()->paymentMethod ?? '-' }}</td>
                             <td class="px-4 py-2 text-center font-semibold text-green-600">{{ ucfirst($shipment->currentStatus) }}</td>
                             <td class="px-4 py-2 text-center">
+                                @if ($shipment->delivery_proof)
+                                    <a href="{{ asset('storage/' . $shipment->delivery_proof) }}" target="_blank" class="text-blue-500 hover:underline">Lihat Gambar</a>
+                                @else
+                                    -
+                                @endif
+                            </td>
+                            <td class="px-4 py-2 text-center">
                                 <div class="flex justify-center gap-2">
                                     <a href="{{ route('kurir.downloadResi', ['shipmentID' => $shipment->shipmentID]) }}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs" title="Unduh">
                                         <i class="fas fa-download"></i>
@@ -71,7 +80,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="13" class="text-center py-4 text-gray-500">Belum ada pengiriman yang selesai.</td>
+                            <td colspan="14" class="text-center py-4 text-gray-500">Belum ada pengiriman yang selesai.</td>
                         </tr>
                     @endforelse
                 </tbody>

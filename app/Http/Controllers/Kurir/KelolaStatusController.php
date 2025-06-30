@@ -20,14 +20,14 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class KelolaStatusController extends Controller
 {
 
-    private $finishedStatuses = ['Pesanan selesai', 'dibatalkan', 'dikembalikan'];
+    // Dibuat lowercase agar konsisten dengan query DB yang menggunakan LOWER()
+    private $finishedStatuses = ['pesanan selesai', 'dibatalkan', 'dikembalikan'];
     /**
      * Pastikan semua method di controller ini hanya bisa diakses oleh kurir.
      */
     public function __construct()
     {
         $this->middleware('auth');
-        // Anda bisa menambahkan middleware role 'courier' di sini nanti
     }
 
     /**
@@ -37,7 +37,7 @@ class KelolaStatusController extends Controller
     {
         $kurirId = Auth::id();
         $search = $request->input('search');
-        $finishedStatuses = ['Pesanan selesai', 'dibatalkan', 'dikembalikan'];
+        $finishedStatuses = $this->finishedStatuses;
 
         $query = Shipment::with(['order.sender'])
             ->where('courierUserID', $kurirId)
@@ -72,7 +72,7 @@ class KelolaStatusController extends Controller
             'delivery_proof' => 'nullable|file|mimes:jpg,jpeg,png,heic|max:2048', // max 2MB
         ]);
 
-        $shipment = Shipment::findOrFail($request->shipment_id);
+        $shipment = Shipment::findOrFail($request->shipmentID);
         $kurir = Auth::user();
 
         // Pastikan kurir hanya bisa mengupdate pengiriman miliknya
@@ -88,7 +88,7 @@ class KelolaStatusController extends Controller
             $shipment->delivery_proof = $path;
         }
 
-        // Update status di tabel shipments
+        // Update status di tabel shipments (pastikan huruf kapital di awal)
         $shipment->currentStatus = ucfirst($status); // Simpan dengan huruf kapital di awal
         $shipment->save();
         

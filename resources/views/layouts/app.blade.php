@@ -30,7 +30,7 @@
     </style>
 </head>
 
-<body class="font-sans antialiased min-h-screen bg-gray-100"> <!-- Tambah bg abu-abu muda -->
+<body class="font-sans antialiased min-h-screen bg-gray-100 flex flex-col"> <!-- Tambah bg abu-abu muda -->
     <!-- Navigation Header -->
     <x-header :user="Auth::user()" :links="getNavigationLinks(Auth::user())" />
 

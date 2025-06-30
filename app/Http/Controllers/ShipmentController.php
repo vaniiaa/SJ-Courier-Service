@@ -185,7 +185,11 @@ class ShipmentController extends Controller
     // ... (method-method Anda yang sudah ada biarkan di atas sini) ...
 
     // Daftar status yang dianggap "selesai" untuk dipindahkan ke riwayat
-    private $finishedStatuses = ['Delivered', 'Cancelled', 'Returned to Sender', 'Pesanan Diterima'];
+    // Disesuaikan dengan status yang di-set oleh kurir
+    private $finishedStatuses = [
+        'Pesanan Selesai', 'Pesanan diterima', // <-- Status yang digunakan kurir
+        'Delivered', 'Cancelled', 'Returned to Sender', 'Dibatalkan', 'Dikembalikan'
+    ];
 
     /**
      * Menampilkan halaman "Daftar Pengiriman" (yang masih aktif) untuk customer.
@@ -206,15 +210,26 @@ class ShipmentController extends Controller
     /**
      * Menampilkan halaman "History Pengiriman" (yang sudah selesai) untuk customer.
      */
-    public function history()
+    public function history(Request $request)
     {
-        $shipments = \App\Models\Shipment::whereHas('order', function ($query) {
-                $query->where('senderUserID', \Illuminate\Support\Facades\Auth::id());
-            })
-            ->whereIn('currentStatus', $this->finishedStatuses) // Ambil yang statusnya SUDAH selesai
-            ->with(['order.sender', 'courier'])
-            ->latest()
-            ->paginate(10);
+        $search = $request->input('search');
+
+        $query = \App\Models\Shipment::whereHas('order', function ($query) {
+            $query->where('senderUserID', \Illuminate\Support\Facades\Auth::id());
+        })
+        ->whereIn('currentStatus', $this->finishedStatuses) // Ambil yang statusnya SUDAH selesai
+        ->with(['order.sender', 'courier', 'order.payments']);
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('tracking_number', 'like', '%' . $search . '%')
+                  ->orWhereHas('order', function($subq) use ($search) {
+                      $subq->where('receiverName', 'like', '%' . $search . '%');
+                  });
+            });
+        }
+
+        $shipments = $query->latest('updated_at')->paginate(10);
 
         return view('User.History_Pengiriman', compact('shipments'));
     }

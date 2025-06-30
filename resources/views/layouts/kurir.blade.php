@@ -21,7 +21,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-900">
+<body class="bg-gray-100 text-gray-900 min-h-screen flex flex-col">
 
     {{-- Navbar khusus kurir --}}
     @include('components.header', [
@@ -32,7 +32,7 @@
     {{-- Breadcrumbs Kurir --}}
 
     {{-- Main Content --}}
-    <main class="main-content w-full p-0 m-0">
+    <main class="main-content w-full p-0 m-0 flex-grow">
         @yield('content')
     </main>
 
