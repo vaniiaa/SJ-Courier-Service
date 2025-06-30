@@ -41,9 +41,10 @@ Route::middleware(['auth', 'verified', 'role:customer'])->group(function () {
     // Rute untuk Midtrans tetap sama
     Route::get('/payment/finish', [ShipmentController::class, 'paymentFinish'])->name('payment.finish');
     
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile/update/{field}', [ProfileController::class, 'updateField'])->name('profile.update-field');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 
     Route::get('/kurir/scan/{tracking_number}', [ShipmentController::class, 'scanTrack'])->name('kurir.scan.track');
 });
