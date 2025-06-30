@@ -175,11 +175,12 @@
             <input type="hidden" id="modalFieldName" name="field">
 
             <div class="mb-4">
-                <label for="modalFieldValue" class="block text-sm font-medium text-gray-700" id="modalLabel">Nilai Baru</label>
+                {{-- Label ini akan diatur secara dinamis oleh JavaScript --}}
+                <label for="modalFieldValue" class="block text-sm font-medium text-gray-700" id="modalLabel">Isian</label>
                 <input type="text" id="modalFieldValue" name="value"
                     class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 text-sm">
                 
-                {{-- *** Notifikasi Error untuk Nilai Baru di Modal Edit *** --}}
+                {{-- Notifikasi Error untuk Input di Modal Edit --}}
                 <div id="modal-status-value" class="status-message text-sm mt-1"></div>
             </div>
 
@@ -189,7 +190,7 @@
                 <input type="password" id="modalFieldValueConfirmation" name="value_confirmation"
                     class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 text-sm">
                 
-                {{-- *** Notifikasi Error untuk Konfirmasi Kata Sandi di Modal Edit *** --}}
+                {{-- Notifikasi Error untuk Konfirmasi Kata Sandi di Modal Edit --}}
                 <div id="modal-status-value_confirmation" class="status-message text-sm mt-1"></div>
             </div>
 
@@ -320,20 +321,17 @@
         const currentPasswordInput = document.getElementById('current_password');
 
         modalTitle.textContent = 'Edit ' + fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
-        modalLabel.textContent = 'Masukkan ' + fieldName.charAt(0).toUpperCase() + fieldName.slice(1) + ' Baru:';
+        modalLabel.textContent = fieldName.charAt(0).toUpperCase() + fieldName.slice(1) + ':';
         modalFieldName.value = fieldName;
 
         // Reset display
         passwordConfirmationField.classList.add('hidden');
-        currentPasswordField.classList.add('hidden'); // Sembunyikan secara default
+        currentPasswordField.classList.add('hidden');
         modalFieldValue.type = 'text'; // Default to text
 
         if (fieldName === 'email') {
             modalFieldValue.type = 'email';
             modalFieldValue.value = currentValue;
-            // Jika Anda ingin email memerlukan password juga, uncomment baris ini:
-            // currentPasswordField.classList.remove('hidden'); 
-            // currentPasswordInput.value = '';
         } else if (fieldName === 'password') {
             modalFieldValue.type = 'password';
             modalFieldValue.value = '';
@@ -346,21 +344,12 @@
         } else if (fieldName === 'phone') {
             modalFieldValue.type = 'tel';
             modalFieldValue.value = currentValue;
-            // Jika Anda ingin phone memerlukan password juga, uncomment baris ini:
-            // currentPasswordField.classList.remove('hidden'); 
-            // currentPasswordInput.value = '';
         } else if (fieldName === 'address') {
             modalFieldValue.type = 'text';
             modalFieldValue.value = currentValue;
-            // Jika Anda ingin address memerlukan password juga, uncomment baris ini:
-            // currentPasswordField.classList.remove('hidden'); 
-            // currentPasswordInput.value = '';
-        } else { // Untuk Nama, dll.
+        } else { // For Name, etc.
             modalFieldValue.type = 'text';
             modalFieldValue.value = currentValue;
-            // Jika Anda ingin nama memerlukan password juga, uncomment baris ini:
-            // currentPasswordField.classList.remove('hidden'); 
-            // currentPasswordInput.value = '';
         }
 
         editForm.action = '/profile/update/' + fieldName; 
@@ -375,7 +364,7 @@
         document.getElementById('modalFieldValueConfirmation').value = '';
         document.getElementById('current_password').value = '';
         document.getElementById('passwordConfirmationField').classList.add('hidden');
-        document.getElementById('currentPasswordField').classList.add('hidden'); // Pastikan ini tersembunyi saat modal ditutup
+        document.getElementById('currentPasswordField').classList.add('hidden');
         
         // Clear any error messages from the modal
         document.querySelectorAll('#editModal .status-message').forEach(el => {
@@ -479,34 +468,44 @@
                 document.getElementById('deleteAccountPassword').classList.add('border-red-500'); // Tambahkan border merah pada input
                 document.getElementById('deleteAccountPassword').focus(); // Fokuskan kembali input
             @else
-                // Jika error berasal dari modal edit
+                // Jika error berasal dari modal edit, kita TIDAK AKAN MEMBUKA MODAL SECARA PAKSA.
+                // Kita hanya akan mencoba menampilkan pesan error JIKA modal sudah terbuka.
                 const modal = document.getElementById('editModal');
-                if (modal) {
-                    modal.classList.remove('hidden');
-                    const fieldName = document.getElementById('modalFieldName').value; // Get fieldName from hidden input in modal
+                const fieldName = document.getElementById('modalFieldName').value;
 
+                // Hanya proses error jika modal terlihat (tidak hidden) dan fieldName di set.
+                // Ini akan mencegah modal muncul secara otomatis karena error validasi.
+                if (!modal.classList.contains('hidden') && fieldName) { 
                     if (fieldName === 'password') {
                         document.getElementById('passwordConfirmationField').classList.remove('hidden');
-                        document.getElementById('currentPasswordField').classList.remove('hidden'); // Tampilkan current password juga
+                        document.getElementById('currentPasswordField').classList.remove('hidden');
+
+                        // Jika ada error pada 'current_password', tampilkan di bawah input tersebut
+                        @if ($errors->has('current_password'))
+                            showStatusMessage('modal-status-current_password', '{{ $errors->first('current_password') }}', 'error');
+                            document.getElementById('current_password').classList.add('border-red-500');
+                            // Tidak perlu fokuskan input jika user tidak ingin pop-up
+                        @endif
+                        // Jika ada error pada 'value' (sandi baru) atau 'value_confirmation' (konfirmasi sandi baru)
+                        @if ($errors->has('value'))
+                            showStatusMessage('modal-status-value', '{{ $errors->first('value') }}', 'error');
+                            document.getElementById('modalFieldValue').classList.add('border-red-500');
+                        @endif
+                        @if ($errors->has('value_confirmation'))
+                            showStatusMessage('modal-status-value_confirmation', '{{ $errors->first('value_confirmation') }}', 'error');
+                            document.getElementById('modalFieldValueConfirmation').classList.add('border-red-500');
+                        @endif
                     } else {
                         // Untuk nama, email, phone, address, SEMBUNYIKAN current password field
                         document.getElementById('passwordConfirmationField').classList.add('hidden');
                         document.getElementById('currentPasswordField').classList.add('hidden');
-                    }
-                    
-                    // Tampilkan error validasi di bawah input terkait di dalam modal edit
-                    @foreach ($errors->all() as $error)
-                        @if (str_contains($error, 'nilai') && (session('field') === 'name' || session('field') === 'email' || session('field') === 'phone' || session('field') === 'address' || session('field') === 'password'))
-                            showStatusMessage('modal-status-value', '{{ $error }}', 'error');
+
+                        // Tampilkan error validasi di bawah input terkait di dalam modal edit
+                        @if ($errors->has('value'))
+                            showStatusMessage('modal-status-value', 'Input tidak valid.', 'error');
                             document.getElementById('modalFieldValue').classList.add('border-red-500');
-                        @elseif (str_contains($error, 'konfirmasi')) // Error for value_confirmation field
-                            showStatusMessage('modal-status-value_confirmation', '{{ $error }}', 'error');
-                            document.getElementById('modalFieldValueConfirmation').classList.add('border-red-500');
-                        @elseif (str_contains($error, 'saat ini')) // Error for current_password field
-                            showStatusMessage('modal-status-current_password', '{{ $error }}', 'error');
-                            document.getElementById('current_password').classList.add('border-red-500');
                         @endif
-                    @endforeach
+                    }
                 }
             @endif
         });
