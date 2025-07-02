@@ -11,7 +11,7 @@ use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\Kurir\KelolaStatusController as KelolaStatusController;
 use App\Http\Controllers\TarifController;
 use App\Http\Controllers\Kurir\DaftarPengirimanController as DaftarPengirimanController;
-use App\Http\Controllers\LiveTrackingController;
+use App\Http\Controllers\Kurir\LiveTrackingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -102,8 +102,6 @@ Route::get('/force-logout', function () {
 });
 
 Route::post('/tarif/hitung', [TarifController::class, 'hitungTarif'])->name('tarif.hitung');
-
-Route::get('/kurir/live-tracking', [LiveTrackingController::class, 'index'])->name('kurir.live_tracking');
-
-// API: update lokasi kurir
+Route::get('/courier/live_tracking', [LiveTrackingController::class, 'index'])->name('kurir.live_tracking');
+Route::post('/kurir/update_location', [LiveTrackingController::class, 'updateLocation'])->name('kurir.update_location');
 Route::get('/api/shipment-location', [LiveTrackingController::class, 'getShipmentLocation'])->name('api.shipment_location');

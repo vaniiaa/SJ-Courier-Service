@@ -224,7 +224,7 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan shipment via AJAX.
             @endif
 
             {{-- Page Numbers --}}
-            @foreach ($shipments->getUrlRange(1, $pengiriman->lastPage()) as $page => $url)
+            @foreach ($shipments->getUrlRange(1, $shipments->lastPage()) as $page => $url)
                 @if ($page == $shipments->currentPage())
                     <span class="px-3 py-2 border border-gray-300 bg-yellow-400 text-white font-semibold">{{ $page }}</span>
                 @else
