@@ -52,5 +52,8 @@
             });
         });
     </script>
+
+    {{-- Stack untuk script spesifik per halaman --}}
+    @stack('scripts')
 </body>
 </html>

@@ -11,6 +11,7 @@ use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\Kurir\KelolaStatusController as KelolaStatusController;
 use App\Http\Controllers\TarifController;
 use App\Http\Controllers\Kurir\DaftarPengirimanController as DaftarPengirimanController;
+use App\Http\Controllers\LiveTrackingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -80,7 +81,8 @@ Route::prefix('courier')->middleware(['auth', 'role:courier'])->group(function (
     Route::get('/profile', [ProfileController::class, 'edit'])->name('courier.profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('courier.profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('courier.profile.destroy');
-
+    Route::post('/update-location', [LiveTrackingController::class, 'updateLocation'])->name('kurir.update_location');
+    Route::get('/live-tracking', [LiveTrackingController::class, 'index'])->name('kurir.live_tracking');
     Route::get('/daftar_pengiriman', [DaftarPengirimanController::class, 'index'])->name('kurir.daftar_pengiriman');
     Route::get('/kelola_status', [KelolaStatusController::class, 'Index'])->name('kurir.kelola_status');
     Route::post('/shipment/update-status', [KelolaStatusController::class, 'konfirmasiStatus'])->name('shipment.updateStatus');
@@ -100,3 +102,8 @@ Route::get('/force-logout', function () {
 });
 
 Route::post('/tarif/hitung', [TarifController::class, 'hitungTarif'])->name('tarif.hitung');
+
+Route::get('/kurir/live-tracking', [LiveTrackingController::class, 'index'])->name('kurir.live_tracking');
+
+// API: update lokasi kurir
+Route::get('/api/shipment-location', [LiveTrackingController::class, 'getShipmentLocation'])->name('api.shipment_location');

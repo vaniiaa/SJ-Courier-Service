@@ -2,6 +2,12 @@
 
 @section('title', 'Home')
 
+@section('header')
+{{-- Memuat library peta Leaflet.js --}}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+@endsection
+
 @section('content')
 
 {{-- Tambahkan CSS di sini --}}
@@ -60,55 +66,6 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        let currentSlide = 1;
-        const totalSlides = 3;
-
-        function moveToNextSlide() {
-            currentSlide = currentSlide >= totalSlides ? 1 : currentSlide + 1;
-            document.querySelector(`#autoSlide${currentSlide}`).scrollIntoView({
-                behavior: 'smooth',
-                block: 'nearest',
-                inline: 'start'
-            });
-        }
-
-        // Auto slide every 20 seconds (20000 ms)
-        setInterval(moveToNextSlide, 20000);
-    });
-
-    function selectTab(tab) {
-        // Konten
-        document.getElementById('tab-tracking-content').classList.add('hidden');
-        document.getElementById('tab-tarif-content').classList.add('hidden');
-
-        // Tombol Tab
-        document.getElementById('tab-tracking-btn').classList.remove('bg-gradient-to-r', 'from-yellow-400', 'to-yellow-300');
-        document.getElementById('tab-tracking-btn').classList.add('bg-white');
-
-        document.getElementById('tab-tarif-btn').classList.remove('bg-gradient-to-r', 'from-yellow-400', 'to-yellow-300');
-        document.getElementById('tab-tarif-btn').classList.add('bg-white');
-
-        // Tampilkan tab sesuai yang dipilih
-        document.getElementById(`tab-${tab}-content`).classList.remove('hidden');
-        document.getElementById(`tab-${tab}-btn`).classList.add('bg-gradient-to-r', 'from-yellow-400', 'to-yellow-300');
-        document.getElementById(`tab-${tab}-btn`).classList.remove('bg-white');
-    }
-
-    // Keep the 'Cek Tarif' tab active on page load if a result was just shown
-    @if (session('tarif') || session('error') || $errors->any())
-        document.addEventListener('DOMContentLoaded', function() {
-            selectTab('tarif');
-            const tarifResultDiv = document.querySelector('.tarif-result-container');
-            if (tarifResultDiv) {
-                tarifResultDiv.classList.add('tarif-result-animation');
-            }
-        });
-    @endif
-</script>
-
-
 <div class="flex justify-center mt-8">
     <div class="tabs tabs-boxed border border-black rounded-md overflow-hidden">
         <a onclick="selectTab('tracking')" id="tab-tracking-btn"
@@ -127,12 +84,22 @@
     <div id="tab-tracking-content">
         <h3 class="font-bold mb-2">Lacak Pengiriman</h3>
         <div class="flex gap-2 flex-col md:flex-row">
-            <input type="text" placeholder="111LU67UTW"
+            {{-- Menambahkan ID pada input dan tombol --}}
+            <input type="text" id="public_tracking_number" placeholder="Masukkan nomor resi..."
                    class="input input-bordered w-full" />
-            <button class="btn bg-gradient-to-r from-yellow-400 to-yellow-300 text-black shadow font-semibold">
+            <button id="public_track_btn" class="btn bg-gradient-to-r from-yellow-400 to-yellow-300 text-black shadow font-semibold">
                 Lacak
             </button>
         </div>
+        {{-- Container untuk menampilkan hasil pelacakan --}}
+        <div id="tracking-result-container" class="mt-4 hidden">
+            <div id="public_map" class="mt-2 rounded-md" style="height: 300px; border: 1px solid #e2e8f0;"></div>
+            <div id="tracking_status_info" class="mt-4 p-3 bg-gray-100 rounded-lg text-sm">
+                <p><strong>Status:</strong> <span id="shipment_status">Memuat...</span></p>
+                <p><strong>Terakhir Diperbarui:</strong> <span id="last_tracked_at">Memuat...</span></p>
+            </div>
+        </div>
+        <div id="tracking-error-message" class="mt-4 text-red-600 text-sm font-medium"></div>
     </div>
 
     <div id="tab-tarif-content" class="hidden">
@@ -214,7 +181,9 @@
             title="Live Tracking"
             description="Tak perlu khawatir soal pengiriman. Pantau posisi paket secara real-time dan pastikan tiba tepat waktu!"
             button="Lacak Sekarang"
-            link="{{ asset('kurir/live_tracking') }}"
+            {{-- Aksi JS untuk mengaktifkan tab tracking di halaman ini --}}
+            onclick="selectTab('tracking'); document.getElementById('tab-tracking-btn').scrollIntoView({ behavior: 'smooth' });"
+            link="javascript:void(0);"
             icon="{{ asset('images/user/1.png') }}"
         />
 
@@ -222,7 +191,8 @@
             title="Permintaan Pengiriman dan Pembayaran"
             description="Ajukan permintaan pengiriman dan lakukan pembayaran dengan mudah, cepat, dan aman dalam hitungan detik!"
             button="Buat Pengiriman"
-            link="{{ asset('kurir/kelola_status') }}"
+            {{-- Link ke halaman pembuatan pengiriman untuk customer --}}
+            link="{{ route('shipments.create.step1') }}"
             icon="{{ asset('images/user/2.png') }}"
         />
 
@@ -230,7 +200,9 @@
             title="Cek Tarif"
             description="Lakukan cek tarif untuk menghitung estimasi biaya pengiriman suatu paket dari lokasi pengirim ke lokasi penerima!"
             button="Lihat"
-            link="{{ asset('kurir/kelola_status') }}"
+            {{-- Aksi JS untuk mengaktifkan tab cek tarif di halaman ini --}}
+            onclick="selectTab('tarif'); document.getElementById('tab-tarif-btn').scrollIntoView({ behavior: 'smooth' });"
+            link="javascript:void(0);"
             icon="{{ asset('images/user/3.png') }}"
         />
 
@@ -238,7 +210,8 @@
             title="History Pengiriman"
             description="Lihat daftar pengirimanmu kapan saja! Riwayat lengkap & transparan untuk memastikan semuanya terkendali."
             button="Lihat History"
-            link="{{ asset('kurir/history') }}"
+            {{-- Link ke halaman riwayat pengiriman customer --}}
+            link="{{ route('customer.history') }}"
             icon="{{ asset('images/user/4.png') }}"
         />
     </div>
@@ -276,3 +249,154 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+    // Pass the PHP condition to a JavaScript variable. 1 is true, 0 is false.
+    const shouldSelectTarifTab = {{ session('tarif') || session('error') || $errors->any() ? 'true' : 'false' }};   
+    
+    // Definisikan fungsi selectTab di scope global agar bisa diakses oleh onclick
+    function selectTab(tab) {
+        // Konten
+        document.getElementById('tab-tracking-content').classList.add('hidden');
+        document.getElementById('tab-tarif-content').classList.add('hidden');
+
+        // Tombol Tab
+        document.getElementById('tab-tracking-btn').classList.remove('bg-gradient-to-r', 'from-yellow-400', 'to-yellow-300');
+        document.getElementById('tab-tracking-btn').classList.add('bg-white');
+
+        document.getElementById('tab-tarif-btn').classList.remove('bg-gradient-to-r', 'from-yellow-400', 'to-yellow-300');
+        document.getElementById('tab-tarif-btn').classList.add('bg-white');
+
+        // Tampilkan tab sesuai yang dipilih
+        document.getElementById(`tab-${tab}-content`).classList.remove('hidden');
+        document.getElementById(`tab-${tab}-btn`).classList.add('bg-gradient-to-r', 'from-yellow-400', 'to-yellow-300');
+        document.getElementById(`tab-${tab}-btn`).classList.remove('bg-white');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        let publicMap, publicMarker;
+        let trackingInterval;
+
+        // --- Logika Carousel ---
+        let currentSlide = 1;
+        const totalSlides = 3;
+        function moveToNextSlide() {
+            currentSlide = currentSlide >= totalSlides ? 1 : currentSlide + 1;
+            const slideElement = document.querySelector(`#autoSlide${currentSlide}`);
+            if (slideElement) {
+                slideElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+            }
+        }
+        setInterval(moveToNextSlide, 20000);
+
+        // --- Logika Tab Tarif saat load halaman ---
+        if (shouldSelectTarifTab) {
+            selectTab('tarif');
+            const tarifResultDiv = document.querySelector('.tarif-result-container');
+            if (tarifResultDiv) {
+                tarifResultDiv.classList.add('tarif-result-animation');
+            }
+        }
+
+        // Fungsi untuk inisialisasi atau update peta
+        function initPublicMap(lat, long) {
+            try {
+            const mapContainer = document.getElementById('public_map');
+            if (!mapContainer) return;
+            // Pastikan Leaflet sudah di-load
+            } catch (error) {
+                console.error('Map initializing error:', error);
+                return;
+            }
+            // Jika peta belum ada, buat baru
+            if (!publicMap) {
+                publicMap = L.map('public_map').setView([lat, long], 15);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(publicMap);
+            }
+
+            // Jika marker sudah ada, pindahkan. Jika belum, buat baru.
+            if (publicMarker) {
+                publicMarker.setLatLng([lat, long]);
+            } else {
+                const courierIcon = L.icon({
+                    iconUrl: '{{ asset("images/user/courier-icon.png") }}', // Ganti dengan path ikon kurir Anda
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 40],
+                    popupAnchor: [0, -40]
+                });
+                publicMarker = L.marker([lat, long], {icon: courierIcon}).addTo(publicMap)
+                    .bindPopup('Posisi Terkini Paket').openPopup();
+            }
+
+            // Arahkan peta ke posisi marker
+            publicMap.setView([lat, long], 15);
+        }
+
+        // Fungsi utama untuk melacak pengiriman
+        async function trackShipment() {
+            const trackingNumber = document.getElementById('public_tracking_number').value.trim();
+            const resultContainer = document.getElementById('tracking-result-container');
+            const errorContainer = document.getElementById('tracking-error-message');
+            const trackBtn = document.getElementById('public_track_btn');
+
+            if (!trackingNumber || trackingNumber.length === 5) {
+                errorContainer.textContent = 'Nomor resi tidak boleh kosong.';
+                resultContainer.classList.add('hidden');
+                return;
+            }
+
+            // Hentikan pelacakan sebelumnya jika ada
+            window.addEventListener('beforeunload', function() {
+                if (trackingInterval) {
+                    clearInterval(trackingInterval);
+                }
+            });
+
+            trackBtn.disabled = true;
+            trackBtn.textContent = 'Melacak...';
+            errorContainer.textContent = '';
+
+            const fetchLocation = async () => {
+                try {
+                    const response = await fetch(`{{ route('api.shipment_location') }}?tracking_number=${trackingNumber}`);
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        errorContainer.textContent = data.message || 'Gagal mengambil data.';
+                        resultContainer.classList.add('hidden');
+                        clearInterval(trackingInterval);
+                        trackBtn.disabled = false;
+                        trackBtn.textContent = 'Lacak';
+                        return;
+                    }
+
+                    if (data.lat && data.long) {
+                        resultContainer.classList.remove('hidden');
+                        initPublicMap(data.lat, data.long);
+                        document.getElementById('shipment_status').textContent = data.status || 'N/A';
+                        document.getElementById('last_tracked_at').textContent = data.last_tracked_at || 'N/A';
+                    } else {
+                        errorContainer.textContent = 'Lokasi untuk pengiriman ini belum tersedia.';
+                        resultContainer.classList.add('hidden');
+                    }
+
+                } catch (error) {
+                    console.error('Fetch error:', error);
+                    errorContainer.textContent = 'Terjadi kesalahan jaringan. Silakan coba lagi.';
+                    clearInterval(trackingInterval);
+                }
+            };
+
+            await fetchLocation(); // Panggil pertama kali
+            trackingInterval = setInterval(fetchLocation, 15000); // Ulangi setiap 15 detik
+            trackBtn.disabled = false;
+            trackBtn.textContent = 'Lacak';
+        }
+
+        document.getElementById('public_track_btn').addEventListener('click', trackShipment);
+    });
+</script>
+@endpush

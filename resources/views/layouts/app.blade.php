@@ -27,6 +27,9 @@
             height: 300px;
             border-radius: 0.5rem; /* Sesuai dengan rounded-lg daisyUI */
         }
+        .main-content {
+            margin-top: 80px; /* Sesuaikan dengan tinggi navbar */  
+        }
     </style>
 </head>
 
@@ -35,9 +38,9 @@
     <x-header :user="Auth::user()" :links="getNavigationLinks(Auth::user())" />
 
     <!-- Page Content -->
-    <main class="flex-grow pt-20 md:px-10">
+    <main class="main-content flex-grow pt-20 md:px-10">
         {{ $slot }}
-    </main>
+    </main>  
 
     <!--Footer-->
     <x-footer :menus="[
