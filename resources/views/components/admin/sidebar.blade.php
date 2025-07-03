@@ -69,14 +69,4 @@
             </a>
         </nav>
     </div>
-
-    <div class="px-4 py-4 border-t">
-        <a href="/logout" class="flex items-center gap-3 text-red-600 hover:underline">
-            <svg class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M17 16l4-4m0 0l-4-4m4 4H7" />
-            </svg>
-            <span>Logout</span>
-        </a>
-    </div>
 </aside>

@@ -26,7 +26,7 @@ if (!function_exists('getNavigationLinks')) {
             ['label' => 'Dashboard', 'url' => route('dashboard')],
             ['label' => 'Layanan', 'children' => [
                 // Arahkan ke dashboard, tempat widget tracking berada
-                ['label' => 'Live Tracking', 'url' => route('dashboard')],
+                ['label' => 'Live Tracking', 'url' => route('user.live_tracking')],
                 ['label' => 'Permintaan Pengiriman', 'url' => route('shipments.create.step1')],
                 ['label' => 'Daftar Pengiriman', 'url' => route('customer.active')],
                 ['label' => 'History Pengiriman', 'url' => route('customer.history')],

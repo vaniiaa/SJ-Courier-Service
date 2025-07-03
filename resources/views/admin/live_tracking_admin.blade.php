@@ -1,74 +1,132 @@
 @extends('layouts.admin')
 
-@include('components.admin.sidebar')
-
 @section('title', 'Live Tracking')
 
 @section('content')
-<div class="absolute top-32 left-0 right-0 px-4" x-data="{ showResult: false }">
-    <div class="max-w-[60rem] mx-auto flex flex-col gap-6">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-        <!-- Card 1: Form Tracking -->
-        <div class="bg-white rounded-xl shadow-md p-6">
-            <div class="flex flex-col md:flex-row items-center gap-4">
-                
-                <!-- Input untuk kode tracking -->
-                <div class="relative w-full md:flex-1">
-                    <label class="block text-md font-semibold mb-1">Lacak Pengiriman</label>
-                    <input type="text" value="11LU67UTW" 
-                        class="w-full pr-10 px-4 py-2 border border-gray-300 rounded-md shadow focus:ring focus:ring-yellow-300 focus:outline-none">
-                </div>
+<style>
+    .tracking-error {
+        color: #ef4444;
+        font-weight: bold;
+        margin-top: 0.5rem;
+    }
 
-                <!-- Tombol untuk memulai tracking -->
-                <button 
-                    @click="showResult = true"
-                    class="mt-5 md:mt-7 bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 px-6 rounded-md shadow">
-                    Mulai
-                </button>
-            </div>
+    .leaflet-map {
+        height: 300px;
+        border-radius: 0.5rem;
+    }
+</style>
+
+<div class="absolute top-32 left-0 right-0 px-4">
+    <div class="max-w-[90rem] min-h-[35rem] mx-auto bg-white rounded-xl shadow-xl p-6 flex flex-col gap-6 items-center">
+        <h1 class="text-2xl font-bold mb-4">Live Tracking Admin</h1>
+        
+        <div class="flex w-full gap-4 items-center mb-4">
+            <input type="text" id="tracking_number" placeholder="Masukkan Nomor Resi"
+                class="border border-gray-300 rounded px-4 py-2 flex-grow" />
+            <button onclick="trackShipment()" class="btn bg-gradient-to-r from-yellow-400 to-yellow-300 text-black shadow font-semibold">
+                Lacak
+            </button>
         </div>
 
-        <!-- Card 2: Hasil Tracking -->
-        <div 
-            x-show="showResult"
-            x-transition
-            class="bg-white rounded-xl shadow-2xl mb-20 p-6"
-        >
-            <div class="text-sm px-6 py-2">
-                <!-- Judul dan informasi pengiriman -->
-                <h2 class="text-center font-semibold text-lg mb-4">Live Tracking</h2>
-                <br>
-                <!-- Menampilkan detail pengiriman -->
-                <div class="grid grid-cols-6 gap-x-2 gap-y-2 mb-4">
-                    <!-- Baris pertama -->
-                    <div class="col-span-1 font-semibold">Pengirim</div>
-                    <div class="col-span-1">: Devia</div>
-                    <div class="col-span-1 font-semibold">Penerima</div>
-                    <div class="col-span-1">: Vicky</div>
-                    <div class="col-span-1 font-semibold">Berat</div>
-                    <div class="col-span-1">: 1 Kg</div>
+        <p id="tracking_error_message" class="tracking-error hidden"></p>
 
-                    <!-- Baris kedua -->
-                    <div class="col-span-1 font-semibold">Alamat</div>
-                    <div class="col-span-1">: Bida Asri 3</div>
-                    <div class="col-span-1 font-semibold">Alamat Tujuan</div>
-                    <div class="col-span-1">: Cendana</div>
-                    <div class="col-span-1 font-semibold">Harga</div>
-                    <div class="col-span-1">: Rp 40.000</div>
-                </div>
-            </div>
+        <div id="tracking_result" class="mt-4 hidden w-full">
+            <p class="font-semibold">Status Pengiriman: <span id="shipment_status" class="font-normal"></span></p>
+            <p class="font-semibold">Terakhir Diperbarui: <span id="last_tracked_at" class="font-normal"></span></p>
+            <div id="user_map" class="mt-4 leaflet-map"></div>
+        </div>
+    </div>
+</div>
 
-            <!-- Peta Lokasi -->
-            <div class="w-full">
-                <!-- Peta dummy -->
-                <img 
-                    src="{{ asset('images/kurir/maps.png') }}"
-                    alt="Map Placeholder" 
-                    class="w-full rounded-md" 
-                />
-            </div>
+@push('scripts')
+<script>
+    let userMap, userMarker;
 
-        </div> 
-    </div> 
-</div> 
+    function initUserMap(lat, long) {
+        if (!userMap) {
+            userMap = L.map('user_map').setView([lat, long], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(userMap);
+        }
+
+        if (userMarker) {
+            userMarker.setLatLng([lat, long]);
+        } else {
+            userMarker = L.marker([lat, long]).addTo(userMap)
+                .bindPopup('Lokasi Kurir Saat Ini').openPopup();
+        }
+
+        userMap.setView([lat, long], 15);
+        setTimeout(() => {
+            userMap.invalidateSize();
+        }, 100);
+    }
+
+    function trackShipment() {
+        const trackingNumber = document.getElementById('tracking_number').value;
+        const trackingResultDiv = document.getElementById('tracking_result');
+        const shipmentStatusSpan = document.getElementById('shipment_status');
+        const lastTrackedAtSpan = document.getElementById('last_tracked_at');
+        const trackingErrorMessage = document.getElementById('tracking_error_message');
+
+        trackingResultDiv.classList.add('hidden');
+        trackingErrorMessage.classList.add('hidden');
+        trackingErrorMessage.innerText = '';
+
+        if (!trackingNumber) {
+            trackingErrorMessage.innerText = 'Nomor resi wajib diisi.';
+            trackingErrorMessage.classList.remove('hidden');
+            return;
+        }
+
+        shipmentStatusSpan.innerText = 'Mencari data...';
+        lastTrackedAtSpan.innerText = '';
+        trackingResultDiv.classList.remove('hidden');
+
+        fetch("{{ route('api.shipment_location') }}?tracking_number=" + trackingNumber)
+            .then(res => {
+                if (!res.ok) {
+                    return res.json().then(err => Promise.reject(err));
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (data.lat && data.long) {
+                    initUserMap(data.lat, data.long);
+                } else {
+                    if (userMap) {
+                        userMap.remove();
+                        userMap = null;
+                        userMarker = null;
+                    }
+                    document.getElementById('user_map').innerHTML = '<p class="text-center text-gray-500">Lokasi kurir belum tersedia atau tidak di-update.</p>';
+                    document.getElementById('user_map').classList.add('leaflet-map');
+                }
+
+                shipmentStatusSpan.innerText = data.status || 'N/A';
+                lastTrackedAtSpan.innerText = data.last_tracked_at || 'N/A';
+                trackingResultDiv.classList.remove('hidden');
+                trackingErrorMessage.classList.add('hidden');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (userMap) {
+                    userMap.remove();
+                    userMap = null;
+                    userMarker = null;
+                }
+                document.getElementById('user_map').innerHTML = '';
+                document.getElementById('user_map').classList.add('leaflet-map');
+                trackingResultDiv.classList.add('hidden');
+                trackingErrorMessage.innerText = error.message || 'Terjadi kesalahan saat melacak pengiriman. Mohon periksa nomor resi Anda.';
+                trackingErrorMessage.classList.remove('hidden');
+            });
+    }
+</script>
+@endpush
+
 @endsection

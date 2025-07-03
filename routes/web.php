@@ -105,3 +105,9 @@ Route::post('/tarif/hitung', [TarifController::class, 'hitungTarif'])->name('tar
 Route::get('/courier/live_tracking', [LiveTrackingController::class, 'index'])->name('kurir.live_tracking');
 Route::post('/kurir/update_location', [LiveTrackingController::class, 'updateLocation'])->name('kurir.update_location');
 Route::get('/api/shipment-location', [LiveTrackingController::class, 'getShipmentLocation'])->name('api.shipment_location');
+Route::get('/user/live_tracking', function () {
+    return view('User.live_tracking');
+})->name('user.live_tracking'); // Beri nama rute ini
+Route::get('/admin/live_tracking_admin', function () {
+    return view('admin.live_tracking_admin');
+})->name('admin.live_tracking');
