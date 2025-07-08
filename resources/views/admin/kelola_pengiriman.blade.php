@@ -382,7 +382,8 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan shipment via AJAX.
             return;
     }
 
-    const url = `{{ url('/admin/couriers/by-area') }}/${selectedAreaId}`;
+    const url = "{{ url('/admin/kurir') }}/" + selectedAreaId;
+
     try {
         const response = await fetch(url);
         if (!response.ok) throw new Error('Gagal mengambil data kurir');
