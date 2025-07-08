@@ -19,7 +19,6 @@ use App\Http\Controllers\Kurir\LiveTrackingController;
 |--------------------------------------------------------------------------
 */
 
-///testing
 // ------------------- Guest Route -------------------
 Route::get('/', function() { return Auth::check() ? redirect()->route('dashboard') : view('PublicUser.home');
 });
