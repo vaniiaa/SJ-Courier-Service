@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>SJ Courier Service - @yield('title')</title>
+    <link rel="icon" href="{{ asset('images/admin/logo2.jpg') }}" type="image/jpeg">
+    {{-- Alpine.js --}}
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     @vite('resources/css/app.css')
     <style>
         .bg-courier-primary {
@@ -21,7 +25,7 @@
    <x-header :user="Auth::user()" :links="$links" />
 
     <!-- Main Content -->
-    <main class="flex-grow pt-20 px-4 md:px-10">
+    <main class="flex-grow pt-20 {{ request()->is('dashboard') ? 'px-0' : 'px-4 md:px-10' }}">
         @yield('content')
     </main>
 

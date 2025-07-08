@@ -15,6 +15,8 @@ use App\Models\TrackingHistory;
 use App\Models\SavedAddress;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Barryvdh\DomPDF\Facade\Pdf; //untuk membuat file PDF menggunakan dompdf
 
 class ShipmentController extends Controller
 {
@@ -194,43 +196,95 @@ class ShipmentController extends Controller
     /**
      * Menampilkan halaman "Daftar Pengiriman" (yang masih aktif) untuk customer.
      */
-    public function List()
-    {
-        $shipments = \App\Models\Shipment::whereHas('order', function ($query) {
-                $query->where('senderUserID', \Illuminate\Support\Facades\Auth::id());
-            })
-            ->whereNotIn('currentStatus', $this->finishedStatuses) // Ambil yang statusnya BUKAN selesai
-            ->with(['order.sender', 'courier', 'order.payments'])
-            ->latest()
-            ->paginate(10);
+    public function List(Request $request)
+{
+    $search = $request->input('search');
 
-        return view('User.Daftar_Pengiriman', compact('shipments'));
+    $query = \App\Models\Shipment::with(['order.sender', 'courier', 'order.payments'])
+        ->whereHas('order', function ($q) {
+            $q->where('senderUserID', \Illuminate\Support\Facades\Auth::id());
+        })
+        ->whereNotIn('currentStatus', $this->finishedStatuses);
+
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('tracking_number', 'like', '%' . $search . '%')
+              ->orWhereHas('order.sender', function ($subq) use ($search) {
+                  $subq->where('name', 'like', '%' . $search . '%');
+              })
+              ->orWhereHas('order', function ($subq) use ($search) {
+                  $subq->where('receiverName', 'like', '%' . $search . '%');
+              });
+        });
     }
+
+    $shipments = $query->latest()->paginate(10);
+
+    return view('User.Daftar_Pengiriman', compact('shipments'));
+}
+
     
     /**
      * Menampilkan halaman "History Pengiriman" (yang sudah selesai) untuk customer.
      */
     public function history(Request $request)
-    {
-        $search = $request->input('search');
+{
+    $search = $request->input('search');
 
-        $query = \App\Models\Shipment::whereHas('order', function ($query) {
+    $query = \App\Models\Shipment::with(['order.sender', 'courier', 'order.payments'])
+        ->where('currentStatus', 'Pesanan selesai') // Status selesai
+        ->whereHas('order', function ($query) {
             $query->where('senderUserID', \Illuminate\Support\Facades\Auth::id());
-        })
-        ->whereIn('currentStatus', $this->finishedStatuses) // Ambil yang statusnya SUDAH selesai
-        ->with(['order.sender', 'courier', 'order.payments']);
+        });
 
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('tracking_number', 'like', '%' . $search . '%')
-                  ->orWhereHas('order', function($subq) use ($search) {
-                      $subq->where('receiverName', 'like', '%' . $search . '%');
-                  });
-            });
-        }
-
-        $shipments = $query->latest('updated_at')->paginate(10);
-
-        return view('User.History_Pengiriman', compact('shipments'));
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('tracking_number', 'like', '%' . $search . '%')
+              ->orWhereHas('order', function ($subq) use ($search) {
+                  $subq->where('receiverName', 'like', '%' . $search . '%');
+              });
+        });
     }
+
+    $shipments = $query->latest('updated_at')->paginate(10);
+
+    return view('User.History_Pengiriman', compact('shipments'));
+}
+
+
+public function downloadResi($id)
+{
+    $shipment = Shipment::findOrFail($id);
+
+    // Buat isi QR Code berupa URL Google Drive
+    $qrContent = 'https://sj-courier-service-production.up.railway.app/';
+
+    // Generate QR code dari link URL, bukan dari tracking_number
+    $qrcode = base64_encode(QrCode::format('png')->size(150)->generate($qrContent));
+
+    $pdf = PDF::loadView('kurir.resi_pdf', compact('shipment', 'qrcode'))
+             ->setPaper([0, 0, 283.46, 340.157]); // Ukuran resi 10x12 cm
+             
+    return $pdf->download('resi_' . $shipment->tracking_number . '.pdf');
+}
+
+/**
+ * Menampilkan preview resi pengiriman dalam bentuk halaman (tanpa download).
+ */
+public function printResi($id)
+    {
+        $shipment = Shipment::findOrFail($id);
+
+        // Buat isi QR Code (contoh: link tracking atau data resi)
+        $qrContent = 'https://sj-courier-service-production.up.railway.app/';
+
+        // Generate QR code dalam format base64 PNG
+        // Ukuran QR Code untuk browser print (biasanya lebih kecil karena resolusi layar)
+        $qrcode = base64_encode(QrCode::format('png')->size(70)->generate($qrContent)); // <-- Ukuran ini cocokkan dengan CSS resi_print
+
+        // GANTI INI KE NAMA VIEW BARU: kurir.resi_print
+        return view('User.resi_print', compact('shipment', 'qrcode'));
+    }
+
+
 }

@@ -15,7 +15,6 @@ use App\Models\Pengiriman; // model untuk tabel pengiriman
 use Barryvdh\DomPDF\Facade\Pdf; //untuk membuat file PDF menggunakan dompdf
 use Illuminate\Support\Facades\Auth; //autentikasi kurir
 
-
 class KelolaStatusController extends Controller
 {
     /**
@@ -109,29 +108,6 @@ public function konfirmasiStatus(Request $request)
         ->paginate(10); // Paginasi 10 data per halaman
 
     return view('kurir.history_pengiriman_kurir', compact('shipments'));
-}
-
- /**
-  * Mengunduh file PDF dari resi pengiriman berdasarkan ID.
-  */
-public function downloadResi($id)
-{
-    $shipment = Pengiriman::findOrFail($id); // Ambil data pengiriman
-
-    $pdf = \PDF::loadView('kurir.resi_pdf', compact('shipment'))
-               ->setPaper([0, 0, 283.46, 425.2]);
-    // Unduh file PDF dengan nama resi
-    return $pdf->download('resi_' . $shipment->resi . '.pdf');
-}
-
-/**
- * Menampilkan preview resi pengiriman dalam bentuk halaman (tanpa download).
- */
-public function printResi($id)
-{
-    $shipment = Pengiriman::findOrFail($id);
-
-    return view('kurir.resi_pdf', compact('shipment'));
 }
 
 }

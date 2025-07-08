@@ -25,7 +25,8 @@
         {{-- Breadcrumbs/Background Kuning --}}
         {{-- Ini adalah div yang akan memberikan background kuning penuh lebar --}}
         {{-- Jika x-app-layout sudah memiliki background kuning ini, Anda bisa menghapusnya dari sini --}}
-        <div class="bg-yellow-400 p-6 shadow-md h-40 w-full absolute top-0 left-0 z-0"></div>
+        <div class="bg-[rgba(255,165,0,0.75)] p-6 shadow-md h-40 absolute top-0 left-1/2 transform -translate-x-1/2 z-0" 
+             style="width: 100vw; margin-left: -50vw; left: 50%;"></div>
 
         {{-- Konten Utama Halaman --}}
         <div class="relative z-10 max-w-7xl mx-auto px-4 py-8">

@@ -1,40 +1,42 @@
 @extends('layouts.kurir')
 
 @section('content')
-<div class="relative w-full h-[500px]">
-  <!-- Carousel -->
-  <div id="carousel" class="carousel w-full h-full relative overflow-hidden">
-    <div id="slide1" class="carousel-item w-full h-full">
-      <img
-        src="{{ asset('images/kurir/carousel1.jpg') }}"
-        class="w-full h-full object-cover"
-      />
-      <div class="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-6 z-30">
-        <a href="#slide3" class="btn btn-circle text-xl p-4 bg-black bg-opacity-50 hover:bg-opacity-75 text-white transition-all" aria-label="Previous slide">❮</a>
-        <a href="#slide2" class="btn btn-circle text-xl p-4 bg-black bg-opacity-50 hover:bg-opacity-75 text-white transition-all" aria-label="Next slide">❯</a>
-      </div>
+<div class="relative w-full h-[300px] md:h-[400px] lg:h-[500px] xl:h-[600px]">
+    <div id="carousel" class="carousel w-full h-full relative overflow-hidden">
+        <div id="slide1" class="carousel-item w-full h-full">
+            <img
+                src="{{ asset('images/kurir/carousel4.png') }}"
+                class="w-full h-full object-cover"
+                alt="Slider Image 1" {{-- Tambahkan alt text untuk aksesibilitas --}}
+            />
+            <div class="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-4 md:px-6 z-30">
+                <a href="#slide3" class="btn btn-circle text-xl p-3 md:p-4 bg-black bg-opacity-50 hover:bg-opacity-75 text-white transition-all focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-75" aria-label="Previous slide">❮</a>
+                <a href="#slide2" class="btn btn-circle text-xl p-3 md:p-4 bg-black bg-opacity-50 hover:bg-opacity-75 text-white transition-all focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-75" aria-label="Next slide">❯</a>
+            </div>
+        </div>
+        <div id="slide2" class="carousel-item w-full h-full">
+            <img
+                src="{{ asset('images/kurir/carousel5.png') }}"
+                class="w-full h-full object-cover"
+                alt="Slider Image 2"
+            />
+            <div class="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-4 md:px-6 z-30">
+                <a href="#slide1" class="btn btn-circle text-xl p-3 md:p-4 bg-black bg-opacity-50 hover:bg-opacity-75 text-white transition-all focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-75" aria-label="Previous slide">❮</a>
+                <a href="#slide3" class="btn btn-circle text-xl p-3 md:p-4 bg-black bg-opacity-50 hover:bg-opacity-75 text-white transition-all focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-75" aria-label="Next slide">❯</a>
+            </div>
+        </div>
+        <div id="slide3" class="carousel-item w-full h-full">
+            <img
+                src="{{ asset('images/kurir/carousel2.jpg') }}"
+                class="w-full h-full object-cover"
+                alt="Slider Image 3"
+            />
+            <div class="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-4 md:px-6 z-30">
+                <a href="#slide2" class="btn btn-circle text-xl p-3 md:p-4 bg-black bg-opacity-50 hover:bg-opacity-75 text-white transition-all focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-75" aria-label="Previous slide">❮</a>
+                <a href="#slide1" class="btn btn-circle text-xl p-3 md:p-4 bg-black bg-opacity-50 hover:bg-opacity-75 text-white transition-all focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-75" aria-label="Next slide">❯</a>
+            </div>
+        </div>
     </div>
-    <div id="slide2" class="carousel-item w-full h-full">
-      <img
-        src="{{ asset('images/kurir/carousel3.png') }}"
-        class="w-full h-full object-cover"
-      />
-      <div class="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-6 z-30">
-        <a href="#slide1" class="btn btn-circle text-xl p-4 bg-black bg-opacity-50 hover:bg-opacity-75 text-white transition-all" aria-label="Previous slide">❮</a>
-        <a href="#slide3" class="btn btn-circle text-xl p-4 bg-black bg-opacity-50 hover:bg-opacity-75 text-white transition-all" aria-label="Next slide">❯</a>
-      </div>
-    </div>
-    <div id="slide3" class="carousel-item w-full h-full">
-      <img
-        src="{{ asset('images/kurir/carousel2.jpg') }}"
-        class="w-full h-full object-cover"
-      />
-      <div class="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-6 z-30">
-        <a href="#slide2" class="btn btn-circle text-xl p-4 bg-black bg-opacity-50 hover:bg-opacity-75 text-white transition-all" aria-label="Previous slide">❮</a>
-        <a href="#slide1" class="btn btn-circle text-xl p-4 bg-black bg-opacity-50 hover:bg-opacity-75 text-white transition-all" aria-label="Next slide">❯</a>
-      </div>
-    </div>
-  </div>
 </div>
 
 <!-- Text and Image Section Below Carousel -->
@@ -67,7 +69,7 @@
         <div class="p-5 pb-4 flex flex-col items-center text-center">
             <h3 class="text-xl font-semibold">Daftar Pengiriman</h3>
             <p class="mt-2">Lihat daftar pengiriman Anda dan selesaikan tugas pengiriman dengan efisien!</p>
-            <a href="{{ asset('kurir/daftar_pengiriman')}}" class="mt-4 inline-block bg-gradient-to-r from-[#FFA500] to-[#FFD45B] text-black px-4 py-2 rounded-lg hover:bg-gradient-to-r from-[#FFA500] to-[#FFD45B] transition">Lihat Daftar Pengiriman</a>
+            <a href="{{ asset('courier/daftar_pengiriman')}}" class="mt-4 inline-block bg-gradient-to-r from-[#FFA500] to-[#FFD45B] text-black px-4 py-2 rounded-lg hover:bg-gradient-to-r from-[#FFA500] to-[#FFD45B] transition">Lihat Daftar Pengiriman</a>
         </div>
     </div>
 
@@ -77,7 +79,7 @@
         <div class="p-5 pb-4 flex flex-col items-center text-center">
             <h3 class="text-xl font-semibold">Live Tracking</h3>
             <p class="mt-2">Aktifkan Pelacakan real-time untuk memastikan paket sampai tepat waktu!</p>
-            <a href="{{ asset('kurir/live_tracking')}}" class="mt-4 inline-block bg-gradient-to-r from-[#FFA500] to-[#FFD45B] text-black px-4 py-2 rounded-lg hover:opacity-90 transition">Aktifkan Live Tracking</a>
+            <a href="{{ asset('courier/live_tracking')}}" class="mt-4 inline-block bg-gradient-to-r from-[#FFA500] to-[#FFD45B] text-black px-4 py-2 rounded-lg hover:opacity-90 transition">Aktifkan Live Tracking</a>
         </div>
     </div>
 
@@ -87,7 +89,7 @@
         <div class="p-5 pb-4 flex flex-col items-center text-center">
             <h3 class="text-xl font-semibold">Kelola Status</h3>
             <p class="mt-2">Perbarui status pengiriman dengan cepat dan mudah, langsung dari dashboard!</p>
-            <a href="{{ asset('kurir/kelola_status')}}" class="mt-4 inline-block bg-gradient-to-r from-[#FFA500] to-[#FFD45B] text-black px-4 py-2 rounded-lg hover:opacity-90 transition">Update Status</a>
+            <a href="{{ asset('courier/kelola_status')}}" class="mt-4 inline-block bg-gradient-to-r from-[#FFA500] to-[#FFD45B] text-black px-4 py-2 rounded-lg hover:opacity-90 transition">Update Status</a>
         </div>
     </div>
 
@@ -97,7 +99,7 @@
         <div class="p-5 pb-4 flex flex-col items-center text-center">
             <h3 class="text-xl font-semibold">Konfirmasi Pengiriman</h3>
             <p class="mt-2">Pastikan paket sudah diterima dengan mengupload bukti pengiriman Anda!</p>
-            <a href="{{ asset('kurir/kelola_status')}}" class="mt-4 inline-block bg-gradient-to-r from-[#FFA500] to-[#FFD45B] text-black px-4 py-2 rounded-lg hover:bg-gradient-to-r from-[#FFA500] to-[#FFD45B] transition">Konfirmasi</a>
+            <a href="{{ asset('courier/kelola_status')}}" class="mt-4 inline-block bg-gradient-to-r from-[#FFA500] to-[#FFD45B] text-black px-4 py-2 rounded-lg hover:bg-gradient-to-r from-[#FFA500] to-[#FFD45B] transition">Konfirmasi</a>
         </div>
     </div>
 </div>

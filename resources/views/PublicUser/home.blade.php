@@ -8,6 +8,7 @@
 
 {{-- Tambahkan CSS di sini --}}
 <style>
+    /* ----- Umum & Animasi ----- */
     @keyframes fadeInScale {
         0% {
             opacity: 0;
@@ -41,29 +42,107 @@
         font-weight: bold;
         margin-top: 0.5rem;
     }
-</style>
 
-<div class="w-full mx-auto relative">
-    <div class="carousel w-full rounded-lg shadow-xl" id="autoSlider">
+    html, body {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden; 
+    }
+
+    .navbar { 
+        margin-bottom: 0 !important; /* Memastikan navbar tidak memiliki margin bawah */
+    }
+  
+    header {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+
+    /* Carousel Full Width */
+    .carousel-full-width {
+        width: 100vw; 
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-top: 0 !important; 
+        padding-top: 0 !important; 
+        border: none;
+        box-shadow: none;
+    }
+
+    /* Mengatur tinggi gambar carousel untuk responsivitas */
+    .carousel-item img {
+        width: 100%; 
+        height: auto; 
+        object-fit: contain; 
+        background-color: transparent; 
+        display: block; 
+    }
+
+    @media (min-width: 640px) { /* sm */
+        .carousel-item img {
+            height: auto;
+        }
+    }
+
+    @media (min-width: 768px) { /* md */
+        .carousel-item img {
+            height: auto;
+        }
+    }
+
+    @media (min-width: 1024px) { /* lg */
+        .carousel-item img {
+            height: auto;
+        }
+    }
+    @media (min-width: 1280px) { /* xl */
+        .carousel-item img {
+            height: auto;
+        }
+    }
+
+    .carousel-item .absolute.px-4.md\:px-6 {
+        padding-left: 1rem; 
+        padding-right: 1rem;
+    }
+
+    /* Untuk mobile */
+    .carousel {
+        border-radius: 0;
+        box-shadow: none;
+        margin-top: 0 !important; /* Pastikan juga tidak ada margin pada carousel itu sendiri */
+    }
+    @media (min-width: 768px) { 
+        .carousel {
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); /* shadow-xl */
+        }
+    }
+
+</style>
+<div class="carousel-full-width"> {{-- Gunakan kelas baru untuk full width --}}
+    <div class="carousel w-full" id="autoSlider">
         <div id="autoSlide1" class="carousel-item relative w-full">
-            <img src="{{ asset('images/kurir/carousel1.jpg') }}" class="w-full object-cover h-64 md:h-80 lg:h-96" alt="Slider Image 1" />
-            <div class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
-                <a href="#autoSlide3" class="btn btn-circle bg-base-100 bg-opacity-50 hover:bg-opacity-70 border-none">❮</a>
-                <a href="#autoSlide2" class="btn btn-circle bg-base-100 bg-opacity-50 hover:bg-opacity-70 border-none">❯</a>
+            <img src="{{ asset('images/kurir/carousel4.png') }}" alt="Slider Image 1" />
+            <div class="absolute flex justify-between w-full top-1/2 transform -translate-y-1/2 px-4 md:px-6"> {{-- Adjust px for mobile --}}
+                <a href="#autoSlide3" class="btn btn-circle bg-base-100 bg-opacity-50 border-none">❮</a>
+                <a href="#autoSlide2" class="btn btn-circle bg-base-100 bg-opacity-50 border-none">❯</a>
             </div>
         </div>
         <div id="autoSlide2" class="carousel-item relative w-full">
-            <img src="{{ asset('images/kurir/carousel2.jpg') }}" class="w-full object-cover h-64 md:h-80 lg:h-96" alt="Slider Image 2" />
-            <div class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
-                <a href="#autoSlide1" class="btn btn-circle bg-base-100 bg-opacity-50 hover:bg-opacity-70 border-none">❮</a>
-                <a href="#autoSlide3" class="btn btn-circle bg-base-100 bg-opacity-50 hover:bg-opacity-70 border-none">❯</a>
+            <img src="{{ asset('images/kurir/carousel5.png') }}" alt="Slider Image 2" />
+            <div class="absolute flex justify-between w-full top-1/2 transform -translate-y-1/2 px-4 md:px-6"> {{-- Adjust px for mobile --}}
+                <a href="#autoSlide1" class="btn btn-circle bg-base-100 bg-opacity-50 border-none">❮</a>
+                <a href="#autoSlide3" class="btn btn-circle bg-base-100 bg-opacity-50 border-none">❯</a>
             </div>
         </div>
         <div id="autoSlide3" class="carousel-item relative w-full">
-            <img src="{{ asset('images/kurir/carousel3.png') }}" class="w-full object-cover h-64 md:h-80 lg:h-96" alt="Slider Image 3" />
-            <div class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
-                <a href="#autoSlide2" class="btn btn-circle bg-base-100 bg-opacity-50 hover:bg-opacity-70 border-none">❮</a>
-                <a href="#autoSlide1" class="btn btn-circle bg-base-100 bg-opacity-50 hover:bg-opacity-70 border-none">❯</a>
+            <img src="{{ asset('images/kurir/carousel2.jpg') }}" alt="Slider Image 3" />
+            <div class="absolute flex justify-between w-full top-1/2 transform -translate-y-1/2 px-4 md:px-6"> {{-- Adjust px for mobile --}}
+                <a href="#autoSlide2" class="btn btn-circle bg-base-100 bg-opacity-50 border-none">❮</a>
+                <a href="#autoSlide1" class="btn btn-circle bg-base-100 bg-opacity-50 border-none">❯</a>
             </div>
         </div>
     </div>
@@ -188,7 +267,7 @@
             title="Permintaan Pengiriman dan Pembayaran"
             description="Ajukan permintaan pengiriman dan lakukan pembayaran dengan mudah, cepat, dan aman dalam hitungan detik!"
             button="Buat Pengiriman"
-            link="{{ asset('kurir/kelola_status') }}"
+            link="{{ asset('login') }}"
             icon="{{ asset('images/user/2.png') }}"
         />
 
@@ -196,7 +275,7 @@
             title="Cek Tarif"
             description="Lakukan cek tarif untuk menghitung estimasi biaya pengiriman suatu paket dari lokasi pengirim ke lokasi penerima!"
             button="Lihat"
-            link="{{ asset('kurir/kelola_status') }}"
+            link="#"
             icon="{{ asset('images/user/3.png') }}"
         />
 
@@ -204,7 +283,7 @@
             title="History Pengiriman"
             description="Lihat daftar pengirimanmu kapan saja! Riwayat lengkap & transparan untuk memastikan semuanya terkendali."
             button="Lihat History"
-            link="{{ asset('kurir/history') }}"
+            link="{{ asset('login') }}"
             icon="{{ asset('images/user/4.png') }}"
         />
     </div>

@@ -1,4 +1,5 @@
 <x-app-layout>
+ 
     <div class="max-w-md mx-auto px-4 py-8">
         <h1 class="text-2xl font-bold text-center mb-4">Pengiriman Berhasil Dibuat!</h1>
         
@@ -17,17 +18,16 @@
             </div>
 
             {{-- QR Code dan Nomor Resi --}}
-            <div class="text-center my-4">
-                {{-- QR Code akan berisi URL untuk dilacak kurir --}}
-                @php
-                    $qrContent = route('kurir.scan.track', ['tracking_number' => $shipment->tracking_number]);
-                @endphp
-                <div class="inline-block p-2 border">
-                    {!! QrCode::size(120)->generate($qrContent) !!}
-                </div>
-                <p class="font-mono tracking-widest mt-2">{{ $shipment->tracking_number }}</p>
-            </div>
-            
+<div class="text-center my-4">
+    {{-- QR Code berisi URL Google Drive --}}
+    @php
+        $qrContent = 'https://sj-courier-service-production.up.railway.app/';
+    @endphp
+    <div class="inline-block p-2 border">
+        {!! QrCode::size(120)->generate($qrContent) !!}
+    </div>
+    <p class="font-mono tracking-widest mt-2">{{ $shipment->tracking_number }}</p>
+</div>
             {{-- Detail Pengirim & Penerima --}}
             <div class="grid grid-cols-2 gap-4 border-t border-b py-2 text-xs">
                 <div>
@@ -59,9 +59,14 @@
             </div>
              <p class="text-center text-xs mt-2">Terima kasih telah menggunakan layanan kami!</p>
         </div>
+<div class="text-center mt-6">
+    <a href="{{ route('User.printResi', ['shipmentID' => $shipment->shipmentID]) }}"
+       target="_blank"
+       class="btn bg-blue-500 text-white">
+       Cetak Resi
+    </a>
 
-        <div class="text-center mt-6">
-            <button onclick="window.print()" class="btn btn-primary">Cetak Label</button>
+
             <a href="{{ route('dashboard') }}" class="btn btn-ghost">Kembali ke Dashboard</a>
         </div>
     </div>

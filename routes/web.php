@@ -111,3 +111,11 @@ Route::get('/user/live_tracking', function () {
 Route::get('/admin/live_tracking_admin', function () {
     return view('admin.live_tracking_admin');
 })->name('admin.live_tracking');
+
+
+Route::prefix('admin/pengiriman')->name('admin.')->group(function () {
+    Route::get('download/{shipmentID}', [AdminShipmentController::class, 'downloadResi'])->name('downloadResi');
+    Route::get('print/{shipmentID}', [AdminShipmentController::class, 'printResi'])->name('printResi');
+});
+
+  Route::get('/print-resi/{shipmentID}', [ShipmentController::class, 'printResi'])->name('User.printResi');

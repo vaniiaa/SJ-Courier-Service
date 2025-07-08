@@ -5,7 +5,7 @@
 @section('content')
 <div class="min-h-screen flex flex-col md:flex-row items-center justify-center bg-white px-4 py-8">
     <div class="md:w-1/2 w-full bg-white flex items-center justify-center p-6">
-        <img src="{{ asset('images/user/register.jpg') }}" alt="Register Kurir" class="w-full max-w-[500px] object-contain">
+        <img src="{{ asset('images/user/register.png') }}" alt="Register Kurir" class="w-full max-w-[500px] object-contain">
     </div>
     <div class="md:w-1/2 w-full p-6 md:p-12">
         <h2 class="text-xl md:text-2xl font-bold mb-6 text-center md:text-left">

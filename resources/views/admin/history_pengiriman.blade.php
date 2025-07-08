@@ -81,16 +81,20 @@
                                 @endif">
                                 {{ ucfirst($data->currentStatus) }}
                             </td>
-                            <td class="px-4 py-2 text-center">
-                                <div class="flex justify-center gap-2">
-                                    <a href="/admin/pengiriman/download/{{ $data->resi }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-xs shadow-md shadow-gray-700" title="Unduh">
-                                        <i class="fas fa-download"></i>
-                                    </a>
-                                    <a href="/admin/pengiriman/print/{{ $data->resi }}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-xs shadow-md shadow-gray-700" title="Print">
-                                        <i class="fas fa-print"></i>
-                                    </a>
-                                </div>
-                            </td>
+                           <td class="px-4 py-2 text-center">
+    <div class="flex justify-center gap-2">
+        <a href="{{ route('admin.downloadResi', ['shipmentID' => $data->shipmentID]) }}"
+           class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-xs shadow-md shadow-gray-700"
+           title="Unduh">
+            <i class="fas fa-download"></i>
+        </a>
+        <a href="{{ route('admin.printResi', ['shipmentID' => $data->shipmentID]) }}"
+           class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-xs shadow-md shadow-gray-700"
+           title="Print">
+            <i class="fas fa-print"></i>
+        </a>
+    </div>
+</td>
                         </tr>
                     @empty
                         <tr>
@@ -113,7 +117,7 @@
 
                     @foreach ($pengiriman->getUrlRange(1, $pengiriman->lastPage()) as $page => $url)
                         @if ($page == $pengiriman->currentPage())
-                            <span class="px-3 py-2 border border-gray-300 bg-blue-500 text-white font-semibold">{{ $page }}</span>
+                            <span class="px-3 py-2 border border-gray-300 bg-yellow-400 text-white font-semibold">{{ $page }}</span>
                         @else
                             <a href="{{ $url }}" class="px-3 py-2 border border-gray-300 bg-white text-gray-700 hover:bg-blue-100">{{ $page }}</a>
                         @endif

@@ -10,6 +10,8 @@ use App\Models\User;
 use App\Models\TrackingHistory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Barryvdh\DomPDF\Facade\Pdf; //untuk membuat file PDF menggunakan dompdf
 
 
 class ShipmentController extends Controller
@@ -155,5 +157,26 @@ class ShipmentController extends Controller
 
         return view('admin.history_pengiriman', compact('pengiriman'));
     }
+
+     public function downloadResi($id)
+{
+    $shipment = Shipment::findOrFail($id);  // gunakan Shipment, bukan Pengiriman
+    $qrContent = 'https://sj-courier-service-production.up.railway.app/';
+    $qrcode = base64_encode(QrCode::format('png')->size(150)->generate($qrContent));
+
+    $pdf = PDF::loadView('admin.resi_pdf', compact('shipment', 'qrcode'))
+             ->setPaper([0, 0, 283.46, 340.157]);
+
+    return $pdf->download('resi_' . $shipment->tracking_number . '.pdf');
+}
+
+public function printResi($id)
+{
+    $shipment = Shipment::findOrFail($id);  // gunakan Shipment, bukan Pengiriman
+    $qrContent = 'https://sj-courier-service-production.up.railway.app/';
+    $qrcode = base64_encode(QrCode::format('png')->size(70)->generate($qrContent));
+
+    return view('admin.resi_print', compact('shipment', 'qrcode'));
+}
 
 }

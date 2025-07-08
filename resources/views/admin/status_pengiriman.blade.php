@@ -105,7 +105,7 @@
                     {{-- Page Numbers --}}
                     @foreach ($pengiriman->getUrlRange(1, $pengiriman->lastPage()) as $page => $url)
                         @if ($page == $pengiriman->currentPage())
-                            <span class="px-3 py-2 border border-gray-300 bg-blue-500 text-white font-semibold">{{ $page }}</span>
+                            <span class="px-3 py-2 border border-gray-300 bg-yellow-400 text-white font-semibold">{{ $page }}</span>
                         @else
                             <a href="{{ $url }}" class="px-3 py-2 border border-gray-300 bg-white text-gray-700 hover:bg-blue-100">{{ $page }}</a>
                         @endif

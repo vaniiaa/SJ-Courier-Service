@@ -2,7 +2,8 @@
     {{-- Menggunakan komponen layout utama Anda yang sudah ada --}}
     <div class="relative">
         <!-- Background orange dari desain Anda -->
-        <div class="bg-yellow-400 p-6 shadow-md h-40 w-full absolute top-0 left-0 z-0"></div>
+        <div class="bg-[rgba(255,165,0,0.75)] p-6 shadow-md h-40 absolute top-0 left-1/2 transform -translate-x-1/2 z-0" 
+             style="width: 100vw; margin-left: -50vw; left: 50%;"></div>
 
         <div class="relative z-10 max-w-4xl mx-auto px-4 py-8">
             <h1 class="text-2xl font-bold text-black mb-8 text-center">Buat Pengiriman Baru: Isi Detail</h1>

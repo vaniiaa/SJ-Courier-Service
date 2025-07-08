@@ -172,11 +172,14 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan shipment via AJAX.
                             <td class="px-4 py-2 text-center">
                                 <div class="flex justify-center gap-2">
                                     {{-- Tombol Print --}}
-                                    <button onclick="printshipment('{{ $shipment->resi }}')" class="w-16 bg-green-500 hover:bg-green-600 text-white py-1 rounded text-xs shadow-md shadow-gray-700 flex justify-center items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V4h12v5M6 14h12v6H6v-6zM6 14H4a2 2 0 01-2-2V9a2 2 0 012-2h16a2 2 0 012 2v3a2 2 0 01-2 2h-2" />
-                                        </svg>
-                                    </button>
+                                    <button 
+    onclick="window.open('{{ route('admin.printResi', ['shipmentID' => $shipment->shipmentID]) }}', '_blank')" 
+    class="w-16 bg-green-500 hover:bg-green-600 text-white py-1 rounded text-xs shadow-md shadow-gray-700 flex justify-center items-center"
+>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V4h12v5M6 14h12v6H6v-6zM6 14H4a2 2 0 01-2-2V9a2 2 0 012-2h16a2 2 0 012 2v3a2 2 0 01-2 2h-2" />
+    </svg>
+</button>
 
                                     {{-- Tombol "Kurir" hanya muncul jika `kurir_id` belum ditentukan (NULL) --}}
                                     @if (empty($shipment->courierUserID))
@@ -353,7 +356,7 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan shipment via AJAX.
 
                 <div class="flex justify-end space-x-4 mt-6">
                     <button type="button" onclick="closeModal()" class="btn btn-ghost">Batal</button>
-                    <button type="submit" class="btn btn-primary">Tugaskan Kurir</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 shadow">Tugaskan Kurir</button>
                 </div>
             </form>
         </div>
