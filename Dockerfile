@@ -1,45 +1,31 @@
-# Stage 1: Composer build (pakai php:8.2-cli)
-FROM php:8.2-cli as builder
+FROM php:8.2-cli
 
-# Install PHP extensions needed to run Composer in Laravel
+# Install dependencies
 RUN apt-get update && apt-get install -y \
-    unzip zip git curl libpng-dev libjpeg-dev libfreetype6-dev \
-    libonig-dev libxml2-dev libzip-dev libpq-dev \
+    git curl zip unzip libonig-dev libxml2-dev libzip-dev libpng-dev libjpeg-dev libfreetype6-dev libpq-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_pgsql mbstring zip exif pcntl gd
 
 # Install Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-WORKDIR /app
-
-COPY . .
-
-# Install composer dependencies
-RUN composer install --no-dev --optimize-autoloader
-
-# Stage 2: Runtime (php-fpm + Caddy)
-FROM php:8.2-fpm
-
-RUN apt-get update && apt-get install -y \
-    curl git zip unzip libpng-dev libjpeg-dev libfreetype6-dev \
-    libonig-dev libxml2-dev libzip-dev libpq-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_pgsql mbstring zip exif pcntl gd \
-    && curl -fsSL https://get.caddyserver.com | bash -s personal
-
+# Set working directory
 WORKDIR /var/www
 
-# Copy project from builder
-COPY --from=builder /app /var/www
+# Copy app files
+COPY . .
 
-# Set permission
-RUN chown -R www-data:www-data /var/www \
-    && chmod -R 755 storage bootstrap/cache
+# Install PHP dependencies
+RUN composer install --no-dev --optimize-autoloader
 
-# Copy Caddyfile
-COPY Caddyfile /etc/caddy/Caddyfile
+# Laravel permissions
+RUN chmod -R 755 storage bootstrap/cache \
+    && mkdir -p storage/framework/{sessions,views,cache} \
+    && chown -R www-data:www-data storage bootstrap/cache
 
+# Railway requires this
+ENV PORT=8080
 EXPOSE 8080
 
-CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
+# Laravel entrypoint — jangan pakai config:cache di build karena butuh ENV
+CMD ["sh", "-c", "php artisan config:clear && php artisan view:clear && php artisan cache:clear && php artisan serve --host=0.0.0.0 --port=8080"]
