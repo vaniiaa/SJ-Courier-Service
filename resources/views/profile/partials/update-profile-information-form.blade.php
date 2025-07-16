@@ -1,10 +1,4 @@
-<div class="bg-[rgba(255,165,0,0.75)] p-6 shadow-md h-40 w-full" style="width: 100vw; margin-left: calc(-50vw + 50%); margin-right: calc(-50vw + 50%);">
-    <div class="max-w-[90rem] mx-auto px-6"> <!-- Tambahkan pembungkus agar sejajar -->
-        <h1 class="text-2xl font-bold text-black">Profile</h1>
-    </div>
-</div>
-
-<section class="max-w-[90rem] mx-auto relative px-4 z-10" style="margin-top: -4rem;">
+<section class="max-w-[90rem] mx-auto relative px-4 z-10" style="margin-top: -8rem;">
     <div class="bg-white rounded-lg shadow-lg p-6 mb-20">
         {{-- Ini adalah "kartu besar" putih yang membungkus semua --}}
 

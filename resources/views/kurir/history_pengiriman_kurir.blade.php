@@ -59,7 +59,14 @@
                             <td class="px-4 py-2 text-center">{{ $shipment->weightKG }}</td>
                             <td class="px-4 py-2 text-center">{{ number_format($shipment->finalPrice, 0, ',', '.') }}</td>
                             <td class="px-4 py-2 text-center">{{ $shipment->order->payments->first()->paymentMethod ?? '-' }}</td>
-                            <td class="px-4 py-2 text-center font-semibold text-green-600">{{ ucfirst($shipment->currentStatus) }}</td>
+                            <td class="px-4 py-2 text-center font-semibold
+                                @php $status = strtolower(trim($shipment->currentStatus)); @endphp
+                                @if ($status === 'Pesanan selesai') text-green-600
+                                @elseif ($status === 'dibatalkan' || $status === 'dikembalikan') text-red-600
+                                @else text-gray-700
+                                @endif">
+                                {{ $shipment->currentStatus }}
+                            </td>
                             <td class="px-4 py-2 text-center">
                                 @if ($shipment->delivery_proof)
                                     <a href="{{ asset('storage/' . $shipment->delivery_proof) }}" target="_blank" class="text-blue-500 hover:underline">Lihat Gambar</a>

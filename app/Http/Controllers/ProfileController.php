@@ -18,7 +18,24 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
-        return view('profile.edit', [
+        $user = Auth::user();
+        $viewName = '';
+
+        // Tentukan view mana yang akan digunakan berdasarkan peran
+        switch ($user->role->role_name) {
+            case 'admin':
+                $viewName = 'admin.profile';
+                break;
+            case 'courier':
+                $viewName = 'kurir.profile';
+                break;
+            default: // Untuk customer dan peran lainnya
+                $viewName = 'profile.edit';
+                break;
+        }
+
+        // Kembalikan view yang sudah dipilih dengan data user
+        return view($viewName, [
             'user' => $request->user(),
         ]);
     }

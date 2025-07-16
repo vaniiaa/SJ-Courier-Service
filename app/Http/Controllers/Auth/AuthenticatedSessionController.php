@@ -29,14 +29,28 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        $user = auth()->user();
-        if ($user->role && $user->role->role_name == 'admin') {
-            return redirect()->intended('/admin/dashboard_admin');
-            } elseif ($user->role && $user->role->role_name == 'courier') {
-            return redirect()->intended('/courier/dashboard');
-            } else {
-            return redirect()->intended(RouteServiceProvider::HOME);
+        $user = $request->user();
+        $redirectUrl = RouteServiceProvider::HOME; // Default redirect untuk customer
+
+        // Pastikan user memiliki relasi 'role' untuk menghindari error
+        if ($user->role) {
+            switch ($user->role->role_name) {
+                case 'admin':
+                    // Gunakan named route untuk admin
+                    $redirectUrl = route('admin.dashboard_admin');
+                    break;
+                case 'courier':
+                    // Gunakan named route untuk kurir
+                    $redirectUrl = route('kurir.dashboard');
+                    break;
+                case 'customer':
+                    // Gunakan named route untuk customer (sesuai default)
+                    $redirectUrl = route('dashboard');
+                    break;
             }
+        }
+
+        return redirect()->intended($redirectUrl);
     }
 
 

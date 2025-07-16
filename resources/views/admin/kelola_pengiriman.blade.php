@@ -162,47 +162,50 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan shipment via AJAX.
                             <td class="px-4 py-2 text-center">{{ $shipment->courier->name ?? 'Belum Ditentukan' }}</td>
                             {{-- Menampilkan status pengiriman dengan warna berdasarkan status --}}
                             <td class="px-4 py-2 text-center font-semibold text-sm
-                                @if ($shipment->currentStatus === 'menunggu konfirmasi') text-gray-600
-                                @elseif ($shipment->currentStatus === 'sedang dikirim') text-red-600
-                                @elseif ($shipment->currentStatus === 'menuju alamat') text-blue-600
-                                @elseif ($shipment->currentStatus === 'pesanan diterima') text-green-600
+                                @php $status = strtolower(trim($shipment->currentStatus)); @endphp
+                                @if ($status === 'menunggu konfirmasi') text-gray-500
+                                @elseif ($status === 'kurir ditugaskan') text-blue-600
+                                @elseif ($status === 'kurir menuju lokasi penjemputan') text-yellow-600
+                                @elseif ($status === 'paket telah di-pickup') text-purple-600
+                                @elseif ($status === 'dalam perjalanan ke penerima') text-red-600
+                                @elseif ($status === 'pesanan selesai') text-green-600
+                                @else text-black
                                 @endif">
                                 {{ $shipment->currentStatus }}
                             </td>
+                            {{-- Tombol Aksi --}}
                             <td class="px-4 py-2 text-center">
                                 <div class="flex justify-center gap-2">
                                     {{-- Tombol Print --}}
-                                    <button 
-    onclick="window.open('{{ route('admin.printResi', ['shipmentID' => $shipment->shipmentID]) }}', '_blank')" 
-    class="w-16 bg-green-500 hover:bg-green-600 text-white py-1 rounded text-xs shadow-md shadow-gray-700 flex justify-center items-center"
->
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V4h12v5M6 14h12v6H6v-6zM6 14H4a2 2 0 01-2-2V9a2 2 0 012-2h16a2 2 0 012 2v3a2 2 0 01-2 2h-2" />
-    </svg>
-</button>
+                                    <button onclick="window.open('{{ route('admin.printResi', ['shipmentID' => $shipment->shipmentID]) }}', '_blank')" class="w-16 bg-green-500 hover:bg-green-600 text-white py-1 rounded text-xs shadow-md shadow-gray-700 flex justify-center items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V4h12v5M6 14h12v6H6v-6zM6 14H4a2 2 0 01-2-2V9a2 2 0 012-2h16a2 2 0 012 2v3a2 2 0 01-2 2h-2" />
+                                        </svg>
+                                    </button>
 
                                     {{-- Tombol "Kurir" hanya muncul jika `kurir_id` belum ditentukan (NULL) --}}
                                     @if (empty($shipment->courierUserID))
-                                        <button type="button" class="w-16 bg-red-500 text-white py-1 rounded text-xs hover:bg-red-600 shadow-md shadow-gray-700"  onclick="openModal('{{ $shipment->shipmentID }}')">Kurir</button>
+                                    <button type="button" onclick="openModal(this)" class="w-16 bg-red-500 text-white py-1 rounded text-xs hover:bg-red-600 shadow-md shadow-gray-700"
+                                        data-shipment-id="{{ $shipment->shipmentID }}"
+                                        data-catatan-customer="{{ $shipment->order->notes ?? '' }}">
+                                        Kurir
+                                    </button>
                                     @endif
 
                                     {{-- Tombol "Detail" --}}
-                                    <button
-                                        class="px-3 bg-blue-500 text-white py-1 rounded text-xs hover:bg-blue-600 shadow-md shadow-gray-700"
-                                        onclick="showDetailModal(
-                                            '{{ $shipment->tracking_number }}',
-                                            '{{ $shipment->order->sender->name }}',
-                                            '{{ $shipment->order->pickupAddress }}',
-                                            '{{ $shipment->order->receiverName }}',
-                                            '{{ $shipment->order->receiverAddress }}',
-                                            '{{ $shipment->courier->name ?? 'Belum Ditentukan' }}',
-                                            '{{ \Carbon\Carbon::parse($shipment->created_at)->format('Y-m-d') }}',
-                                            '{{ $shipment->weightKG }}',
-                                            '{{ number_format($shipment->finalPrice, 0, ',', '.') }}',
-                                            '{{ ucfirst($shipment->currentStatus) }}',
-                                            '{{ $shipment->noteadmin ?? '' }}', //Meneruskan catatan ke modal detail 
-                                        )"
-                                    > Detail
+                                    <button type="button" onclick="showDetailModal(this)" class="px-3 bg-blue-500 text-white py-1 rounded text-xs hover:bg-blue-600 shadow-md shadow-gray-700"
+                                        data-resi="{{ $shipment->tracking_number }}"
+                                        data-pengirim="{{ $shipment->order->sender->name ?? 'N/A' }}"
+                                        data-alamat-jemput="{{ $shipment->order->pickupAddress }}"
+                                        data-penerima="{{ $shipment->order->receiverName }}"
+                                        data-alamat-tujuan="{{ $shipment->order->receiverAddress }}"
+                                        data-kurir="{{ $shipment->courier->name ?? 'Belum Ditentukan' }}"
+                                        data-tanggal="{{ $shipment->created_at->format('Y-m-d') }}"
+                                        data-berat="{{ $shipment->weightKG }} Kg"
+                                        data-harga="Rp{{ number_format($shipment->finalPrice) }}"
+                                        data-status="{{ ucfirst($shipment->currentStatus) }}"
+                                        data-catatan="{{ $shipment->order->notes ?? 'Tidak ada catatan' }}">
+                                        Detail
                                     </button>
                                 </div>
                             </td>
@@ -347,16 +350,18 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan shipment via AJAX.
 
                 <div class="mb-4">
                     <label for="pickupTimestamp" class="block text-sm font-medium text-gray-700">Tanggal Pengiriman</label>
-                    <input type="datetime-local" id="pickupTimestamp" name="pickupTimestamp" required class="mt-1 block w-full px-3 py-2 border bg-white border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">                </div>
+                    <input type="datetime-local" id="pickupTimestamp" name="pickupTimestamp" required class="mt-1 block w-full px-3 py-2 border bg-white border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">                
+                </div>
 
                 <div class="mb-4">
-                    <label for="noteadmin" class="block text-sm font-medium text-gray-700">Catatan</label>
-                    <textarea id="noteadmin" name="noteadmin" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    <label for="catatanKurirModal" class="block text-sm font-medium text-gray-700">Catatan dari Customer</label>
+                    <textarea id="catatanKurirModal" name="notes" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-gray-100 rounded-md focus:ring-blue-500 focus:border-blue-500" ></textarea>
                 </div>
 
                 <div class="flex justify-end space-x-4 mt-6">
                     <button type="button" onclick="closeModal()" class="btn btn-ghost">Batal</button>
                     <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 shadow">Tugaskan Kurir</button>
+
                 </div>
             </form>
         </div>
@@ -364,85 +369,147 @@ Ini penting untuk keamanan Laravel, terutama saat mengirimkan shipment via AJAX.
 
  {{-- Script JavaScript --}}
     @push('scripts')
-    <script>
+<script>
+    // Menunggu seluruh konten halaman siap sebelum menjalankan JavaScript
+    document.addEventListener('DOMContentLoaded', function() {
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const areaSelect = document.getElementById('area_id');
-            const kurirSelect = document.getElementById('kurir_id');
-            const formTentukanKurir = document.getElementById('formTentukanKurir');
+        // --- LOGIKA UNTUK MODAL PENJADWALAN KURIR ---
+        const modalKurir = document.getElementById('modalTentukanKurir');
+        const buttonsBukaModalKurir = document.querySelectorAll('.btn-buka-modal-kurir');
 
-            // Event listener untuk dropdown area
+        buttonsBukaModalKurir.forEach(button => {
+            button.addEventListener('click', function() {
+                const shipmentId = this.dataset.shipmentId;
+                const catatanCustomer = this.dataset.catatanCustomer;
+
+                // Mengisi data ke dalam form di modal
+                modalKurir.querySelector('#shipmentIdToAssign').value = shipmentId;
+                modalKurir.querySelector('#catatanKurirModal').value = catatanCustomer;
+
+                // Menampilkan modal
+                modalKurir.classList.remove('hidden');
+            });
+        });
+
+        // Event untuk tombol batal/close di modal kurir
+        modalKurir.querySelector('button[onclick="closeModal()"]').addEventListener('click', function() {
+            modalKurir.classList.add('hidden');
+            modalKurir.querySelector('#formTentukanKurir').reset();
+            modalKurir.querySelector('#kurir_id').innerHTML = '<option value="">Pilih wilayah dahulu...</option>';
+        });
+
+
+        // --- LOGIKA UNTUK MODAL DETAIL PENGIRIMAN ---
+        const modalDetail = document.getElementById('modalDetail');
+        const buttonsBukaModalDetail = document.querySelectorAll('.btn-buka-modal-detail');
+
+        buttonsBukaModalDetail.forEach(button => {
+            button.addEventListener('click', function() {
+                const data = this.dataset; // Mengambil semua atribut data-*
+
+                // Mengisi data ke setiap input di modal detail
+                modalDetail.querySelector('#resiDetail').value = data.resi;
+                modalDetail.querySelector('#pengirimDetail').value = data.pengirim;
+                modalDetail.querySelector('#alamatJemputDetail').value = data.alamatJemput;
+                modalDetail.querySelector('#penerimaDetail').value = data.penerima;
+                modalDetail.querySelector('#alamatTujuanDetail').value = data.alamatTujuan;
+                modalDetail.querySelector('#tanggalDetail').value = data.tanggal;
+                modalDetail.querySelector('#beratDetail').value = data.berat;
+                modalDetail.querySelector('#hargaDetail').value = data.harga;
+                modalDetail.querySelector('#kurirDetail').value = data.kurir;
+                modalDetail.querySelector('#statusDetail').value = data.status;
+                modalDetail.querySelector('#catatanDetail').value = data.catatan;
+
+                // Menampilkan modal
+                modalDetail.classList.remove('hidden');
+            });
+        });
+
+        // Event untuk tombol tutup di modal detail
+        modalDetail.querySelector('button[onclick="closeDetailModal()"]').addEventListener('click', function() {
+            modalDetail.classList.add('hidden');
+        });
+
+
+        // --- LOGIKA AJAX UNTUK DROPDOWN & SUBMIT FORM KURIR ---
+        const areaSelect = document.getElementById('area_id');
+        const kurirSelect = document.getElementById('kurir_id');
+        const formTentukanKurir = document.getElementById('formTentukanKurir');
+
+        // Event listener untuk dropdown area
         areaSelect.addEventListener('change', async function() {
             const selectedAreaId = this.value;
             kurirSelect.innerHTML = '<option value="">Memuat kurir...</option>';
             kurirSelect.disabled = true;
 
             if (!selectedAreaId) {
-            kurirSelect.innerHTML = '<option value="">Pilih wilayah dahulu...</option>';
-            return;
-    }
+                kurirSelect.innerHTML = '<option value="">Pilih wilayah dahulu...</option>';
+                return;
+            }
 
-    const url = `{{ url('/admin/couriers/by-area') }}/${selectedAreaId}`;
-    try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Gagal mengambil data kurir');
-        const couriers = await response.json();
-        kurirSelect.innerHTML = '<option value="">Pilih kurir...</option>';
-        if (couriers.length === 0) {
-            kurirSelect.innerHTML = '<option value="">Tidak ada kurir di area ini</option>';
-        } else {
-            couriers.forEach(kurir => {
-                const option = document.createElement('option');
-                option.value = kurir.id;
-                option.textContent = kurir.name;
-                kurirSelect.appendChild(option);
-            });
-        }
-        kurirSelect.disabled = false;
-    } catch (error) {
-        kurirSelect.innerHTML = '<option value="">Gagal memuat kurir</option>';
-        kurirSelect.disabled = false;
-    }
-});
-
-            // Event listener untuk submit form (AJAX)
-            formTentukanKurir.addEventListener('submit', async function(event) {
-                event.preventDefault();
-                const formData = new FormData(this);
-                const submitButton = this.querySelector('button[type="submit"]');
-                submitButton.classList.add('btn-disabled');
-                submitButton.textContent = 'Menyimpan...';
-
-                try {
-                    const response = await fetch("{{ route('shipments.assignCourier') }}", {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                            'Accept': 'application/json',
-                        }
+            const url = `{{ url('/admin/couriers/by-area') }}/${selectedAreaId}`;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Gagal mengambil data kurir');
+                const couriers = await response.json();
+                
+                kurirSelect.innerHTML = '<option value="">Pilih kurir...</option>';
+                if (couriers.length === 0) {
+                    kurirSelect.innerHTML = '<option value="" disabled>Tidak ada kurir di area ini</option>';
+                } else {
+                    couriers.forEach(kurir => {
+                        const option = document.createElement('option');
+                        option.value = kurir.id;
+                        option.textContent = kurir.name;
+                        kurirSelect.appendChild(option);
                     });
-
-                    const result = await response.json();
-
-                    if (!response.ok) {
-                        // Tampilkan error validasi atau server
-                        alert('Gagal: ' + (result.message || 'Terjadi kesalahan.'));
-                    } else {
-                        // Tampilkan notifikasi sukses
-                        alert('Sukses: ' + result.message);
-                        closeModal();
-                        location.reload(); // Reload halaman untuk melihat perubahan status
-                    }
-                } catch (error) {
-                    console.error('Error submitting form:', error);
-                    alert('Gagal mengirim permintaan. Periksa koneksi Anda.');
-                } finally {
-                    submitButton.classList.remove('btn-disabled');
-                    submitButton.textContent = 'Tugaskan Kurir';
                 }
-            });
+            } catch (error) {
+                console.error('Error fetching couriers:', error);
+                kurirSelect.innerHTML = '<option value="" disabled>Gagal memuat kurir</option>';
+            } finally {
+                kurirSelect.disabled = false;
+            }
         });
-    </script>
-    @endpush
+
+        // Event listener untuk submit form penugasan kurir
+        formTentukanKurir.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const submitButton = this.querySelector('button[type="submit"]');
+            
+            submitButton.disabled = true;
+            submitButton.textContent = 'Menyimpan...';
+
+            try {
+                const response = await fetch("{{ route('shipments.assignCourier') }}", {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                    }
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'Terjadi kesalahan.');
+                }
+                
+                alert('Sukses: ' + result.message);
+                location.reload(); // Muat ulang halaman untuk melihat perubahan
+                
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                alert('Gagal: ' + error.message);
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Tugaskan Kurir';
+            }
+        });
+
+    });
+</script>
+@endpush
 @endsection

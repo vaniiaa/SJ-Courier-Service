@@ -15,14 +15,36 @@ class VerifyEmailController extends Controller
      */
     public function __invoke(EmailVerificationRequest $request): RedirectResponse
     {
+        $user = $request->user();
+
         if ($request->user()->hasVerifiedEmail()) {
-            return redirect()->intended(RouteServiceProvider::HOME.'?verified=1');
+            return redirect()->intended($this->redirectPath($user).'?verified=1');
         }
 
         if ($request->user()->markEmailAsVerified()) {
             event(new Verified($request->user()));
         }
 
-        return redirect()->intended(RouteServiceProvider::HOME.'?verified=1');
+        return redirect()->intended($this->redirectPath($user).'?verified=1');
+    }
+
+    /**
+     * Get the post-verification redirect path based on user role.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @return string
+     */
+    protected function redirectPath($user): string
+    {
+        if ($user->role) {
+            switch ($user->role->role_name) {
+                case 'admin':
+                    return route('admin.dashboard_admin');
+                case 'courier':
+                    return route('kurir.dashboard');
+            }
+        }
+
+        return RouteServiceProvider::HOME; // Default for customer
     }
 }

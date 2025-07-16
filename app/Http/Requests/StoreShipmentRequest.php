@@ -24,16 +24,19 @@ class StoreShipmentRequest extends FormRequest
     {
         return [
             'pickupAddress' => 'required|string|max:255',
+            'pickupKecamatan' => 'required|string|max:100',
             'pickupLatitude' => 'required|numeric|between:-90,90',
             'pickupLongitude' => 'required|numeric|between:-180,180',
             'receiverName' => 'required|string|max:100',
             'receiverAddress' => 'required|string|max:255',
+            'receiverKecamatan' => 'required|string|max:100',
             'receiverLatitude' => 'required|numeric|between:-90,90',
             'receiverLongitude' => 'required|numeric|between:-180,180',
             'receiverPhoneNumber' => 'required|string|regex:/^[0-9\+\-\(\)\s]{7,20}$/',
             'itemType' => 'required|string|max:100',
             'weightKG' => 'required|numeric|min:0.1|max:1000', // Sesuaikan max weight
             'notes' => 'nullable|string|max:500',
+            
         ];
     }
 
@@ -44,6 +47,7 @@ class StoreShipmentRequest extends FormRequest
     {
         return [
             'pickupAddress.required' => 'Alamat penjemputan wajib diisi.',
+            'pickupKecamatan.required' => 'Kecamatan penjemputan wajib diisi.',
             'pickupLatitude.required' => 'Koordinat latitude penjemputan wajib ada.',
             'pickupLatitude.numeric' => 'Koordinat latitude penjemputan harus angka.',
             'pickupLatitude.between' => 'Koordinat latitude penjemputan tidak valid.',
@@ -52,6 +56,7 @@ class StoreShipmentRequest extends FormRequest
             'pickupLongitude.between' => 'Koordinat longitude penjemputan tidak valid.',
             'receiverName.required' => 'Nama penerima wajib diisi.',
             'receiverAddress.required' => 'Alamat penerima wajib diisi.',
+            'receiverKecamatan.required' => 'Kecamatan penerima wajib diisi.',
             'receiverLatitude.required' => 'Koordinat latitude penerima wajib ada.',
             'receiverLatitude.numeric' => 'Koordinat latitude penerima harus angka.',
             'receiverLatitude.between' => 'Koordinat latitude penerima tidak valid.',

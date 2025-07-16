@@ -5,7 +5,7 @@ if (!function_exists('getNavigationLinks')) {
         if (!$user) {
             return [
                 ['label' => 'Layanan', 'children' => [
-                    ['label' => 'Live Tracking', 'url' => route('login')],
+                    ['label' => 'Live Tracking', 'url' => url('/#tab-tracking-content')],
                     ['label' => 'Pengiriman', 'url' => route('login')],
                 ]],
             ];
@@ -27,9 +27,10 @@ if (!function_exists('getNavigationLinks')) {
             ['label' => 'Layanan', 'children' => [
                 // Arahkan ke dashboard, tempat widget tracking berada
                 ['label' => 'Live Tracking', 'url' => route('user.live_tracking')],
-                ['label' => 'Permintaan Pengiriman', 'url' => route('shipments.create.step1')],
-                ['label' => 'Daftar Pengiriman', 'url' => route('customer.active')],
-                ['label' => 'History Pengiriman', 'url' => route('customer.history')],
+                ['label' => 'Permintaan Pengiriman', 'url' => route('user.form_pengiriman')],
+                ['label' => 'Daftar Pengiriman', 'url' => route('user.daftar_pengiriman')],
+                ['label' => 'History Pengiriman', 'url' => route('user.history')],
+
             ]],
         ];
     }

@@ -30,7 +30,26 @@
     [x-cloak] { display: none !important; }
 </style>
 
-<div class="absolute top-32 left-0 right-0 px-4" x-data="{ showModal: false, showStatus: false, selectedData: {} }" @keydown.escape.window="showModal = false; showStatus = false">
+<div class="absolute top-32 left-0 right-0 px-4" <div class="absolute top-32 left-0 right-0 px-4" 
+    x-data="{ 
+        showModal: false, 
+        showStatus: false, 
+        selectedData: {}, 
+        nextStatus: '',
+        transitions: {
+            'menunggu konfirmasi': [{ value: 'kurir menuju lokasi penjemputan', text: 'Mulai Menuju Lokasi Penjemputan' }],
+            'kurir ditugaskan': [{ value: 'kurir menuju lokasi penjemputan', text: 'Mulai Menuju Lokasi Penjemputan' }],
+            'kurir menuju lokasi penjemputan': [{ value: 'paket telah di-pickup', text: 'Konfirmasi Paket Telah Di-pickup' }],
+            'paket telah di-pickup': [{ value: 'dalam perjalanan ke penerima', text: 'Mulai Antar ke Penerima' }],
+            'dalam perjalanan ke penerima': [{ value: 'pesanan selesai', text: 'Konfirmasi Pesanan Selesai' }]
+        },
+        get availableOptions() {
+            if (!this.selectedData.status) return [];
+            const currentStatusKey = this.selectedData.status.toLowerCase().trim();
+            return this.transitions[currentStatusKey] || [];
+        }
+    }" 
+    @keydown.escape.window="showModal = false; showStatus = false">
     <div class="max-w-[90rem] mx-auto bg-white rounded-lg shadow-lg mb-20 p-4">
         {{-- Search Bar --}}
         <div class="flex justify-end items-center mb-4">
@@ -78,12 +97,16 @@
                             <td class="px-4 py-2 text-center">{{ number_format($shipment->finalPrice, 0, ',', '.') }}</td>
                             <td class="px-4 py-2 text-center">{{ $shipment->courier->name ?? 'N/A' }}</td>
                             <td class="px-4 py-2 text-center font-semibold text-sm
-                                @if ($shipment->currentStatus === 'menunggu konfirmasi') text-gray-600
-                                @elseif ($shipment->currentStatus === 'sedang dikirim') text-red-600
-                                @elseif ($shipment->currentStatus === 'menuju alamat') text-blue-600
-                                @elseif ($shipment->currentStatus === 'pesanan selesai') text-green-600
+                                @php $status = strtolower(trim($shipment->currentStatus)); @endphp
+                                @if ($status === 'menunggu konfirmasi') text-gray-500
+                                @elseif ($status === 'kurir ditugaskan') text-blue-600
+                                @elseif ($status === 'kurir menuju lokasi penjemputan') text-yellow-600
+                                @elseif ($status === 'paket telah di-pickup') text-purple-600
+                                @elseif ($status === 'dalam perjalanan ke penerima') text-red-600
+                                @elseif ($status === 'pesanan selesai') text-green-600
+                                @else text-black
                                 @endif">
-                                {{ ucfirst($shipment->currentStatus) }}
+                                {{ $shipment->currentStatus }}
                             </td>
                             <td class="px-4 py-2 text-center">
                                 {{-- Tampilkan gambar bukti jika ada, atau teks 'Menunggu Konfirmasi' --}}
@@ -260,133 +283,44 @@
         </div>
 
         {{-- Modal Konfirmasi Status --}}
-        <div
-            x-show="showStatus"
-            x-transition
-            @keydown.escape.window="showStatus = false"
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-        >
-            <div
-                @click.away="showStatus = false"
-                x-data="{ open: false, selected: 'Pilih Status' }" {{-- Pindahkan x-data ke sini --}}
-                class="bg-white rounded-xl shadow-xl w-full max-w-2xl mx-4 min-h-[40px] overflow-visible relative"
-            >
-                <button
-                    @click="showStatus = false"
-                    class="absolute top-2 right-2 text-gray-600 text-xl font-bold focus:outline-none"
-                    aria-label="Tutup"
-                >
-                    ×
-                </button>
-
-                <div class="flex items-center gap-3 px-6 py-3 border-b border-gray-200">
-                    <img src="{{ asset('images/admin/logo2.jpg') }}" alt="Logo" class="w-16 h-16 object-cover rounded-full">
-                    <h2 class="text-lg font-semibold text-gray-800">Konfirmasi Status</h2>
+        <div x-show="showStatus" x-transition @keydown.escape.window="showStatus = false" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" x-cloak>
+            <div @click.away="showStatus = false" class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4">
+                <div class="flex items-center justify-between px-6 py-4 border-b">
+                    <h2 class="text-lg font-semibold">Konfirmasi Status</h2>
+                    <button @click="showStatus = false" class="text-gray-500 text-2xl">&times;</button>
                 </div>
+                <form action="{{ route('shipment.updateStatus') }}" method="POST" enctype="multipart/form-data" class="p-6">
+                    @csrf
+                    <input type="hidden" name="shipmentID" :value="selectedData.id">
+                    
+                    {{-- PERBAIKAN 2: Baris untuk debugging, untuk melihat status yang diterima --}}
+                    <div class="mb-4 p-2 bg-gray-100 rounded">
+                        <p class="text-sm">Status Saat Ini: <strong x-text="selectedData.status || 'Tidak Terbaca'"></strong></p>
+                    </div>
 
-                <div class="px-6 py-5 grid grid-cols-1 gap-6 text-gray-700 text-sm">
-                    <form
-                        action="{{ route('shipment.updateStatus') }}"
-                        method="POST"
-                        enctype="multipart/form-data"
-                        x-init="
-                            // Set nilai awal dropdown jika selectedData.status ada
-                            if (selectedData.status) {
-                                // Normalisasi status string agar cocok dengan pilihan dropdown
-                                let normalizedStatus = selectedData.status.toLowerCase();
-                                if (normalizedStatus.includes('sedang dikirim')) {
-                                    selected = 'Sedang Dikirim';
-                                } else if (normalizedStatus.includes('menuju alamat')) {
-                                    selected = 'Menuju Alamat';
-                                } else if (normalizedStatus.includes('pesanan selesai')) {
-                                    selected = 'Pesanan Selesai';
-                                } else {
-                                    selected = 'Pilih Status'; // Default jika tidak cocok
-                                }
-                            } else {
-                                selected = 'Pilih Status';
-                            }
-                        "
-                    >
-                        @csrf
+                    <div class="mb-4">
+                        <label for="currentStatus" class="block text-sm font-medium text-gray-700 mb-1">Pilih Aksi Berikutnya:</label>
+                        {{-- PERBAIKAN 3: Dropdown kini dibuat dengan perulangan x-for --}}
+                        <select id="currentStatus" name="currentStatus" required x-model="nextStatus" class="select select-bordered w-full bg-white text-black">
+                            <option value="" disabled>-- Pilih Aksi --</option>
+                            <template x-for="option in availableOptions" :key="option.value">
+                                <option :value="option.value" x-text="option.text"></option>
+                            </template>
+                        </select>
+                        {{-- Pesan jika tidak ada opsi --}}
+                        <template x-if="availableOptions.length === 0">
+                            <p class="text-xs text-red-500 mt-1">Tidak ada aksi lanjutan untuk status ini.</p>
+                        </template>
+                    </div>
 
-                        {{-- PERBAIKAN: Menggunakan selectedData.id yang sesuai dengan data yang disimpan --}}
-                        <input type="hidden" name="shipmentID" :value="selectedData.id">
-
-                        @if ($errors->any())
-                            <div class="mb-4 text-red-600">
-                                <ul class="list-disc list-inside">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
-                        @if (session('success'))
-                            <div class="mb-4 text-green-600">
-                                {{ session('success') }}
-                            </div>
-                        @endif
-
-                        <div class="mb-4 relative">
-                            <label for="status" class="font-semibold">Status Pengiriman:</label>
-                            <button
-                                type="button"
-                                @click="open = !open"
-                                class="w-full input input-neutral border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-left pl-4 pr-10 py-2 relative"
-                                aria-haspopup="listbox"
-                                :aria-expanded="open.toString()"
-                            >
-                                <span x-text="selected"></span>
-                                <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                                    <svg
-                                        class="w-4 h-4 transform transition-transform duration-300"
-                                        :class="open ? 'rotate-180' : ''"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        viewBox="0 0 24 24"
-                                        aria-hidden="true"
-                                    >
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
-                            </button>
-
-                            <ul
-                                x-show="open"
-                                @click.away="open = false"
-                                x-transition
-                                class="absolute w-full mt-1 bg-white border border-gray-300 rounded shadow z-10 max-h-48 overflow-auto"
-                                role="listbox"
-                                tabindex="-1"
-                            >
-                                <li><a href="#" @click.prevent="selected = 'Sedang Dikirim'; open = false" class="block px-4 py-2 hover:bg-gray-100" role="option">Sedang Dikirim</a></li>
-                                <li><a href="#" @click.prevent="selected = 'Menuju Alamat'; open = false" class="block px-4 py-2 hover:bg-gray-100" role="option">Menuju Alamat</a></li>
-                                <li><a href="#" @click.prevent="selected = 'Pesanan Selesai'; open = false" class="block px-4 py-2 hover:bg-gray-100" role="option">Pesanan Selesai</a></li>
-                            </ul>
-
-                            <input type="hidden" name="currentStatus" :value="selected">
-
-                        </div>
-
-                        <div x-show="selected === 'Pesanan Selesai'" class="mb-4" x-transition>
-                            <label for="delivery_proof" class="font-semibold">Bukti Pengiriman:</label>
-                            <input
-                                type="file"
-                                id="delivery_proof"
-                                name="delivery_proof"
-                                class="file file-input w-full border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 pl-4"
-                            />
-                        </div>
-
-                        <div class="flex justify-end items-center gap-2 border-t border-gray-200 pt-4">
-                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                                Konfirmasi Status
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                    <div x-show="nextStatus === 'pesanan selesai'" x-transition class="mb-4">
+                        <label for="delivery_proof" class="block text-sm font-medium text-gray-700 mb-1">Bukti Pengiriman (Wajib):</label>
+                        <input type="file" id="delivery_proof" name="delivery_proof" class="file-input file-input-bordered w-full" :required="nextStatus === 'pesanan selesai'">
+                    </div>
+                    <div class="flex justify-end pt-4 border-t mt-6">
+                        <button type="submit" class="btn btn-primary">Update Status</button>
+                    </div>
+                </form>
             </div>
         </div>
 

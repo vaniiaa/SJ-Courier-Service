@@ -50,23 +50,20 @@ class DashboardAdminController extends Controller // Mendefinisikan kelas contro
      * @return \Illuminate\Http\JsonResponse Mengembalikan data pengiriman per wilayah dalam format JSON.
      */
     public function getPengirimanPerWilayah()
-    {
-        // PERBAIKAN FINAL: Memperbaiki logika join agar benar-benar LEFT JOIN.
-        // 1. Mulai dari semua DeliveryArea.
-        // 2. LEFT JOIN ke users, TAPI HANYA users dengan role_id = 2 (kurir).
-        // 3. LEFT JOIN ke shipments berdasarkan kurir yang ditemukan.
-        $data = DeliveryArea::query()
-            ->leftJoin('users', function ($join) {
-                $join->on('delivery_area.area_id', '=', 'users.area_id')
-                     ->where('users.role_id', 2); // Filter kurir di dalam kondisi join
-            })
-            ->leftJoin('shipments', 'users.user_id', '=', 'shipments.courierUserID')
-            ->select('delivery_area.area_name', DB::raw('COUNT(shipments.shipmentID) as total'))
-            ->groupBy('delivery_area.area_name')
-            ->orderBy('delivery_area.area_name', 'asc') // Urutkan berdasarkan nama wilayah
-            ->get();
+{
+    $data = DeliveryArea::query()
+        ->leftJoin('users', function ($join) {
+            $join->on('delivery_area.area_id', '=', 'users.area_id')
+                 ->where('users.role_id', 2);
+        })
+        // GANTI 'courierUserID' DENGAN NAMA KOLOM YANG BENAR (misal: 'courier_user_id')
+        ->leftJoin('shipments', 'users.user_id', '=', 'shipments.courierUserID') 
+        // GANTI 'shipmentID' DENGAN NAMA KOLOM YANG BENAR (misal: 'shipment_id')
+        ->select('delivery_area.area_name', DB::raw('COUNT(shipments."shipmentID") as total')) 
+        ->groupBy('delivery_area.area_name')
+        ->orderBy('delivery_area.area_name', 'asc')
+        ->get();
 
-        // Mengembalikan data yang diambil dalam format JSON.
-        return response()->json($data);
-    }
+    return response()->json($data);
+}
 }

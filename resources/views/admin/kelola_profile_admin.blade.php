@@ -6,6 +6,26 @@
 
 @section('content')
 <div class="absolute top-32 left-0 right-0 px-4" x-data="{ showModal: false, selectedData: {} }" @keydown.escape.window="showModal = false">
+    {{-- Pesan Sukses --}}
+    @if (session('success'))
+        <div class="max-w-[90rem] mx-auto mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+            <strong class="font-bold">Sukses!</strong>
+            <span class="block sm:inline">{{ session('success') }}</span>
+        </div>
+    @endif
+    
+    {{-- Notifikasi Error Validasi --}}
+    @if ($errors->any())
+        <div class="max-w-[90rem] mx-auto mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <strong class="font-bold">Oops!</strong>
+            <span class="block sm:inline">Terdapat beberapa kesalahan pada input Anda.</span>
+            <ul class="mt-2 list-disc list-inside">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <div class="max-w-[90rem] h-[20rem] mx-auto bg-white rounded-xl shadow-xl p-6 flex flex-col md:flex-row gap-6 items-center">
         <!-- Avatar -->
         <div class="flex justify-center items-center w-40 h-40 bg-gray-100 rounded-full ml-10">

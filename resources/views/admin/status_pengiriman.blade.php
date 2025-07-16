@@ -74,12 +74,16 @@
                         <td class="px-4 py-2 text-center">{{ $data->order->payments->first()->paymentMethod ?? 'N/A' }}</td>
                         <td class="px-4 py-2 text-center">{{ $data->courier->name ?? 'Belum Ditentukan' }}</td>
                         <td class="px-4 py-2 text-center font-bold
-                            @if ($data->currentStatus === 'menunggu konfirmasi') text-gray-600
-                            @elseif ($data->currentStatus === 'sedang dikirim') text-red-600
-                            @elseif ($data->currentStatus === 'menuju alamat') text-blue-600
-                            @elseif ($data->currentStatus === 'pesanan diterima') text-green-600
+                            @php $status = strtolower(trim($data->currentStatus)); @endphp
+                            @if ($status === 'menunggu konfirmasi') text-gray-500
+                            @elseif ($status === 'kurir ditugaskan') text-blue-600
+                            @elseif ($status === 'kurir menuju lokasi penjemputan') text-yellow-600
+                            @elseif ($status === 'paket telah di-pickup') text-purple-600
+                            @elseif ($status === 'dalam perjalanan ke penerima') text-red-600
+                            @elseif ($status === 'pesanan selesai') text-green-600
+                            @else text-black
                             @endif">
-                            {{ ucfirst($data->currentStatus) }}
+                            {{ $data->currentStatus }}
                         </td>
                     </tr>
                     @empty

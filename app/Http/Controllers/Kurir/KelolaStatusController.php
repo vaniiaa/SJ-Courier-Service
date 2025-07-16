@@ -22,7 +22,7 @@ class KelolaStatusController extends Controller
 {
 
     // Dibuat lowercase agar konsisten dengan query DB yang menggunakan LOWER()
-    private $finishedStatuses = ['pesanan selesai', 'dibatalkan', 'dikembalikan'];
+    private $finishedStatuses = ['Pesanan selesai', 'dibatalkan', 'dikembalikan'];
     /**
      * Pastikan semua method di controller ini hanya bisa diakses oleh kurir.
      */
@@ -73,7 +73,7 @@ class KelolaStatusController extends Controller
             'delivery_proof' => 'nullable|file|mimes:jpg,jpeg,png,heic|max:2048', // max 2MB
         ]);
 
-        $shipment = Shipment::findOrFail($request->shipmentID);
+        $shipment = Shipment::with('order')->findOrFail($request->shipmentID);
         $kurir = Auth::user();
 
         // Pastikan kurir hanya bisa mengupdate pengiriman miliknya
@@ -82,45 +82,85 @@ class KelolaStatusController extends Controller
         }
 
         $status = strtolower(trim($request->currentStatus));
+        $deskripsiRiwayat = ''; // Variabel untuk menyimpan deskripsi riwayat
         
-        // Simpan path bukti pengiriman jika ada
-        if ($request->hasFile('delivery_proof')) {
-            $path = $request->file('delivery_proof')->store('delivery_proof', 'public');
-            $shipment->delivery_proof = $path;
+        // Menggunakan switch untuk logika yang lebih terstruktur
+        switch ($status) {
+            case 'kurir menuju lokasi penjemputan':
+                $shipment->currentStatus = 'Kurir Menuju Lokasi Penjemputan';
+                $deskripsiRiwayat = 'Kurir sedang dalam perjalanan untuk mengambil paket.';
+                break;
+
+            case 'paket telah di-pickup':
+                $shipment->currentStatus = 'Paket Telah Di-pickup';
+                $shipment->pickupTimestamp = now(); // Set waktu pickup secara otomatis
+                $deskripsiRiwayat = 'Paket telah berhasil dijemput dari pengirim.';
+                break;
+
+            case 'dalam perjalanan ke penerima':
+                $shipment->currentStatus = 'Dalam Perjalanan ke Penerima';
+                $deskripsiRiwayat = 'Paket sedang diantar menuju alamat penerima.';
+                break;
+
+            case 'pesanan selesai':
+                // Validasi bukti pengiriman jika statusnya 'pesanan selesai'
+                $request->validate(['delivery_proof' => 'required|file|mimes:jpg,jpeg,png,heic|max:2048']);
+                
+                $shipment->currentStatus = 'Pesanan Selesai';
+                $shipment->deliveredTimestamp = now(); // Set waktu pengiriman selesai
+                $deskripsiRiwayat = 'Paket telah berhasil diterima oleh ' . $shipment->order->receiverName . '.';
+                
+                if ($request->hasFile('delivery_proof')) {
+                    $path = $request->file('delivery_proof')->store('delivery_proof', 'public');
+                    $shipment->delivery_proof = $path;
+                }
+                break;
+
+            default:
+                return back()->with('error', 'Aksi status tidak valid.');
         }
 
-        // Update status di tabel shipments (pastikan huruf kapital di awal)
-        $shipment->currentStatus = ucfirst($status); // Simpan dengan huruf kapital di awal
+        // Simpan semua perubahan pada shipment
         $shipment->save();
         
-        // Buat entri baru di tabel tracking_histories
+        // Buat entri baru di tabel tracking_histories dengan deskripsi yang lebih baik
         TrackingHistory::create([
             'shipmentID' => $shipment->shipmentID,
-            'statusDescription' => 'Status diperbarui menjadi: ' . ucfirst($status),
+            'statusDescription' => $deskripsiRiwayat,
             'updatedByUserID' => $kurir->user_id,
         ]);
 
         $successMessage = 'Status untuk resi ' . $shipment->tracking_number . ' berhasil diperbarui.';
 
-        // Jika status pengiriman adalah "pesanan diterima", arahkan ke halaman history
-        if (in_array($status, $this->finishedStatuses)) {
+        // Jika status pengiriman adalah "pesanan selesai", arahkan ke halaman history
+        if ($status === 'pesanan selesai') {
             return redirect()->route('kurir.history_pengiriman_kurir')->with('success', $successMessage);
         }
 
         return redirect()->route('kurir.kelola_status')->with('success', $successMessage);
     }
 
+
     /**
      * Menampilkan riwayat pengiriman yang sudah selesai untuk kurir yang login.
+     */
+    /**
+     * Menampilkan riwayat pengiriman yang sudah selesai untuk kurir yang login.
+     * --- TELAH DIPERBAIKI ---
      */
     public function history(Request $request)
     {
         $kurirId = Auth::id();
         $search = $request->input('search');
 
+        // PENYESUAIAN 1: Buat array status dengan kapitalisasi yang benar
+        // sesuaikan dengan yang tersimpan di database Anda.
+        $finishedStatuses = ['Pesanan Selesai', 'Dibatalkan', 'Dikembalikan'];
+
         $query = Shipment::with(['order.sender', 'courier', 'order.payments'])
             ->where('courierUserID', $kurirId)
-            ->whereIn(DB::raw('LOWER(TRIM("currentStatus"))'), $this->finishedStatuses);
+            // PENYESUAIAN 2: Gunakan whereIn langsung tanpa DB::raw
+            ->whereIn('currentStatus', $finishedStatuses);
 
         if ($search) {
              $query->where(function ($q) use ($search) {
@@ -145,7 +185,7 @@ class KelolaStatusController extends Controller
     $shipment = Shipment::findOrFail($id);
 
     // Buat isi QR Code berupa URL Google Drive
-    $qrContent = 'https://sj-courier-service-production.up.railway.app/';
+    $qrContent = 'https://sj-courier-service-production-3685.up.railway.app/';
 
     // Generate QR code dari link URL, bukan dari tracking_number
     $qrcode = base64_encode(QrCode::format('png')->size(150)->generate($qrContent));
@@ -164,7 +204,7 @@ public function printResi($id)
         $shipment = Shipment::findOrFail($id);
 
         // Buat isi QR Code (contoh: link tracking atau data resi)
-        $qrContent = 'https://sj-courier-service-production.up.railway.app/';
+        $qrContent = 'https://sj-courier-service-production-3685.up.railway.app/';
 
         // Generate QR code dalam format base64 PNG
         // Ukuran QR Code untuk browser print (biasanya lebih kecil karena resolusi layar)

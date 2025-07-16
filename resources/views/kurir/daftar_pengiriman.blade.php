@@ -64,12 +64,15 @@
                             <td class="px-4 py-2 text-center">{{ $shipment->courier->name ?? 'Belum Ditentukan' }}</td>
                             <td class="px-4 py-2 text-center">{{ $shipment->pickupTimestamp ? \Carbon\Carbon::parse($shipment->pickupTimestamp)->format('Y-m-d') : 'Belum Ditentukan' }}</td>
                             <td class="px-4 py-2 text-center font-semibold text-sm
-                                @if ($shipment->currentStatus === 'menunggu konfirmasi') text-gray-600
-                                @elseif ($shipment->currentStatus === 'sedang dikirim') text-red-600
-                                @elseif ($shipment->currentStatus === 'menuju alamat') text-blue-600
-                                @elseif ($shipment->currentStatus === 'pesanan selesai') text-green-600
-                                @endif">
-                                {{ ucfirst($shipment->currentStatus) }}
+                                @php $status = strtolower(trim($shipment->currentStatus)); @endphp
+                                @if ($status === 'menunggu konfirmasi') text-gray-500
+                                @elseif ($status === 'kurir ditugaskan') text-blue-600
+                                @elseif ($status === 'kurir menuju lokasi penjemputan') text-yellow-600
+                                @elseif ($status === 'paket telah di-pickup') text-purple-600
+                                @elseif ($status === 'dalam perjalanan ke penerima') text-red-600
+                                @elseif ($status === 'pesanan selesai') text-green-600
+                                @else text-black @endif">
+                                {{ $shipment->currentStatus }}
                             </td>
                             <td class="px-4 py-2 text-center">
                                 <div class="flex justify-center gap-2">

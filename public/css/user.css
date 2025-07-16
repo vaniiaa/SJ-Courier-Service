@@ -1,0 +1,10 @@
+#breadcrumbs-container {
+    position: absolute;
+    top: 56px; /* di bawah header */
+    left: 0;
+    right: 0;
+    padding: 8px 16px;
+    background-color: inherit;
+    z-index: 10;
+    /* transition dan transform dihapus */
+}

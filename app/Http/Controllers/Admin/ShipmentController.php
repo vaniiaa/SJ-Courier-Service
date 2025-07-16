@@ -71,43 +71,44 @@ class ShipmentController extends Controller
      * Menugaskan kurir ke sebuah pengiriman.
      */
     public function assignCourier(Request $request)
-    {
-        $request->validate([
-            'shipment_id' => 'required|exists:shipments,shipmentID',
-            'kurir_id' => 'required|exists:users,user_id',
-            'pickupTimestamp' => 'required|date_format:Y-m-d\TH:i', // Format timestamp pengambilan
-            'noteadmin' => 'nullable|string|max:255',
+{
+    $request->validate([
+        'shipment_id' => 'required|exists:shipments,shipmentID',
+        'kurir_id' => 'required|exists:users,user_id',
+        'pickupTimestamp' => 'required|date_format:Y-m-d\TH:i',
+        'notes' => 'nullable|string|max:255', // <-- Telah diubah
+    ]);
+
+    DB::beginTransaction();
+    try {
+        $shipment = Shipment::findOrFail($request->shipment_id);
+        $kurir = User::findOrFail($request->kurir_id);
+
+        // Perbarui data pengiriman
+        $shipment->courierUserID = $kurir->user_id;
+        $shipment->currentStatus = 'Kurir Ditugaskan';
+        $shipment->pickupTimestamp = $request->pickupTimestamp;
+        // Mengambil dari request 'notes' dan tetap menyimpan ke kolom 'noteadmin'
+        $shipment->noteadmin = $request->notes; // <-- Telah diubah
+        $shipment->save();
+
+        // Buat entri baru di riwayat pelacakan
+        TrackingHistory::create([
+            'shipmentID' => $shipment->shipmentID,
+            'statusDescription' => 'Kurir (' . $kurir->name . ') telah ditugaskan oleh admin.',
+            'updatedByUserID' => auth()->id(),
         ]);
 
-        DB::beginTransaction();
-        try {
-            $shipment = Shipment::findOrFail($request->shipment_id);
-            $kurir = User::findOrFail($request->kurir_id);
+        DB::commit();
 
-            // Perbarui data pengiriman
-            $shipment->courierUserID = $kurir->user_id;
-            $shipment->currentStatus = 'Menunggu Diambil Kurir';
-            $shipment->pickupTimestamp = $request->pickupTimestamp; // Simpan timestamp pengambilan
-            $shipment->noteadmin = $request->noteadmin; // Simpan catatan admin
-            $shipment->save();
+        return response()->json(['message' => 'Kurir ' . $kurir->name . ' berhasil ditugaskan untuk resi ' . $shipment->tracking_number]);
 
-            // Buat entri baru di riwayat pelacakan
-            TrackingHistory::create([
-                'shipmentID' => $shipment->shipmentID,
-                'statusDescription' => 'Kurir (' . $kurir->name . ') telah ditugaskan oleh admin.',
-                'updatedByUserID' => auth()->id(),
-            ]);
-
-            DB::commit();
-
-            return response()->json(['message' => 'Kurir ' . $kurir->name . ' berhasil ditugaskan untuk resi ' . $shipment->tracking_number]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error("Gagal menugaskan kurir: " . $e->getMessage());
-            return response()->json(['message' => 'Terjadi kesalahan internal.'], 500);
-        }
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error("Gagal menugaskan kurir: " . $e->getMessage());
+        return response()->json(['message' => 'Terjadi kesalahan internal.'], 500);
     }
+}
 
     /**
      * Menampilkan halaman status pengiriman yang sedang berlangsung.
@@ -137,46 +138,72 @@ class ShipmentController extends Controller
      * Menampilkan halaman riwayat pengiriman yang sudah selesai.
      */
 
+    /**
+     * Menampilkan halaman riwayat pengiriman yang sudah selesai.
+     * --- TELAH DIPERBAIKI ---
+     */
     public function historyPengiriman(Request $request)
     {
         $search = $request->input('search');
-        $query = Shipment::query();
+        $query = Shipment::query()->with(['order.sender', 'courier', 'order.payments']);
 
         if ($search) {
-            $query->where('tracking_number', 'like', '%' . $search . '%')
-                ->orWhereHas('order.sender', function($q) use ($search) {
-                    $q->where('name', 'like', '%' . $search . '%');
-                })
-                ->orWhereHas('order', function($q) use ($search) {
-                    $q->where('receiverName', 'like', '%' . $search . '%');
-                });
+            $query->where(function($q) use ($search) {
+                $q->where('tracking_number', 'like', '%' . $search . '%')
+                    ->orWhereHas('order.sender', function($subq) use ($search) {
+                        $subq->where('name', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('order', function($subq) use ($search) {
+                        $subq->where('receiverName', 'like', '%' . $search . '%');
+                    });
+            });
         }
 
-        $pengiriman = $query->whereRaw('TRIM(LOWER("currentStatus")) NOT IN (?)', ['Pesanan selesai'])
-                                ->latest()->paginate(10);
+        // PERBAIKAN 1: Sesuaikan kapitalisasi array agar sama persis dengan yang ada di database.
+        $finishedStatuses = ['Pesanan Selesai', 'Dibatalkan', 'Dikembalikan'];
+        
+        // PERBAIKAN 2: Gunakan whereIn langsung ke kolom 'currentStatus' tanpa DB::raw.
+        $query->whereIn('currentStatus', $finishedStatuses);
+
+        $pengiriman = $query->latest('updated_at')->paginate(10);
 
         return view('admin.history_pengiriman', compact('pengiriman'));
     }
 
-     public function downloadResi($id)
-{
-    $shipment = Shipment::findOrFail($id);  // gunakan Shipment, bukan Pengiriman
-    $qrContent = 'https://sj-courier-service-production.up.railway.app/';
+     /**
+    * Download Resi dalam format PDF
+    */
+    public function downloadResi($id)
+    {
+    $shipment = Shipment::findOrFail($id);
+ 
+    // QRCODE
+    $qrContent = 'https://sj-courier-service-production-3685.up.railway.app/';
+
+    // Generate QR code dari link URL
     $qrcode = base64_encode(QrCode::format('png')->size(150)->generate($qrContent));
 
-    $pdf = PDF::loadView('admin.resi_pdf', compact('shipment', 'qrcode'))
-             ->setPaper([0, 0, 283.46, 340.157]);
-
+    $pdf = PDF::loadView('kurir.resi_pdf', compact('shipment', 'qrcode'))
+             ->setPaper([0, 0, 283.46, 340.157]); // Ukuran resi 10x12 cm
+             
     return $pdf->download('resi_' . $shipment->tracking_number . '.pdf');
 }
 
-public function printResi($id)
-{
-    $shipment = Shipment::findOrFail($id);  // gunakan Shipment, bukan Pengiriman
-    $qrContent = 'https://sj-courier-service-production.up.railway.app/';
-    $qrcode = base64_encode(QrCode::format('png')->size(70)->generate($qrContent));
+    /**
+    * Menampilkan preview resi pengiriman dalam bentuk halaman (tanpa download).
+    */
+    public function printResi($id)
+    {
+        $shipment = Shipment::findOrFail($id);
 
-    return view('admin.resi_print', compact('shipment', 'qrcode'));
-}
+        // QRCODE
+        $qrContent = 'https://sj-courier-service-production-3685.up.railway.app/';
+
+        // Generate QR code dalam format base64 PNG
+        // Ukuran QR Code untuk browser print (biasanya lebih kecil karena resolusi layar)
+        $qrcode = base64_encode(QrCode::format('png')->size(70)->generate($qrContent)); 
+
+        return view('User.resi_print', compact('shipment', 'qrcode'));
+    }
 
 }

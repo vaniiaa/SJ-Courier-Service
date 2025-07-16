@@ -36,6 +36,26 @@ class ConfirmablePasswordController extends Controller
 
         $request->session()->put('auth.password_confirmed_at', time());
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        return redirect()->intended($this->redirectPath($request->user()));
+    }
+
+    /**
+     * Get the post-confirmation redirect path based on user role.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @return string
+     */
+    protected function redirectPath($user): string
+    {
+        if ($user->role) {
+            switch ($user->role->role_name) {
+                case 'admin':
+                    return route('admin.dashboard_admin');
+                case 'courier':
+                    return route('kurir.dashboard');
+            }
+        }
+
+        return RouteServiceProvider::HOME; // Default for customer
     }
 }

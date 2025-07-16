@@ -1,16 +1,21 @@
 <x-app-layout>
-    <div class="relative">
-         <div class="bg-[rgba(255,165,0,0.75)] p-6 shadow-md h-40 absolute top-0 left-1/2 transform -translate-x-1/2 z-0" 
-             style="width: 100vw; margin-left: -50vw; left: 50%;"></div>
-        <div class="relative z-10 max-w-7xl mx-auto px-4 py-8">
-            <h1 class="text-2xl font-bold text-black mb-8">History Pengiriman</h1>
-            <div class="bg-white rounded-lg shadow-md p-6">
+    @section('title', 'History Pengiriman')
+        <div class="absolute top-32 left-0 right-0 px-4">
+            <div class="max-w-7xl mx-auto bg-white p-6 rounded-lg shadow-lg text-center">
+                {{-- Menampilkan pesan sukses jika ada (misal: setelah pembayaran berhasil) --}}
+                @if (session('success'))
+                    <div role="alert" class="alert alert-success mb-6 shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <span>{{ session('success') }}</span>
+                    </div>
+                @endif
+
                 {{-- Membuat form pencarian yang fungsional --}}
-                <form action="{{ route('customer.history') }}" method="GET" class="flex justify-end mb-4 gap-2">
+                <form action="{{ route('user.history') }}" method="GET" class="flex justify-end mb-4 gap-2">
                     <input type="text" name="search" placeholder="Cari resi, penerima..." value="{{ request('search') }}" class="input input-bordered w-full max-w-xs">
                     <button type="submit" class="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600">Cari</button>
                 </form>
-               <div class="overflow-x-auto border border-gray-300 rounded-lg">
+                <div class="overflow-x-auto border border-gray-300 rounded-lg">
     <table class="w-full table-auto text-sm rounded-lg overflow-hidden">
         <thead class="bg-gray-50 text-gray-700 text-sm">
             <tr class="border-b border-gray-300">
@@ -34,13 +39,24 @@
                 <td class="px-4 py-3">{{ $shipment->courier->name ?? 'N/A' }}</td>
                 <td class="px-4 py-3 text-center">{{ $shipment->updated_at->format('d M Y') }}</td>
                 <td class="px-4 py-3 text-center">
-                    <span class="badge badge-success text-white whitespace-nowrap">
+                    @php
+                        $status = strtolower(trim($shipment->currentStatus));
+                        $badgeClass = '';
+                        if ($status === 'pesanan selesai') {
+                            $badgeClass = 'badge-success';
+                        } elseif ($status === 'dibatalkan') {
+                            $badgeClass = 'badge-error';
+                        } else {
+                            $badgeClass = 'badge-ghost';
+                        }
+                    @endphp
+                    <span class="badge {{ $badgeClass }} whitespace-nowrap">
                         {{ $shipment->currentStatus }}
                     </span>
                 </td>
                 <td class="px-4 py-3 text-center">
                     <div class="flex justify-center gap-2">
-                        <a href="{{ route('shipments.confirmation', ['order' => $shipment->orderID]) }}" target="_blank" class="btn btn-xs btn-outline btn-info" title="Lihat Detail/Cetak">
+                        <a href="{{ route('user.confirmation', ['order' => $shipment->orderID]) }}" target="_blank" class="btn btn-xs btn-outline btn-info" title="Lihat Detail/Cetak">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                             </svg>
@@ -63,8 +79,7 @@
         </tbody>
     </table>
 </div>
-
-                <div class="mt-4 ">{{ $shipments->links() }}</div>
+                <div class="mt-4">{{ $shipments->links() }}</div>
             </div>
         </div>
     </div>

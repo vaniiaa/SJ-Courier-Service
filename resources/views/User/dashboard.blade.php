@@ -1,14 +1,9 @@
-@extends('layouts.PublicUser')
-
-@section('title', 'Home')
-
-@section('content')
+<x-app-layout>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 {{-- Tambahkan CSS di sini --}}
 <style>
-    /* ----- Umum & Animasi ----- */
     @keyframes fadeInScale {
         0% {
             opacity: 0;
@@ -24,7 +19,7 @@
         animation: fadeInScale 0.5s ease-out forwards;
     }
 
-    /* Kelas untuk latar belakang kuning soft */
+     /* Kelas untuk latar belakang kuning soft */
     .bg-soft-yellow-result {
         background-color: #FEF3C7; /* Tailwind yellow-200 */
         border-color: #FDE68A; /* Tailwind yellow-300 */
@@ -119,26 +114,26 @@
             box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); /* shadow-xl */
         }
     }
-
 </style>
+
 <div class="carousel-full-width"> 
     <div class="carousel w-full" id="autoSlider">
         <div id="autoSlide1" class="carousel-item relative w-full">
-            <img src="{{ asset('images/kurir/carousel4.png') }}" alt="Slider Image 1" />
+            <img src="{{ asset('images/kurir/fixcarousel4.png') }}" alt="Slider Image 1" />
             <div class="absolute flex justify-between w-full top-1/2 transform -translate-y-1/2 px-4 md:px-6"> {{-- Adjust px for mobile --}}
                 <a href="#autoSlide3" class="btn btn-circle bg-base-100 bg-opacity-50 border-none">❮</a>
                 <a href="#autoSlide2" class="btn btn-circle bg-base-100 bg-opacity-50 border-none">❯</a>
             </div>
         </div>
         <div id="autoSlide2" class="carousel-item relative w-full">
-            <img src="{{ asset('images/kurir/carousel5.png') }}" alt="Slider Image 2" />
+            <img src="{{ asset('images/kurir/fixcarousel5.png') }}" alt="Slider Image 2" />
             <div class="absolute flex justify-between w-full top-1/2 transform -translate-y-1/2 px-4 md:px-6"> {{-- Adjust px for mobile --}}
                 <a href="#autoSlide1" class="btn btn-circle bg-base-100 bg-opacity-50 border-none">❮</a>
                 <a href="#autoSlide3" class="btn btn-circle bg-base-100 bg-opacity-50 border-none">❯</a>
             </div>
         </div>
         <div id="autoSlide3" class="carousel-item relative w-full">
-            <img src="{{ asset('images/kurir/carousel2.jpg') }}" alt="Slider Image 3" />
+            <img src="{{ asset('images/kurir/fixcarousel6.png') }}" alt="Slider Image 3" />
             <div class="absolute flex justify-between w-full top-1/2 transform -translate-y-1/2 px-4 md:px-6"> {{-- Adjust px for mobile --}}
                 <a href="#autoSlide2" class="btn btn-circle bg-base-100 bg-opacity-50 border-none">❮</a>
                 <a href="#autoSlide1" class="btn btn-circle bg-base-100 bg-opacity-50 border-none">❯</a>
@@ -239,9 +234,6 @@
             <p class="text-sm md:text-base text-gray-700">
                 Semua fitur yang tersedia dirancang untuk memberikan pengalaman pengiriman yang lebih cepat, aman, praktis, dan transparan, sehingga kamu dapat mengelola semua kebutuhan pengiriman dalam satu tempat dengan nyaman.
             </p>
-
-            <div class="mt-4 md:mt-6">
-            </div>
         </div>
 
         <div class="hidden md:flex justify-center">
@@ -257,7 +249,7 @@
             title="Live Tracking"
             description="Tak perlu khawatir soal pengiriman. Pantau posisi paket secara real-time dan pastikan tiba tepat waktu!"
             button="Lacak Sekarang"
-            link="{{ asset('user/live_tracking') }}" {{-- Ubah link ini ke bagian live tracking di halaman ini --}}
+            link="{{ route('user.live_tracking') }}"
             icon="{{ asset('images/user/1.png') }}"
         />
 
@@ -265,7 +257,7 @@
             title="Permintaan Pengiriman dan Pembayaran"
             description="Ajukan permintaan pengiriman dan lakukan pembayaran dengan mudah, cepat, dan aman dalam hitungan detik!"
             button="Buat Pengiriman"
-            link="{{ asset('shipments/create-step-1') }}"
+            link="{{ route('user.form_pengiriman') }}"
             icon="{{ asset('images/user/2.png') }}"
         />
 
@@ -273,7 +265,7 @@
             title="Cek Tarif"
             description="Lakukan cek tarif untuk menghitung estimasi biaya pengiriman suatu paket dari lokasi pengirim ke lokasi penerima!"
             button="Lihat"
-            link="{{ asset('/dashboard') }}"
+            link="{{ route('dashboard') }}"
             icon="{{ asset('images/user/3.png') }}"
         />
 
@@ -281,7 +273,7 @@
             title="History Pengiriman"
             description="Lihat daftar pengirimanmu kapan saja! Riwayat lengkap & transparan untuk memastikan semuanya terkendali."
             button="Lihat History"
-            link="{{ asset('history') }}"
+            link="{{ route('user.history') }}"
             icon="{{ asset('images/user/4.png') }}"
         />
     </div>
@@ -313,6 +305,32 @@
         </div>
     </div>
 </div>
+<!--Footer-->
+<div class="w-full">
+    <x-footer :menus="[
+        [
+            'title' => 'Waktu Kerja',
+            'content' => '<p>Senin - Jumat: 08:00 - 18:00</p><p>Sabtu: 09:00 - 15:00</p><p>Minggu: Libur</p>',
+        ],
+        [
+            'title' => 'Layanan Kami',
+            'items' => [
+                ['label' => 'Live Tracking', 'url' => route('user.live_tracking')],
+                ['label' => 'Pengiriman', 'url' => route('user.form_pengiriman')],
+                ['label' => 'Cek Tarif', 'url' => route('dashboard')],
+                ['label' => 'History Pengiriman', 'url' => route('user.history')],
+            ],
+        ],
+        [
+            'title' => 'Privacy & TOS',
+            'items' => [
+                ['label' => 'Kebijakan Privasi', 'url' => '#'],
+                ['label' => 'Syarat & Ketentuan', 'url' => '#'],
+            ],
+        ],
+    ]" />
+    </div>
+</x-app-layout>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -436,19 +454,16 @@
     }
 
     // Keep the 'Cek Tarif' tab active on page load if a result was just shown
-    @if (session('tarif') || session('error') || $errors->any())
-        document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
+        const hasTarif = "{{ session('tarif') || session('error') || $errors->any() ? 'true' : 'false' }}";
+        if (hasTarif === "true") {
             selectTab('tarif');
             const tarifResultDiv = document.querySelector('.tarif-result-container');
             if (tarifResultDiv) {
                 tarifResultDiv.classList.add('tarif-result-animation');
             }
-        });
-    @else
-        // Default to 'Live Tracking' tab if no tarif result
-        document.addEventListener('DOMContentLoaded', function() {
+        } else {
             selectTab('tracking');
-        });
-    @endif
+        }
+    });
 </script>
-@endsection

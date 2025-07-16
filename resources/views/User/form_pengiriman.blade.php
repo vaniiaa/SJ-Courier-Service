@@ -1,13 +1,5 @@
 <x-app-layout>
-    {{-- Menggunakan komponen layout utama Anda yang sudah ada --}}
-    <div class="relative">
-        <!-- Background orange dari desain Anda -->
-        <div class="bg-[rgba(255,165,0,0.75)] p-6 shadow-md h-40 absolute top-0 left-1/2 transform -translate-x-1/2 z-0" 
-             style="width: 100vw; margin-left: -50vw; left: 50%;"></div>
-
-        <div class="relative z-10 max-w-4xl mx-auto px-4 py-8">
-            <h1 class="text-2xl font-bold text-black mb-8 text-center">Buat Pengiriman Baru: Isi Detail</h1>
-
+    @section('title', 'Form Pengiriman')
             {{-- Notifikasi Error/Sukses --}}
             @if(session('error'))
                 <div role="alert" class="alert alert-error mb-6 shadow-lg"><span>{{ session('error') }}</span></div>
@@ -21,7 +13,8 @@
                 </div>
             @endif
 
-            <form id="shipmentForm" method="POST" action="{{ route('shipments.store.step1') }}">
+            <div class="max-w-2xl mx-auto left-0 right-0 px-4 p-6">
+            <form id="shipmentForm" method="POST" action="{{ route('user.store_pengiriman') }}">
                 @csrf
 
                 <!-- ================================== -->
@@ -62,10 +55,22 @@
                     @endif
                     
                     {{-- Alamat Penjemputan Baru / Manual --}}
-                    <div class="mt-2">
-                        <label for="pickupAddress" class="block text-sm font-medium text-gray-700">Alamat Penjemputan</label>
-                        <input type="text" id="pickupAddress" name="pickupAddress" placeholder="Isi alamat baru atau pilih dari daftar di atas" value="{{ old('pickupAddress', Auth::user()->address) }}" class="input input-bordered w-full @error('pickupAddress') input-error @enderror" required>
-                        @error('pickupAddress')<span class="text-error text-xs mt-1">{{ $message }}</span>@enderror
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                        <div>
+                            <label for="pickupAddress" class="block text-sm font-medium text-gray-700">Alamat Penjemputan</label>
+                            <input type="text" id="pickupAddress" name="pickupAddress" placeholder="Isi alamat baru atau pilih dari daftar di atas" value="{{ old('pickupAddress', Auth::user()->address) }}" class="input input-bordered w-full @error('pickupAddress') input-error @enderror" required>
+                            @error('pickupAddress')<span class="text-error text-xs mt-1">{{ $message }}</span>@enderror
+                        </div>
+                        <div>
+                            <label for="pickupKecamatan" class="block text-sm font-medium text-gray-700">Kecamatan Penjemputan</label>
+                            <select id="pickupKecamatan" name="pickupKecamatan" class="select select-bordered w-full @error('pickupKecamatan') select-error @enderror" required>
+                                <option disabled selected value="">-- Pilih Kecamatan --</option>
+                                @foreach($kecamatanList as $kecamatan)
+                                    <option value="{{ $kecamatan }}" @if(old('pickupKecamatan') == $kecamatan) selected @endif>{{ $kecamatan }}</option>
+                                @endforeach
+                            </select>
+                            @error('pickupKecamatan')<span class="text-error text-xs mt-1">{{ $message }}</span>@enderror
+                        </div>
                     </div>
                     <div class="mt-4">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Titik Penjemputan di Peta</label>
@@ -95,10 +100,22 @@
                             @error('receiverPhoneNumber')<span class="text-error text-xs mt-1">{{ $message }}</span>@enderror
                         </div>
                     </div>
-                    <div class="mt-4">
-                        <label for="receiverAddress" class="block text-sm font-medium text-gray-700">Alamat Penerima</label>
-                        <input type="text" id="receiverAddress" name="receiverAddress" placeholder="Masukkan Alamat lengkap penerima" value="{{ old('receiverAddress') }}" class="input input-bordered w-full @error('receiverAddress') input-error @enderror" required>
-                        @error('receiverAddress')<span class="text-error text-xs mt-1">{{ $message }}</span>@enderror
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <label for="receiverAddress" class="block text-sm font-medium text-gray-700">Alamat Penerima</label>
+                            <input type="text" id="receiverAddress" name="receiverAddress" placeholder="Masukkan Alamat lengkap penerima" value="{{ old('receiverAddress') }}" class="input input-bordered w-full @error('receiverAddress') input-error @enderror" required>
+                            @error('receiverAddress')<span class="text-error text-xs mt-1">{{ $message }}</span>@enderror
+                        </div>
+                        <div>
+                            <label for="receiverKecamatan" class="block text-sm font-medium text-gray-700">Kecamatan Tujuan</label>
+                            <select id="receiverKecamatan" name="receiverKecamatan" class="select select-bordered w-full @error('receiverKecamatan') select-error @enderror" required>
+                                <option disabled selected value="">-- Pilih Kecamatan --</option>
+                                @foreach($kecamatanList as $kecamatan)
+                                    <option value="{{ $kecamatan }}" @if(old('receiverKecamatan') == $kecamatan) selected @endif>{{ $kecamatan }}</option>
+                                @endforeach
+                            </select>
+                            @error('receiverKecamatan')<span class="text-error text-xs mt-1">{{ $message }}</span>@enderror
+                        </div>
                     </div>
                     <div class="mt-4">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Titik Tujuan di Peta</label>
@@ -135,9 +152,7 @@
                     <button type="submit" class="btn bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-8 py-2 rounded-lg shadow-md w-full md:w-auto">Lanjutkan ke Ringkasan</button>
                 </div>
             </form>
-        </div>
-    </div>
-
+            </div>
     @push('scripts')
         <script>
             // Variabel global untuk menyimpan objek peta dan marker agar bisa diakses
