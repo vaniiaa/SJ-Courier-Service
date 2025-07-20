@@ -108,7 +108,7 @@
                     Sandi
                 </label>
                 <span class="mx-2 mt-2">:</span>
-                <input type="password" id="password" name="password" placeholder="Tulis sandi minimal 6 karakter"
+                <input type="password" id="password" name="password" placeholder="Tulis sandi minimal 8 karakter"
                     class="flex-1 px-3 py-2 border border-gray-300 bg-white rounded-md shadow-md shadow-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500">
             </div>
 

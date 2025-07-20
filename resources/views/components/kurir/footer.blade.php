@@ -19,9 +19,5 @@
                 <li><a href="{{ asset('kurir/kelola_status')}}" class="hover:underline">Konfirmasi Pengiriman</a></li>
             </ul>
         </div>
-        <div>
-            <h3 class="font-bold">Privacy & TOS</h3>
-            <a href="{{ asset('/login/kurir')}}" class="hover:underline">Login</a>
-        </div>
     </div>
 </footer>
