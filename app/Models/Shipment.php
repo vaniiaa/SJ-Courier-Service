@@ -25,6 +25,7 @@ class Shipment extends Model
         'deliveredTimestamp',
         'finalPrice',
         'delivery_proof',
+        'noteadmin',
         'current_lat',       
         'current_long',      
         'last_updated_at'    
@@ -77,6 +78,6 @@ class Shipment extends Model
         // Mengambil alamat tersimpan milik pengguna yang login
         $savedAddresses = \App\Models\SavedAddress::where('user_id', Auth::id())->get();
 
-        return view('shipments.create-step-1', compact('savedAddresses'));
+        return view('user.form_pengiriman', compact('savedAddresses'));
     }
 }
