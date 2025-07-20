@@ -90,7 +90,7 @@ Route::prefix('admin')->middleware(['auth','role:admin'])->group(function () {
 });
 
 // ------------------- Authenticated Courier Routes -------------------
-Route::prefix('courier')->middleware(['auth', 'role:courier'])->group(function () {
+Route::prefix('courier')->middleware(['auth', 'verified', 'role:courier'])->group(function () {
     Route::get('/dashboard', fn() => view('kurir.dashboard'))->name('kurir.dashboard');
     
     // Courier Live Tracking
