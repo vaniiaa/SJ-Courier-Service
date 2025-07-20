@@ -36,7 +36,7 @@
                 <!-- Ilustrasi di sebelah kiri - hanya muncul di tampilan md ke atas -->
                 <div class="hidden md:flex md:w-1/2 bg-white p-8 items-center justify-center">
                     <div class="w-full max-w-md">
-                        <img src="{{ asset('images/user/register.jpg') }}" alt="Delivery Illustration" class="w-full">
+                        <img src="{{ asset('images/user/register.png') }}" alt="Delivery Illustration" class="w-full">
                     </div>
                 </div>
 
