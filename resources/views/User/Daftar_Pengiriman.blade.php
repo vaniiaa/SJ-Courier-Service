@@ -58,7 +58,7 @@
                                     class="px-3 bg-blue-500 text-white py-1 rounded text-xs hover:bg-blue-600 shadow-md shadow-gray-700">Detail</a>
                                      {{-- Logika untuk menampilkan tombol Batalkan --}}
                                         @php
-                                            $cancellableStatuses = ['Menunggu Pembayaran', 'Menunggu Penjemputan', 'Kurir Belum Ditugaskan'];
+                                            $cancellableStatuses = ['Menunggu Pembayaran', 'Menunggu Penjemputan', 'Kurir Belum Ditugaskan', 'Menunggu Konfirmasi'];
                                         @endphp
                                         @if (in_array($shipment->currentStatus, $cancellableStatuses))
                                             <form action="{{ route('user.shipment.cancel', $shipment->shipmentID) }}" method="POST" onsubmit="return confirm('Anda yakin ingin membatalkan pesanan dengan resi {{ $shipment->tracking_number }}?')">
