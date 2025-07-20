@@ -119,7 +119,7 @@
 <div class="carousel-full-width"> 
     <div class="carousel w-full" id="autoSlider">
         <div id="autoSlide1" class="carousel-item relative w-full">
-            <img src="{{ asset('images/kurir/carousel2.png') }}" alt="Slider Image 1" />
+            <img src="{{ asset('images/kurir/carousel2.jpg') }}" alt="Slider Image 1" />
             <div class="absolute flex justify-between w-full top-1/2 transform -translate-y-1/2 px-4 md:px-6"> {{-- Adjust px for mobile --}}
                 <a href="#autoSlide3" class="btn btn-circle bg-base-100 bg-opacity-50 border-none">❮</a>
                 <a href="#autoSlide2" class="btn btn-circle bg-base-100 bg-opacity-50 border-none">❯</a>
