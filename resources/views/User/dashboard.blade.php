@@ -119,21 +119,21 @@
 <div class="carousel-full-width"> 
     <div class="carousel w-full" id="autoSlider">
         <div id="autoSlide1" class="carousel-item relative w-full">
-            <img src="{{ asset('images/kurir/fixcarousel4.png') }}" alt="Slider Image 1" />
+            <img src="{{ asset('images/kurir/carousel2.png') }}" alt="Slider Image 1" />
             <div class="absolute flex justify-between w-full top-1/2 transform -translate-y-1/2 px-4 md:px-6"> {{-- Adjust px for mobile --}}
                 <a href="#autoSlide3" class="btn btn-circle bg-base-100 bg-opacity-50 border-none">❮</a>
                 <a href="#autoSlide2" class="btn btn-circle bg-base-100 bg-opacity-50 border-none">❯</a>
             </div>
         </div>
         <div id="autoSlide2" class="carousel-item relative w-full">
-            <img src="{{ asset('images/kurir/fixcarousel5.png') }}" alt="Slider Image 2" />
+            <img src="{{ asset('images/kurir/carousel4.png') }}" alt="Slider Image 2" />
             <div class="absolute flex justify-between w-full top-1/2 transform -translate-y-1/2 px-4 md:px-6"> {{-- Adjust px for mobile --}}
                 <a href="#autoSlide1" class="btn btn-circle bg-base-100 bg-opacity-50 border-none">❮</a>
                 <a href="#autoSlide3" class="btn btn-circle bg-base-100 bg-opacity-50 border-none">❯</a>
             </div>
         </div>
         <div id="autoSlide3" class="carousel-item relative w-full">
-            <img src="{{ asset('images/kurir/fixcarousel6.png') }}" alt="Slider Image 3" />
+            <img src="{{ asset('images/kurir/carousel5.png') }}" alt="Slider Image 3" />
             <div class="absolute flex justify-between w-full top-1/2 transform -translate-y-1/2 px-4 md:px-6"> {{-- Adjust px for mobile --}}
                 <a href="#autoSlide2" class="btn btn-circle bg-base-100 bg-opacity-50 border-none">❮</a>
                 <a href="#autoSlide1" class="btn btn-circle bg-base-100 bg-opacity-50 border-none">❯</a>
