@@ -40,7 +40,13 @@
                             <details>
                                 <summary>{{ $user->name }}</summary>
                                 <ul>
-                                    <li><a href="{{ route('profile.edit') }}">Profil</a></li>
+                                    <li>
+                                    @if (Auth::user()->role->role_name == 'courier')
+                                        <a href="{{ route('courier.profile.edit') }}" class="block px-4 py-2 text-sm hover:bg-yellow-100">Profil</a>
+                                    @else
+                                        <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm hover:bg-yellow-100">Profil</a>
+                                    @endif
+                                    </li>
                                     <li>
                                         <form method="POST" action="{{ route('logout') }}">
                                         @csrf
@@ -84,7 +90,11 @@
                         </summary>
                         <ul class="p-2 bg-white text-black shadow-lg border border-yellow-300 rounded-md w-40 mt-2">
                             <li>
+                            @if (Auth::user()->role->role_name == 'courier')
+                                <a href="{{ route('courier.profile.edit') }}" class="block px-4 py-2 text-sm hover:bg-yellow-100">Profil</a>
+                            @else
                                 <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm hover:bg-yellow-100">Profil</a>
+                            @endif
                             </li>
                             <li>
                                 <a href="#" class="block px-4 py-2 text-sm hover:bg-yellow-100"
