@@ -43,6 +43,10 @@
     <!-- Navigation Header -->
     <x-header :user="Auth::user()" :links="getNavigationLinks(Auth::user())" />
 
+    @if (!Route::is('dashboard'))
+    <x-page-header title="{{ View::getSection('title') ?? 'SJ Courier Service' }}" />
+    @endif
+
     <!-- Page Content -->
     <main class="main-content flex-grow pt-20 md:px-10">
         {{ $slot }}
