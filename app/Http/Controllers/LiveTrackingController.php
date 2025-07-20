@@ -30,7 +30,7 @@ class LiveTrackingController extends Controller
         // Redirect ke view sesuai role
         switch ($user->role->role_name) {
             case 'admin':
-                return view('admin.live_tracking');
+                return view('admin.live_tracking_admin');
             case 'courier':
                 return view('kurir.live_tracking');
             case 'customer':
@@ -92,7 +92,7 @@ class LiveTrackingController extends Controller
             $updated = $shipment->update([
                     'current_lat' => $request->lat,
                     'current_long' => $request->long,
-                    'last_updated_at' => now(),
+                    'last_tracked_at' => now(),
                 ]);
 
             if ($updated) {

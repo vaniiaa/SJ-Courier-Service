@@ -12,7 +12,7 @@
     <div class="ml-auto mr-4">
         <form method="POST" action="{{ route('logout') }}">
     @csrf
-    <button type="submit">Logout</button>
+    <button class="px-5 py-2 rounded-lg text-black font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2" style="background:#FFD45B;" type="submit">Logout</button>
 </form>
     </div>
 </header>
