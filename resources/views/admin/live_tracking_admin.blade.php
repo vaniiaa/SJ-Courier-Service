@@ -25,7 +25,7 @@
         
         <div class="flex w-full gap-4 items-center mb-4">
             <input type="text" id="tracking_number" placeholder="Masukkan Nomor Resi"
-                class="border border-gray-300 rounded px-4 py-2 flex-grow" />
+                class="border border-gray-300 rounded px-4 py-2 flex-grow bg-white" />
             <button onclick="trackShipment()" class="btn bg-gradient-to-r from-yellow-400 to-yellow-300 text-black shadow font-semibold">
                 Lacak
             </button>
