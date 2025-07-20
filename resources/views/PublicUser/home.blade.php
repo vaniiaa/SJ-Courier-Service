@@ -403,7 +403,7 @@
                     document.getElementById('user_map').innerHTML = '<p class="text-center text-gray-500">Lokasi kurir belum tersedia atau tidak di-update.</p>';
                 }
 
-                shipmentStatusSpan.innerText = data.status || 'N/A';
+                shipmentStatusSpan.innerText = data.currentStatus || 'N/A';
                 lastTrackedAtSpan.innerText = data.last_tracked_at || 'N/A';
                 trackingResultDiv.classList.remove('hidden');
                 trackingErrorMessage.classList.add('hidden'); // Pastikan error disembunyikan jika sukses
