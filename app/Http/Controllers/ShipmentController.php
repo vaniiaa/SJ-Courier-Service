@@ -487,7 +487,7 @@ public function printResi($id)
         }
 
         // 2. Validasi Aturan Bisnis: Cek status saat ini
-        $cancellableStatuses = ['Menunggu Pembayaran', 'Menunggu Penjemputan', 'Kurir Belum Ditugaskan'];
+        $cancellableStatuses = ['Menunggu Pembayaran', 'Menunggu Penjemputan', 'Kurir Belum Ditugaskan', 'Menunggu Konfirmasi'];
         if (!in_array($shipment->currentStatus, $cancellableStatuses)) {
             return redirect()->route('user.daftar_pengiriman')->with('error', 'Pesanan tidak dapat dibatalkan karena sudah dalam proses pengiriman.');
         }
