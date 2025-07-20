@@ -305,6 +305,7 @@
         </div>
     </div>
 </div>
+</x-app-layout>
 <!--Footer-->
 <div class="w-full">
     <x-footer :menus="[
@@ -330,7 +331,6 @@
         ],
     ]" />
     </div>
-</x-app-layout>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

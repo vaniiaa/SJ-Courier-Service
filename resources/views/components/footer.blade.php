@@ -1,7 +1,7 @@
 @props(['menus' => [], 'year' => null])
 
-<footer class="bg-gradient-to-r from-[#FFA500] to-[#FFD45B] text-black mt-16">
-    <div class="max-w-screen-xl mx-auto py-10 px-4 flex flex-col md:flex-row justify-between space-y-8 md:space-y-0">
+<footer class="bg-gradient-to-r from-[#FFA500] to-[#FFD45B] text-black py-8 w-full p-10 rounded-t-xl">
+    <div class="max-w-screen-xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-4">
         <!-- Logo & Deskripsi -->
         <div>
             <img src="{{ asset('images/admin/logo.png') }}" alt="SJ Courier" class="h-10 mb-4">
