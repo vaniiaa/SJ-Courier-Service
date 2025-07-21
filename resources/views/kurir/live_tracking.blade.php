@@ -102,7 +102,7 @@
         .then(data => {
             statusMessage.textContent = 'Aktif';
             statusMessage.className = 'font-semibold text-green-600';
-            lastSentTime.textContent = new Date().toLocaleTimeString('id-ID');
+            lastSentTime.textContent = data.updated_at || new Date().toLocaleTimeString('id-ID');
         })
         .catch(err => {
             console.error('Gagal kirim lokasi:', err);

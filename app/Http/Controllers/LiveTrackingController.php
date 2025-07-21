@@ -92,13 +92,21 @@ class LiveTrackingController extends Controller
             $updated = $shipment->update([
                     'current_lat' => $request->lat,
                     'current_long' => $request->long,
-                    'last_tracked_at' => now(),
+                    'updated_at' => now(),
                 ]);
 
             if ($updated) {
-                return response()->json(['message' => 'Lokasi berhasil diperbarui']);
+                return response()->json([
+                    'message' => 'Lokasi berhasil diperbarui',
+                    'updated_at' => $shipment->updated_at
+                        ? \Carbon\Carbon::parse($shipment->updated_at)->setTimezone('Asia/Jakarta')->format('d M Y, H:i:s') . ' WIB'
+                        : 'N/A',]);
             } else {
-                return response()->json(['message' => 'Lokasi sudah terbaru atau tidak ada perubahan.']);
+                return response()->json([
+                    'message' => 'Lokasi sudah terbaru atau tidak ada perubahan.',
+                    'updated_at' => $shipment->updated_at
+                        ? \Carbon\Carbon::parse($shipment->updated_at)->setTimezone('Asia/Jakarta')->format('d M Y, H:i:s') . ' WIB'
+                        : 'N/A',]);
             }
 
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -144,8 +152,8 @@ class LiveTrackingController extends Controller
                 }
             }
 
-            $lastTrackedAt = $shipment->last_updated_at
-                ? Carbon::parse($shipment->last_updated_at)->setTimezone('Asia/Jakarta')->format('d M Y, H:i:s') . ' WIB'
+            $lastTrackedAt = $shipment->updated_at
+                ? Carbon::parse($shipment->updated_at)->setTimezone('Asia/Jakarta')->format('d M Y, H:i:s') . ' WIB'
                 : 'N/A';
 
             // Siapkan data detail untuk ditampilkan di frontend
@@ -162,14 +170,14 @@ class LiveTrackingController extends Controller
                     'status' => 'finished',
                     'message' => 'Pengiriman untuk nomor resi ini telah selesai.',
                     'shipment_status' => $shipment->currentStatus,
-                    'last_tracked_at' => $lastTrackedAt,
+                    'updated_at' => $lastTrackedAt,
                     'details' => $shipmentDetails,
                 ], 200);
             }
 
             // Cek apakah pelacakan live aktif
             $isTrackingActive = $shipment->current_lat && $shipment->current_long &&
-                                Carbon::parse($shipment->last_updated_at)->diffInMinutes(now()) < 5;
+                                Carbon::parse($shipment->updated_at)->diffInMinutes(now()) < 5;
 
             if ($isTrackingActive) {
                 // Jika pelacakan aktif, kirim lokasi.
@@ -178,7 +186,7 @@ class LiveTrackingController extends Controller
                     'lat' => $shipment->current_lat,
                     'long' => $shipment->current_long,
                     'shipment_status' => $shipment->currentStatus,
-                    'last_tracked_at' => $lastTrackedAt,
+                    'updated_at' => $lastTrackedAt,
                 ]);
             } else {
                 // Jika tidak aktif, kirim pesan informatif beserta detail pengiriman.
@@ -186,7 +194,7 @@ class LiveTrackingController extends Controller
                     'tracking_status' => 'inactive',
                     'message' => 'Pelacakan live akan aktif saat kurir sedang dalam perjalanan menuju lokasi Anda.',
                     'shipment_status' => $shipment->currentStatus,
-                    'last_tracked_at' => $lastTrackedAt,
+                    'updated_at' => $lastTrackedAt,
                     'details' => $shipmentDetails,
                 ]);
             }
@@ -213,7 +221,7 @@ class LiveTrackingController extends Controller
             }
 
             // Ambil semua pengiriman yang belum selesai dan memiliki lokasi
-            $shipments = Shipment::select('tracking_number', 'current_lat', 'current_long', 'currentStatus', 'last_updated_at')
+            $shipments = Shipment::select('tracking_number', 'current_lat', 'current_long', 'currentStatus', 'updated_at')
                                 ->whereNotIn(DB::raw('LOWER(TRIM(currentStatus))'), $this->finishedStatuses)
                                 ->whereNotNull('current_lat')
                                 ->whereNotNull('current_long')
@@ -226,8 +234,8 @@ class LiveTrackingController extends Controller
                         'lat' => $shipment->current_lat,
                         'long' => $shipment->current_long,
                         'status' => $shipment->currentStatus,
-                        'last_tracked_at' => $shipment->last_updated_at
-                            ? Carbon::parse($shipment->last_updated_at)->setTimezone('Asia/Jakarta')->format('d M Y, H:i:s') . ' WIB'
+                        'updated_at' => $shipment->updated_at
+                            ? Carbon::parse($shipment->updated_at)->setTimezone('Asia/Jakarta')->format('d M Y, H:i:s') . ' WIB'
                             : 'N/A',
                     ];
                 })
@@ -256,7 +264,7 @@ class LiveTrackingController extends Controller
             }
 
             // Ambil pengiriman milik customer yang login
-            $shipments = Shipment::select('tracking_number', 'current_lat', 'current_long', 'currentStatus', 'last_updated_at')
+            $shipments = Shipment::select('tracking_number', 'current_lat', 'current_long', 'currentStatus', 'updated_at')
                                 ->where('customer_id', Auth::id())
                                 ->whereNotNull('current_lat')
                                 ->whereNotNull('current_long')
@@ -269,8 +277,8 @@ class LiveTrackingController extends Controller
                         'lat' => $shipment->current_lat,
                         'long' => $shipment->current_long,
                         'status' => $shipment->currentStatus,
-                        'last_tracked_at' => $shipment->last_updated_at
-                            ? Carbon::parse($shipment->last_updated_at)->setTimezone('Asia/Jakarta')->format('d M Y, H:i:s') . ' WIB'
+                        'updated_at' => $shipment->updated_at
+                            ? Carbon::parse($shipment->updated_at)->setTimezone('Asia/Jakarta')->format('d M Y, H:i:s') . ' WIB'
                             : 'N/A',
                         'is_finished' => in_array(strtolower(trim($shipment->currentStatus)), $this->finishedStatuses)
                     ];
@@ -300,7 +308,7 @@ class LiveTrackingController extends Controller
             }
 
             // Ambil pengiriman yang ditugaskan ke kurir yang login
-            $shipments = Shipment::select('tracking_number', 'current_lat', 'current_long', 'currentStatus', 'last_updated_at')
+            $shipments = Shipment::select('tracking_number', 'current_lat', 'current_long', 'currentStatus', 'updated_at')
                                 ->where('courier_id', Auth::id())
                                 ->whereNotNull('current_lat')
                                 ->whereNotNull('current_long')
@@ -313,8 +321,8 @@ class LiveTrackingController extends Controller
                         'lat' => $shipment->current_lat,
                         'long' => $shipment->current_long,
                         'status' => $shipment->currentStatus,
-                        'last_tracked_at' => $shipment->last_updated_at
-                            ? Carbon::parse($shipment->last_updated_at)->setTimezone('Asia/Jakarta')->format('d M Y, H:i:s') . ' WIB'
+                        'updated_at' => $shipment->updated_at
+                            ? Carbon::parse($shipment->updated_at)->setTimezone('Asia/Jakarta')->format('d M Y, H:i:s') . ' WIB'
                             : 'N/A',
                         'is_finished' => in_array(strtolower(trim($shipment->currentStatus)), $this->finishedStatuses)
                     ];
