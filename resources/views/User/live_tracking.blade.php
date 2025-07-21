@@ -12,7 +12,7 @@
                 <div class="flex gap-2 flex-col md:flex-row">
                     <input type="text" id="user_tracking_number" placeholder="Masukkan Nomor Resi Anda"
                            class="input input-bordered w-full" />
-                    <button onclick="trackShipment()" class="btn bg-gradient-to-r from-yellow-400 to-yellow-300 text-black shadow font-semibold">
+                    <button id="track_btn" class="btn bg-gradient-to-r from-yellow-400 to-yellow-300 text-black shadow font-semibold">
                         Lacak
                     </button>
                     </div>
